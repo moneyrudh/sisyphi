@@ -7,15 +7,22 @@ public class Movement : MonoBehaviour
 {
     public InputActionReference movement;
     public InputActionReference jump;
+    public GameObject pushingColliders;
+    public Transform proximityCheck;
+    public Transform groundCheck;
+    public LayerMask groundLayer;
+    public LayerMask rockLayer;
+
+    private GameObject rock;
+
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
     public float groundCheckDistance = 0.1f;
-    public Transform groundCheck;
-    public LayerMask groundLayer;
     public float gravityMultiplier = 2.5f;
     public float fallMultiplier = 2.5f;
     public float rotationSpeed = 72f;
-
+    public float rotationSmoothTime = 0.1f;
+    private Vector3 currentRotationVelocity;
     private Vector2 moveDirection;
     private Rigidbody rb;
     private Animator animator;
@@ -40,6 +47,7 @@ public class Movement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        rock = GameObject.FindWithTag("Rock");
     }
 
     void Update()
@@ -47,6 +55,7 @@ public class Movement : MonoBehaviour
         moveDirection = movement.action.ReadValue<Vector2>();
         CheckGrounded();
         UpdateAnimator();
+        CheckRockProximity();
     }
 
     private void FixedUpdate()
@@ -60,10 +69,32 @@ public class Movement : MonoBehaviour
     {
         Vector3 movement = new Vector3(moveDirection.x, 0, moveDirection.y).normalized;
         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        if (pushing && moveDirection != Vector2.zero) {
+            rock.GetComponent<Rigidbody>().MovePosition(rock.GetComponent<Rigidbody>().position + movement * moveSpeed / 3f * Time.fixedDeltaTime);
+        }
     }
 
     private void Rotate() {
-        if (moveDirection != Vector2.zero) {
+        if (pushing) 
+        {
+            Vector3 relativePos = (rock.transform.position - transform.position).normalized;
+            // Quaternion toRotation = Quaternion.LookRotation(relativePos, Vector3.up);
+            // transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.fixedDeltaTime);
+
+            relativePos.y = 0;
+
+            Vector3 smoothedForward = Vector3.SmoothDamp(
+                transform.forward,
+                relativePos,
+                ref currentRotationVelocity,
+                rotationSmoothTime
+            );
+            
+            if (smoothedForward != Vector3.zero) {
+                transform.rotation = Quaternion.LookRotation(smoothedForward);
+            }
+        }
+        else if (moveDirection != Vector2.zero) {
             Quaternion toRotation = Quaternion.LookRotation(new Vector3(moveDirection.x, 0, moveDirection.y), Vector3.up);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.fixedDeltaTime);
         }
@@ -90,6 +121,20 @@ public class Movement : MonoBehaviour
         }
     }
 
+    private void CheckRockProximity()
+    {
+        if (Physics.Raycast(proximityCheck.position, transform.TransformDirection(Vector3.forward), 0.75f, rockLayer))
+        {
+            pushing = true;
+            pushingColliders.SetActive(true);
+        }
+        else
+        {
+            pushing = false;
+            pushingColliders.SetActive(false);
+        }
+    }
+
     private void ApplyGravity()
     {
         if (rb.velocity.y < 0)
@@ -105,10 +150,21 @@ public class Movement : MonoBehaviour
     private void UpdateAnimator()
     {
         bool isMoving = moveDirection.magnitude > 0.1f;
-        if (Input.GetKey(KeyCode.LeftShift) && !pushing) {
-            pushing = true;
-            animator.SetBool("pushing", pushing);
-            moveSpeed = 1.5f;
+        if (pushing && isGrounded) {
+            animator.SetBool("pushing", true);
+            if (Input.GetKey(KeyCode.LeftShift)) {
+                animator.SetBool("fast-push", true);
+                moveSpeed = 2.5f;
+            } else {
+                animator.SetBool("fast-push", false);
+                moveSpeed = 1.5f;
+            }
+            // if (moveDirection.x == 0) {
+            //     animator.SetBool("right", false);
+            // } else {
+            //     animator.SetBool("right", true);
+            //     animator.SetBool("pushing", pushing);
+            // }
             return;
         } 
         // if (!isMoving && pushing) {
@@ -116,14 +172,19 @@ public class Movement : MonoBehaviour
         //     animator.SetBool("pushing", pushing);
         //     moveSpeed = 5f;
         // }
-        if (Input.GetKeyUp(KeyCode.LeftShift) && pushing) {
-            pushing = false;
-            animator.SetBool("pushing", pushing);
-            moveSpeed = 5f;
-        }
-        
+
         if (!pushing) {
-            animator.SetBool("run", isMoving && isGrounded && !pushing);
+            animator.SetBool("pushing", pushing);
+            animator.SetBool("right", false);
+            if (Input.GetKey(KeyCode.LeftShift)) {
+                animator.SetBool("sprint", isMoving && isGrounded);
+                animator.SetBool("run", false);
+                moveSpeed = 7.5f;
+            } else {
+                animator.SetBool("run", isMoving && isGrounded);
+                animator.SetBool("sprint", false);
+                moveSpeed = 5f;
+            }
             animator.SetBool("isGrounded", isGrounded);
             animator.SetBool("idle", !isMoving && isGrounded && rb.velocity.x <= 0.1f);
         }
