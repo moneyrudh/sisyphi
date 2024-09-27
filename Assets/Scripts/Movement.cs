@@ -69,7 +69,7 @@ public class Movement : MonoBehaviour
     {
         Vector3 movement = new Vector3(moveDirection.x, 0, moveDirection.y).normalized;
         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-        if (pushing && moveDirection != Vector2.zero) {
+        if (pushing) {
             rock.GetComponent<Rigidbody>().MovePosition(rock.GetComponent<Rigidbody>().position + movement * moveSpeed / 3f * Time.fixedDeltaTime);
         }
     }
@@ -159,23 +159,17 @@ public class Movement : MonoBehaviour
                 animator.SetBool("fast-push", false);
                 moveSpeed = 1.5f;
             }
-            // if (moveDirection.x == 0) {
-            //     animator.SetBool("right", false);
-            // } else {
-            //     animator.SetBool("right", true);
-            //     animator.SetBool("pushing", pushing);
-            // }
+            if (!isMoving) {
+                animator.speed = 0.1f;
+            } else {
+                animator.speed = 1;
+            }
             return;
-        } 
-        // if (!isMoving && pushing) {
-        //     pushing = false;
-        //     animator.SetBool("pushing", pushing);
-        //     moveSpeed = 5f;
-        // }
+        }
 
+        animator.speed = 1;
         if (!pushing) {
             animator.SetBool("pushing", pushing);
-            animator.SetBool("right", false);
             if (Input.GetKey(KeyCode.LeftShift)) {
                 animator.SetBool("sprint", isMoving && isGrounded);
                 animator.SetBool("run", false);
@@ -185,7 +179,6 @@ public class Movement : MonoBehaviour
                 animator.SetBool("sprint", false);
                 moveSpeed = 5f;
             }
-            animator.SetBool("isGrounded", isGrounded);
             animator.SetBool("idle", !isMoving && isGrounded && rb.velocity.x <= 0.1f);
         }
     }
