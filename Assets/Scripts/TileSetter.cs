@@ -10,7 +10,7 @@ using System;
 public class TileSetter : MonoBehaviour
 {
     public GameObject tilePrefab;
-    public GameObject[] tileParents = new GameObject[16];
+    public GameObject[] tileParents = new GameObject[13];
     public TMP_InputField inputField;
     public float sizeMultiplier;
     private APIManager apiManager;

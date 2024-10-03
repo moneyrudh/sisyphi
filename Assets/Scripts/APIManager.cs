@@ -47,28 +47,54 @@ public class APIManager : MonoBehaviour
     public async Task<string> SendRequestToAnthropic(string setting)
     {
         string prompt = @"
-            I want you to generate a 2D 10x10 matrix populated with values 0-15. The values represent an element of an environment, like so:
+            I want you to generate a 2D 10x10 matrix populated with values 0-12. The values represent an element of an environment, like so:
 
             0: Grass
-            1: Grass
-            2: Flowers (type A)
-            3: Flowers (type B)
-            4: Bushes
-            5: Barren grass patch
-            6: Sand (or anything sand-related)
-            7: Rock
-            8: Tower
-            9: Fence
-            10: Tree
-            11: Water
-            12: House
-            13: House
-            14: House
-            15: Bomb
+            1: Flowers
+            2: Bushes
+            3: Barren grass patch
+            4: Sand
+            5: Rocks for a grassy terrain
+            6: Rocks for a sandy terrain
+            7: Tower
+            8: Fence
+            9: Tree
+            10: Water
+            11: House
+            12: Bomb
 
             Consider that this 10x10 grid will be used in Unity3D for a game. Each element of this 2D matrix represents a tile that will be replaced in-game based on its number.
-            Now, for the prompt """ + setting + @""", generate a 2D matrix with these values 0-15. Regardless of what the prompt asks for, make sure the values of the matrix are between 0-15 ONLY. If additional information is not specified about some remaining elements of the matrix, fill it by yourself by correlating it to the prompt. Your response should be only the 10x10 matrix and nothing else. Give it in a JSON string format without indentation under the key ""tiles"" with the value being the 2D array. DO NOT response with any other text.
+            Now, for the prompt """ + setting + @""", generate a 2D matrix with these values 0-12. Regardless of what the prompt asks for, make sure the values of the matrix are between 0-12 ONLY.
+            If additional information is not specified about some remaining elements of the matrix, fill it by yourself by correlating it to the prompt. Your response should be only the 10x10 matrix and nothing else. 
+            Give it in a JSON string format without indentation under the key ""tiles"" with the value being the 2D array. DO NOT response with any other text.
         ";
+
+        string promptWithPath = @"
+            I want you to generate a 2D 10x10 matrix populated with values 0-12. The values represent an element of an environment, like so:
+
+            0: Grass
+            1: Flowers
+            2: Bushes
+            3: Barren grass patch
+            4: Sand
+            5: Rocks for a grassy terrain
+            6: Rocks for a sandy terrain
+            7: Tower
+            8: Fence
+            9: Tree
+            10: Water
+            11: House
+            12: Bomb
+
+            Consider that this 10x10 grid will be used in Unity3D for a game. Each element of this 2D matrix represents a tile that will be replaced in-game based on its number.
+            Now, for the prompt """ + setting + "with a contiguous traversible path from row 0 to row 10 NOT obstructed by water, trees, towers, houses, or bombs along the path" + @""", generate a 2D matrix with these values 0-12. Regardless of what the prompt asks for, make sure the values of the matrix are between 0-12 ONLY.
+            Keep in mind that the movement of the player will be along the direction row 0 to row 10, so while generating this matrix, try to make sure there is at least one traversable path from row 0 to row 10.
+            A traversable path is a path that DOES NOT have any obstacles in it. Values 5, 6, 7, 8, 9, 10, 11, and 12 are considered obstacles.
+            This means that you will ensure there exists at least one path with values 0, 1, 2, 3, and/or 4 (depending on the environment of the setting) all the way from row 0 to row 10, which has a path width of 1 or 2 tiles.
+            If additional information is not specified about some remaining elements of the matrix, fill it by yourself by correlating it to the prompt. Your response should be only the 10x10 matrix and nothing else. 
+            Give it in a JSON string format without indentation under the key ""tiles"" with the value being the 2D array. DO NOT response with any other text.
+        ";
+        
         var anthropic = new Anthropic()
         {
             ApiKey = "KEY"
@@ -80,7 +106,7 @@ public class APIManager : MonoBehaviour
         {
             Model = Models.Claude3_5Sonnet,
             MaxTokens = 300,
-            Messages = new Message[] { new() { Role = "user", Content = prompt} }
+            Messages = new Message[] { new() { Role = "user", Content = prompt } }
         });
 
         // Debug.Log("Received response from Anthropic: " + message);
