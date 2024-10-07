@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WaterMat
+  m_Name: IceMat
   m_Shader: {fileID: 4800000, guid: 5da8b0368ef6e224f81430e29e23cd96, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -55,7 +55,7 @@ Material:
     m_Floats:
     - _Depth: 0.98
     - _DepthFalloff: -13
-    - _Distortion: 0.5
+    - _Distortion: 0
     - _Float0: 0.0192
     - _Float1: 0.85
     - _Float3: 0.9
@@ -75,10 +75,10 @@ Material:
     - _TessValue: 6
     - _WaterDepth: 0.99
     - _WaterFalloff: -10
-    - _WaterSmoothness: 1
+    - _WaterSmoothness: 3.25
     - _WaterSpecular: 0.3
-    - _WavesAmount: 8
-    - _WavesAmplitude: 0.1
+    - _WavesAmount: 0
+    - _WavesAmplitude: 0
     - __dirty: 0
     m_Colors:
     - _Color: {r: 0.4292453, g: 0.7559531, b: 1, a: 1}
