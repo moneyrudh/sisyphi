@@ -11,7 +11,7 @@ public class Movement : MonoBehaviour
     public Transform proximityCheck;
     public Transform groundCheck;
     public LayerMask groundLayer;
-    public LayerMask rockLayer;
+    public LayerMask boulderLayer;
 
     private GameObject rock;
 
@@ -123,7 +123,7 @@ public class Movement : MonoBehaviour
 
     private void CheckRockProximity()
     {
-        if (Physics.Raycast(proximityCheck.position, transform.TransformDirection(Vector3.forward), 0.75f, rockLayer))
+        if (Physics.Raycast(proximityCheck.position, transform.TransformDirection(Vector3.forward), 0.75f, boulderLayer))
         {
             pushing = true;
             pushingColliders.SetActive(true);

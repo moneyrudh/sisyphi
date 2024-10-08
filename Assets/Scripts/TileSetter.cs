@@ -126,6 +126,7 @@ public class TileSetter : MonoBehaviour
     private IEnumerator SetTiles(int[][] tiles)
     {
         float width = tilePrefab.GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+        const float demultiplier = 0.91f;
         for (int i = 0; i < tiles.Length; i++)
         {
             for (int j = 0; j < tiles[i].Length; j++)
@@ -141,14 +142,16 @@ public class TileSetter : MonoBehaviour
                     tile.transform.localScale = new Vector3(sizeMultiplier, sizeMultiplier, sizeMultiplier);
                     tile.transform.parent = tilesParent.transform;
                 }
-                curX += width * 0.91f;
+                curX += width * demultiplier;
             }
             curX = 0;
-            curZ += width * 0.91f;
+            curZ += width * demultiplier;
         }
         GameObject waterGO = Instantiate(WaterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         waterGO.SetActive(true);
         waterGO.transform.parent = tilesParent.transform;
+        waterGO.transform.GetChild(0).transform.localScale = new Vector3(sizeMultiplier * 2f, waterGO.transform.localScale.y, sizeMultiplier * 2f);
+        waterGO.transform.position = new Vector3((tiles.Length - 1) * demultiplier * (width / 2f), waterGO.transform.position.y, (tiles.Length - 1) * demultiplier * (width / 2f));
         isIce = false;
         isTilesSet = true;
         // isLoading = false;
