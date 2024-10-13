@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
-public class Movement : MonoBehaviour
+public class Movement : NetworkBehaviour
 {
     public InputActionReference movement;
     public InputActionReference jump;
@@ -31,16 +32,25 @@ public class Movement : MonoBehaviour
     private bool idle;
     private bool pushing;
 
-    private void OnEnable()
+    private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
+    private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
+
+    private void OnNetworkSpawn()
     {
-        movement.action.Enable();
-        jump.action.started += Jump;
+        if (IsOwner)
+        {
+            movement.action.Enable();
+            jump.action.started += Jump;
+        }
     }
 
-    private void OnDisable()
+    private void OnNetworkDespawn()
     {
-        movement.action.Disable();
-        jump.action.started -= Jump;
+        if (IsOwner)
+        {
+            movement.action.Disable();
+            jump.action.started -= Jump;
+        }
     }
 
     void Start()
@@ -52,29 +62,50 @@ public class Movement : MonoBehaviour
 
     void Update()
     {
-        moveDirection = movement.action.ReadValue<Vector2>();
-        CheckGrounded();
-        UpdateAnimator();
-        CheckRockProximity();
+        if (IsOwner)
+        {
+            moveDirection = movement.action.ReadValue<Vector2>();
+            CheckGrounded();
+            UpdateAnimator();
+            CheckRockProximity();
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.deltaTime * 10f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.deltaTime * 10f);
+        }
     }
 
     private void FixedUpdate()
     {
-        Move();
-        Rotate();
-        ApplyGravity();
+        if (IsOwner)
+        {
+            Move();
+            Rotate();
+            ApplyGravity();
+            UpdateNetworkPositionServerRpc(transform.position, transform.rotation);
+        }
+    }
+
+    [ServerRpc]
+    private void UpdateNetworkPositionServerRpc(Vector3 position, Quaternion rotation)
+    {
+        netPosition.Value = position;
+        netRotation.Value = rotation;
     }
 
     private void Move()
     {
+        if (!IsOwner) return;
         Vector3 movement = new Vector3(moveDirection.x, 0, moveDirection.y).normalized;
         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-        if (pushing) {
-            rock.GetComponent<Rigidbody>().MovePosition(rock.GetComponent<Rigidbody>().position + movement * moveSpeed / 3f * Time.fixedDeltaTime);
-        }
+        // if (pushing) {
+        //     rock.GetComponent<Rigidbody>().MovePosition(rock.GetComponent<Rigidbody>().position + movement * moveSpeed / 3f * Time.fixedDeltaTime);
+        // }
     }
 
     private void Rotate() {
+        if (!IsOwner) return;
         if (pushing) 
         {
             Vector3 relativePos = (rock.transform.position - transform.position).normalized;
@@ -102,6 +133,7 @@ public class Movement : MonoBehaviour
 
     private void Jump(InputAction.CallbackContext context)
     {
+        if (!IsOwner) return;
         if (isGrounded && !isJumping)
         {
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z); // Reset Y velocity

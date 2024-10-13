@@ -44,28 +44,29 @@ public class APIManager : MonoBehaviour
         }
     }
 
-    public async Task<string> SendRequestToAnthropic(string setting)
+    public async Task<string> SendRequestToAnthropic(string setting, int size)
     {
         string prompt = @"
-            I want you to generate a 2D 10x10 matrix populated with values 0-10. The values represent an element of an environment, like so:
+            I want you to generate a 2D 10x10 matrix populated with values 0-" + size.ToString() + @". The values represent an element of an environment, like so:
 
             0: Grass
             1: Flowers
-            2: Bushes
-            3: Barren grass patch
-            4: Sand
-            5: Rocks for a grassy terrain
-            6: Rocks for a sandy terrain
-            7: Fence
-            8: Tree
+            2: Sand
+            3: Rocks for a grassy terrain
+            4: Rocks for a sandy terrain
+            5: Trees for a grassy terrain
+            6: Trees for a sandy terrain
+            7: Logs for a grassy terrain
+            8: Logs for a sandy terrain
             9: Water
             10: Bomb
 
             Consider that this 10x10 grid will be used in Unity3D for a game. Each element of this 2D matrix represents a tile that will be replaced in-game based on its number.
-            Now, for the prompt """ + setting + @""", generate a 2D matrix with these values 0-10. Regardless of what the prompt asks for, make sure the values of the matrix are between 0-10 ONLY.
+            Now, for the prompt """ + setting + @""", generate a 2D matrix with these values 0-" + size.ToString() + @". Regardless of what the prompt asks for, make sure the values of the matrix are between 0-" + size.ToString() + @" ONLY.
             If additional information is not specified about some remaining elements of the matrix, fill it by yourself by correlating it to the prompt. Your response should be only the 10x10 matrix and nothing else. 
             Give it in a JSON string format without indentation under the key ""tiles"" with the value being the 2D array. DO NOT response with any other text.
         ";
+        Debug.Log(prompt);
 
         string promptWithPath = @"
             I want you to generate a 2D 10x10 matrix populated with values 0-12. The values represent an element of an environment, like so:

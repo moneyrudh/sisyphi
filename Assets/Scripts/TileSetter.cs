@@ -25,6 +25,7 @@ public class TileSetter : MonoBehaviour
     private Dictionary<string, float> originalWaterValues = new Dictionary<string, float>();
     // private bool isLoading = true;
     private GameObject tilesParent;
+    private GameObject initParent;
     // private int[][] tiles;
     public string anthropicResponse;
     // Start is called before the first frame update
@@ -42,6 +43,7 @@ public class TileSetter : MonoBehaviour
         }
 
         tilesParent = new GameObject("TilesParent");
+        initParent = new GameObject("InitParent");
         SetOriginalWaterValues();
         // apiManager.SendRequest("Ocean", HandleResponse);
         // StartCoroutine(CallAnthropicCoroutine(""));
@@ -56,6 +58,11 @@ public class TileSetter : MonoBehaviour
         //     curX = 0;
         //     curZ += width * 0.9f;
         // }
+        // Init ground with {"tiles":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}
+        float width = tilePrefab.GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+        string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
+        int[][] initTiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
+        StartCoroutine(SetTiles(initTiles, initParent, 0, 0 - width * 9));
     }
 
     // Update is called once per frame
@@ -77,7 +84,7 @@ public class TileSetter : MonoBehaviour
                 response = "{\"tiles\":[[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5]]}";
                 int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
                 // int[][] tiles = JsonConvert.DeserializeObject<int[][]>(response);
-                StartCoroutine(SetTiles(tiles));
+                StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
             }
             catch (System.Exception e)
             {
@@ -94,7 +101,7 @@ public class TileSetter : MonoBehaviour
     {
         try
         {
-            string response = await apiManager.SendRequestToAnthropic(setting);
+            string response = await apiManager.SendRequestToAnthropic(setting, tileParents.Length);
             Debug.Log("Response from Anthropic: " + response);
         }
         catch (Exception e)
@@ -109,9 +116,10 @@ public class TileSetter : MonoBehaviour
         {
             setting = "A circular pond surrounded by trees.";
             string response = @"{""tiles"":[[0,0,8,8,8,8,8,8,0,0],[0,8,8,9,9,9,9,8,8,0],[8,8,9,9,9,9,9,9,8,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,8,9,9,9,9,9,9,8,8],[0,8,8,9,9,9,9,8,8,0],[0,0,8,8,8,8,8,8,0,0]]}";
+            // string response = @"{""tiles"":[[2,2,2,2,2,2,2,2,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,2,2,2,2,2,2,2]]}";
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
             yield return null;
-            StartCoroutine(SetTiles(tiles));
+            StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
         }
         else
         {
@@ -119,12 +127,14 @@ public class TileSetter : MonoBehaviour
             yield return new WaitUntil(() => task.IsCompleted);
             Debug.Log(anthropicResponse);
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(anthropicResponse).tiles;
-            StartCoroutine(SetTiles(tiles));
+            StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
         }
     }
 
-    private IEnumerator SetTiles(int[][] tiles)
+    private IEnumerator SetTiles(int[][] tiles, GameObject parent, float x, float z)
     {
+        curX = x;
+        curZ = z;
         float width = tilePrefab.GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
         const float demultiplier = 0.91f;
         for (int i = 0; i < tiles.Length; i++)
@@ -140,7 +150,7 @@ public class TileSetter : MonoBehaviour
                     GameObject tilePrefab = tileParents[value].transform.GetChild(index).gameObject;
                     GameObject tile = Instantiate(tilePrefab, new Vector3(curX, curY, curZ), Quaternion.identity);
                     tile.transform.localScale = new Vector3(sizeMultiplier, sizeMultiplier, sizeMultiplier);
-                    tile.transform.parent = tilesParent.transform;
+                    tile.transform.parent = parent.transform;
                 }
                 curX += width * demultiplier;
             }
@@ -149,7 +159,7 @@ public class TileSetter : MonoBehaviour
         }
         GameObject waterGO = Instantiate(WaterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         waterGO.SetActive(true);
-        waterGO.transform.parent = tilesParent.transform;
+        waterGO.transform.parent = parent.transform;
         waterGO.transform.GetChild(0).transform.localScale = new Vector3(sizeMultiplier * 2f, waterGO.transform.localScale.y, sizeMultiplier * 2f);
         waterGO.transform.position = new Vector3((tiles.Length - 1) * demultiplier * (width / 2f), waterGO.transform.position.y, (tiles.Length - 1) * demultiplier * (width / 2f));
         isIce = false;
@@ -214,6 +224,13 @@ public class TileSetter : MonoBehaviour
         WaterMaterial.SetFloat("_WavesAmplitude", iceWavesAmplitude);
         WaterMaterial.SetFloat("_WavesAmount", iceWavesAmount);
 
+        Transform waterGO = tilesParent.transform.Find("WaterGO(Clone)");
+        if (waterGO == null)
+        {
+            Debug.LogError("Water not found");
+            RestoreOriginalWaterValues();
+            yield break;
+        }
         GameObject water = tilesParent.transform.Find("WaterGO(Clone)").GetChild(0).gameObject;
         if (water == null)
         {
