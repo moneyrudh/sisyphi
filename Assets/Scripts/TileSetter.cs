@@ -71,7 +71,7 @@ public class TileSetter : MonoBehaviour
         // if (isLoading) return;
         if (isTilesSet && !isIce && Input.GetKeyDown(KeyCode.Space))
         {
-            StartCoroutine(SetIce());
+            // StartCoroutine(SetIce());
         }
     }
 

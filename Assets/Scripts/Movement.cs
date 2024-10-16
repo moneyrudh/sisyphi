@@ -35,23 +35,41 @@ public class Movement : NetworkBehaviour
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
 
-    private void OnNetworkSpawn()
+    public void OnEnable()
     {
+        movement.action.Enable();
+        jump.action.started += Jump;
         if (IsOwner)
         {
-            movement.action.Enable();
-            jump.action.started += Jump;
         }
     }
 
-    private void OnNetworkDespawn()
+    public void OnDisable()
     {
+        movement.action.Disable();
+        jump.action.started -= Jump;
         if (IsOwner)
         {
-            movement.action.Disable();
-            jump.action.started -= Jump;
         }
     }
+
+    // private void OnNetworkSpawn()
+    // {
+    //     if (IsOwner)
+    //     {
+    //         movement.action.Enable();
+    //         jump.action.started += Jump;
+    //     }
+    // }
+
+    // private void OnNetworkDespawn()
+    // {
+    //     if (IsOwner)
+    //     {
+    //         movement.action.Disable();
+    //         jump.action.started -= Jump;
+    //     }
+    // }
 
     void Start()
     {
@@ -69,11 +87,11 @@ public class Movement : NetworkBehaviour
             UpdateAnimator();
             CheckRockProximity();
         }
-        else
-        {
-            transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.deltaTime * 10f);
-            transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.deltaTime * 10f);
-        }
+        // else
+        // {
+        //     transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.deltaTime * 10f);
+        //     transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.deltaTime * 10f);
+        // }
     }
 
     private void FixedUpdate()
@@ -83,7 +101,7 @@ public class Movement : NetworkBehaviour
             Move();
             Rotate();
             ApplyGravity();
-            UpdateNetworkPositionServerRpc(transform.position, transform.rotation);
+            // UpdateNetworkPositionServerRpc(transform.position, transform.rotation);
         }
     }
 
