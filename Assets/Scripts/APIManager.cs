@@ -12,7 +12,10 @@ public class APIManager : MonoBehaviour
     private const string URL = "https://aigame.engineering.nyu.edu/generate";
     public delegate void RequestCallback(bool success, string response);
     private ChatCompletionsApi chatCompletionsApi;
-    private readonly string apiKey = "KEY";
+    private readonly string OpenAIApiKey = "KEY";
+    private readonly string AnthropicApiKey = "KEY";
+    private readonly string GroqApiKey = "KEY";
+    private const string GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
     public void SendRequest(string prompt, RequestCallback callback)
     {
@@ -72,7 +75,7 @@ public class APIManager : MonoBehaviour
 
         try
         {
-            chatCompletionsApi = new(apiKey);
+            chatCompletionsApi = new(OpenAIApiKey);
             ChatCompletionsRequest chatCompletionsRequest = new ChatCompletionsRequest();
             chatCompletionsRequest.Model = "gpt-3.5-turbo";
             chatCompletionsRequest.MaxTokens = 600;
@@ -148,7 +151,7 @@ public class APIManager : MonoBehaviour
         try {
             var anthropic = new Anthropic()
             {
-                ApiKey = "KEY"
+                ApiKey = AnthropicApiKey
             };
 
             Debug.Log("Sending request to Anthropic");
@@ -175,8 +178,6 @@ public class APIManager : MonoBehaviour
         }
     }
 
-    private const string GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-    private readonly string groqApiKey = "KEY"; // Replace with your actual Groq API key
 
     [System.Serializable]
     private class GroqRequestBody
@@ -256,7 +257,7 @@ public class APIManager : MonoBehaviour
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Authorization", "Bearer " + groqApiKey);
+            request.SetRequestHeader("Authorization", "Bearer " + GroqApiKey);
 
             yield return request.SendWebRequest();
 

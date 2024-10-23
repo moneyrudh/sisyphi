@@ -608,7 +608,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: Chest_M
       parentName: Spine2_M
-      position: {x: -0.08937383, y: 3.1974422e-16, z: 2.0677903e-16}
+      position: {x: -0.08937383, y: 3.1974422e-16, z: 2.0674236e-16}
       rotation: {x: 0, y: 0, z: 0.046256915, w: 0.9989296}
       scale: {x: 1, y: 1, z: 1}
     - name: Neck_M

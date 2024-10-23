@@ -76,7 +76,6 @@ public class TileSetter : NetworkBehaviour
         string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
         int[][] initTiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
         // StartCoroutine(SetTiles(initTiles, initParent, 0, 0 - width * 9));
-
     }
 
     // Update is called once per frame
@@ -89,7 +88,7 @@ public class TileSetter : NetworkBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.P)) {
-            // SpawnNetworkObjectServerRpc(5, 0, -5, 0, 10);
+            SpawnNetworkObjectServerRpc(5, 0, 10, -1, 10, sizeMultiplier);
         }
     }
 

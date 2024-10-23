@@ -3693,6 +3693,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.4951734, y: -0.021778248, z: -0.00007315725}
     m_Extent: {x: 0.5072493, y: 0.16250014, z: 0.23951918}
   m_DirtyAABB: 0
+--- !u!1 &5346866847807493131
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7489287984856098926}
+  m_Layer: 0
+  m_Name: FarmPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7489287984856098926
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5346866847807493131}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.31, z: 0.63}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3742736202113095190}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5434609822505086661
 GameObject:
   m_ObjectHideFlags: 0
@@ -3986,6 +4017,7 @@ GameObject:
   - component: {fileID: 2134349123159761976}
   - component: {fileID: -2078974578330786735}
   - component: {fileID: -7565663241502737667}
+  - component: {fileID: 3629608946139005133}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -4012,6 +4044,7 @@ Transform:
   - {fileID: 6654591264043039490}
   - {fileID: 8560478710581063736}
   - {fileID: 2817456718215930386}
+  - {fileID: 7489287984856098926}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &3743273975912292817
@@ -4047,7 +4080,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3715926696
+  GlobalObjectIdHash: 2427064709
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4235,6 +4268,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TransitionStateInfoList: []
   m_Animator: {fileID: 3743273975912292817}
+--- !u!114 &3629608946139005133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5751469025688621471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a96e6c1f78a244bf8ad28686d698970, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  treeLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  farmPoint: {fileID: 7489287984856098926}
 --- !u!1 &6075755152283341952
 GameObject:
   m_ObjectHideFlags: 0

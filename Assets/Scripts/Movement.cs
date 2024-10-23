@@ -28,7 +28,7 @@ public class Movement : NetworkBehaviour
     private Rigidbody rb;
     private Animator animator;
     private bool isJumping;
-    private bool isGrounded;
+    public static bool isGrounded;
     private bool idle;
     private bool pushing;
 
