@@ -6,11 +6,20 @@ using UnityEngine.UI;
 using TMPro;
 using System.Threading.Tasks;
 using System;
+using Unity.Netcode;
 
-public class TileSetter : MonoBehaviour
+public class TileSetter : NetworkBehaviour
 {
-    public GameObject tilePrefab;
+    [System.Serializable]
+    public class TileGroup
+    {
+        public string name;
+        public List<GameObject> tiles;
+    }
+    public List<TileGroup> environmentTileGroups;
+
     public GameObject[] tileParents = new GameObject[13];
+    [SerializeField] private GameObject networkPrefab;
     public GameObject WaterPrefab;
     public Material WaterMaterial;
     public GameObject IcePrefab;
@@ -24,10 +33,14 @@ public class TileSetter : MonoBehaviour
     private bool isTilesSet = false;
     private Dictionary<string, float> originalWaterValues = new Dictionary<string, float>();
     // private bool isLoading = true;
-    private GameObject tilesParent;
+    [SerializeField] private GameObject tilesParent;
     private GameObject initParent;
     // private int[][] tiles;
     public string anthropicResponse;
+    public string openAIResponse;
+    public string grocResponse;
+
+    private bool isSetTilesParent = false;
     // Start is called before the first frame update
 
     void Start()
@@ -42,7 +55,7 @@ public class TileSetter : MonoBehaviour
             return;
         }
 
-        tilesParent = new GameObject("TilesParent");
+        // tilesParent = new GameObject("TilesParent");
         initParent = new GameObject("InitParent");
         SetOriginalWaterValues();
         // apiManager.SendRequest("Ocean", HandleResponse);
@@ -59,10 +72,11 @@ public class TileSetter : MonoBehaviour
         //     curZ += width * 0.9f;
         // }
         // Init ground with {"tiles":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}
-        float width = tilePrefab.GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+        float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
         string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
         int[][] initTiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
-        StartCoroutine(SetTiles(initTiles, initParent, 0, 0 - width * 9));
+        // StartCoroutine(SetTiles(initTiles, initParent, 0, 0 - width * 9));
+
     }
 
     // Update is called once per frame
@@ -73,26 +87,89 @@ public class TileSetter : MonoBehaviour
         {
             // StartCoroutine(SetIce());
         }
+
+        if (Input.GetKeyDown(KeyCode.P)) {
+            // SpawnNetworkObjectServerRpc(5, 0, -5, 0, 10);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnNetworkObjectServerRpc(int value, int index, float x, float y, float z, float sizeMultiplier)
+    {
+        if (value < 0 || value >= environmentTileGroups.Count)
+        {
+            Debug.LogError("Invalid value: " + value);
+            return;
+        }
+        if (index < 0 || index >= environmentTileGroups[value].tiles.Count)
+        {
+            Debug.LogError("Invalid index: " + index + " for value: " + value);
+            return;
+        }
+
+        NetworkObject tilesParentNetworkObject = null;
+        if (!isSetTilesParent) {
+            isSetTilesParent = true;
+            GameObject tilesParentGO = Instantiate(tilesParent, new Vector3(0, 0, 0), Quaternion.identity);
+            tilesParentNetworkObject = tilesParentGO.GetComponent<NetworkObject>();
+            if (tilesParentNetworkObject != null)
+            {
+                tilesParentNetworkObject.Spawn();
+                tilesParentNetworkObject.gameObject.name = "TilesParent";
+            }
+        }
+
+        GameObject childPrefabReference = environmentTileGroups[value].tiles[index];
+        GameObject spawnedObject = Instantiate(childPrefabReference, new Vector3(x, y, z), Quaternion.identity);
+        NetworkObject networkObject = spawnedObject.GetComponent<NetworkObject>();
+        spawnedObject.transform.localScale = new Vector3(sizeMultiplier, sizeMultiplier, sizeMultiplier);
+        spawnedObject.gameObject.name = environmentTileGroups[value].name + "_" + index;
+        if (networkObject != null)
+        {
+            networkObject.Spawn();
+            networkObject.transform.parent = GameObject.Find("TilesParent").transform;
+        }
+        // if (networkPrefab == null)
+        // {
+        //     Debug.LogError("Network prefab reference is null!");
+        //     return;
+        // }
+
+        // GameObject spawnedObject = Instantiate(networkPrefab, new Vector3(x, y, z), Quaternion.identity);
+        // NetworkObject networkObject = spawnedObject.GetComponent<NetworkObject>();
+        // if (networkObject != null)
+        // {
+        //     networkObject.Spawn();
+        // }
     }
 
     void HandleResponse(bool success, string response)
     {
+        // if (!IsServer) return;
         if (success)
         {
             try
             {
-                response = "{\"tiles\":[[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5]]}";
+                // response = "{\"tiles\":[[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5]]}";
                 int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
                 // int[][] tiles = JsonConvert.DeserializeObject<int[][]>(response);
-                StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+                // StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+                // SetTilesServerRpc(tiles, 0, 0);
+                StartCoroutine(SetNetworkTiles(tiles, 0, 0));
             }
             catch (System.Exception e)
             {
+                const string fallbackResponse = "{\"tiles\":[[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5]]}";
+                int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(fallbackResponse).tiles;
+                StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
                 Debug.LogError("Error while parsing response: " + e);
             }
         }
         else
         {
+            const string fallbackResponse = "{\"tiles\":[[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,4,4,3,2,5,5],[5,5,2,3,3,3,3,2,5,5],[5,5,2,2,2,2,2,2,5,5],[5,5,5,5,5,5,5,5,5,5],[5,5,5,5,5,5,5,5,5,5]]}";
+            int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(fallbackResponse).tiles;
+            StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
             Debug.LogError("Error while requesting model: " + response);
         }
     }
@@ -107,6 +184,19 @@ public class TileSetter : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError("Error while calling Anthropic: " + e);
+        }
+    }
+
+    public async Task CallOpenAI(string setting)
+    {
+        try
+        {
+            string response = await apiManager.SendRequestToOpenAI(setting, tileParents.Length);
+            Debug.Log("Response from OpenAI: " + response);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error while calling OpenAI: " + e);
         }
     }
 
@@ -131,11 +221,32 @@ public class TileSetter : MonoBehaviour
         }
     }
 
+    private IEnumerator CallOpenAICoroutine(string setting)
+    {
+        if (setting == "" || setting == null) 
+        {
+            setting = "A circular pond surrounded by trees.";
+            string response = @"{""tiles"":[[0,0,8,8,8,8,8,8,0,0],[0,8,8,9,9,9,9,8,8,0],[8,8,9,9,9,9,9,9,8,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,8,9,9,9,9,9,9,8,8],[0,8,8,9,9,9,9,8,8,0],[0,0,8,8,8,8,8,8,0,0]]}";
+            // string response = @"{""tiles"":[[2,2,2,2,2,2,2,2,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,2,2,2,2,2,2,2]]}";
+            int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
+            yield return null;
+            StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+        }
+        else
+        {
+            Task task = CallOpenAI(setting);
+            yield return new WaitUntil(() => task.IsCompleted);
+            Debug.Log(openAIResponse);
+            int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(openAIResponse).tiles;
+            StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+        }
+    }
+
     private IEnumerator SetTiles(int[][] tiles, GameObject parent, float x, float z)
     {
         curX = x;
         curZ = z;
-        float width = tilePrefab.GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+        float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
         const float demultiplier = 0.91f;
         for (int i = 0; i < tiles.Length; i++)
         {
@@ -167,6 +278,76 @@ public class TileSetter : MonoBehaviour
         // isLoading = false;
     }
 
+    private IEnumerator SetNetworkTiles(int[][] tiles, float x, float z)
+    {
+        Transform parent = tilesParent.transform;
+        curX = x;
+        curZ = z;
+        float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+        const float demultiplier = 0.91f;
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            for (int j = 0; j < tiles[i].Length; j++)
+            {
+                yield return null;
+                int value = tiles[i][j];
+                if (value != 9)
+                {
+                    // int count = tileParents[value].transform.childCount;
+                    int count = environmentTileGroups[value].tiles.Count;
+                    int index = UnityEngine.Random.Range(0, count-1);
+                    // Debug.Log("" "Index: " + index);
+                    // SetGOServerRpc(value, index, curX, curY, curZ);
+                    SpawnNetworkObjectServerRpc(value, index, curX, curY, curZ, sizeMultiplier);
+                    // GameObject tilePrefab = tileParents[value].transform.GetChild(index).gameObject;
+                    // GameObject tile = Instantiate(tilePrefab, new Vector3(curX, curY, curZ), Quaternion.identity);
+                    // tile.transform.localScale = new Vector3(sizeMultiplier, sizeMultiplier, sizeMultiplier);
+                    // tile.transform.parent = parent.transform;
+                }
+                curX += width * demultiplier;
+            }
+            curX = 0;
+            curZ += width * demultiplier;
+        }
+        GameObject waterGO = Instantiate(WaterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        waterGO.SetActive(true);
+        // waterGO.transform.parent = parent.transform;
+        waterGO.transform.GetChild(0).transform.localScale = new Vector3(sizeMultiplier * 2f, waterGO.transform.localScale.y, sizeMultiplier * 2f);
+        waterGO.transform.position = new Vector3((tiles.Length - 1) * demultiplier * (width / 2f), waterGO.transform.position.y, (tiles.Length - 1) * demultiplier * (width / 2f));
+        isIce = false;
+        isTilesSet = true;
+        // isLoading = false;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SetGOServerRpc(int value, int index, float x, float y, float z)
+    {
+        SetGOClientRpc(value, index, x, y, z);
+    }
+
+    [ClientRpc]
+    public void SetGOClientRpc(int value, int index, float x, float y, float z)
+    {
+        GameObject parent = tilesParent;
+        GameObject tilePrefab = tileParents[value].transform.GetChild(index).gameObject;
+        GameObject tile = Instantiate(tilePrefab, new Vector3(x, y, z), Quaternion.identity);
+        tile.transform.localScale = new Vector3(sizeMultiplier, sizeMultiplier, sizeMultiplier);
+        tile.transform.parent = parent.transform;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SetTilesServerRpc(int[][] tiles, float x, float z)
+    {
+        // SetTilesClientRpc(tiles, x, z);
+        StartCoroutine(SetNetworkTiles(tiles, x, z));
+    }
+
+    [ClientRpc]
+    public void SetTilesClientRpc(int[][] tiles, float x, float z)
+    {
+        StartCoroutine(SetNetworkTiles(tiles, x, z));
+    }
+
     public void RestartScene() {
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
@@ -183,7 +364,8 @@ public class TileSetter : MonoBehaviour
         }
         Debug.Log("Generating map with text: " + inputField.text);
         // apiManager.SendRequest(inputField.text, HandleResponse);
-        StartCoroutine(CallAnthropicCoroutine(inputField.text));
+        apiManager.SendRequestToGroq(inputField.text, tileParents.Length, HandleResponse);
+        // StartCoroutine(CallGrocCoroutine(inputField.text));
     }
 
     private IEnumerator SetIce()
