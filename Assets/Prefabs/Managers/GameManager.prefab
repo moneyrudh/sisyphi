@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3932127849
+  GlobalObjectIdHash: 3953791312
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -137,6 +137,13 @@ MonoBehaviour:
   - name: Bomb
     tiles:
     - {fileID: 2167601141956382864, guid: 4d3948131f5914f889fded2cba85f4a5, type: 3}
+  logs:
+  - wood: 1
+    log: {fileID: 671629856029042925, guid: 00a0d2e59d1c749e3893bbc559a6db8d, type: 3}
+  - wood: 2
+    log: {fileID: 1685947531291783314, guid: 831c82c07fb3845a0a36f50406fec248, type: 3}
+  - wood: 3
+    log: {fileID: 1254620803359304976, guid: eace3d34761a74092a05fcec7b178507, type: 3}
   tileParents:
   - {fileID: 0}
   - {fileID: 0}
@@ -159,6 +166,7 @@ MonoBehaviour:
   anthropicResponse: 
   openAIResponse: 
   grocResponse: 
+  apiProvider: 2
 --- !u!114 &8996924889675245924
 MonoBehaviour:
   m_ObjectHideFlags: 0

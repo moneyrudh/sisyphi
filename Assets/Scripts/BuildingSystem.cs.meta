@@ -1,10 +1,9 @@
 fileFormatVersion: 2
-guid: 859cdf6c874824640b0ee665e66fdcd9
+guid: 13ea07336b72a496e8607c6e87e5d25b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences:
-  - onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: aed12c224fbc8704d8eaa07a52e88f44, type: 3}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

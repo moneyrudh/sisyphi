@@ -24,7 +24,7 @@ public class Movement : NetworkBehaviour
     public float rotationSpeed = 72f;
     public float rotationSmoothTime = 0.1f;
     private Vector3 currentRotationVelocity;
-    private Vector2 moveDirection;
+    [System.NonSerialized] public Vector2 moveDirection;
     private Rigidbody rb;
     private Animator animator;
     private bool isJumping;

@@ -4018,6 +4018,8 @@ GameObject:
   - component: {fileID: -2078974578330786735}
   - component: {fileID: -7565663241502737667}
   - component: {fileID: 3629608946139005133}
+  - component: {fileID: 2211036979320679271}
+  - component: {fileID: -895039447018581072}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -4080,7 +4082,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2427064709
+  GlobalObjectIdHash: 3715926696
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4114,7 +4116,7 @@ MonoBehaviour:
     m_Bits: 128
   moveSpeed: 5
   jumpForce: 5
-  groundCheckDistance: 0.1
+  groundCheckDistance: 0.2
   gravityMultiplier: 3
   fallMultiplier: 3
   rotationSpeed: 500
@@ -4193,7 +4195,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.28
   m_Height: 1.78
@@ -4284,6 +4286,46 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   farmPoint: {fileID: 7489287984856098926}
+--- !u!65 &2211036979320679271
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5751469025688621471}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.45, y: 1.78, z: 0.37}
+  m_Center: {x: 0, y: 0.93, z: 0}
+--- !u!114 &-895039447018581072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5751469025688621471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ea07336b72a496e8607c6e87e5d25b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snapDistance: 1
+  maxBuildDistance: 5
+  tileLayer:
+    serializedVersion: 2
+    m_Bits: 264
+  rampPrefab: {fileID: 3166283859120847890, guid: 0ae00ae7119e24cf8912efb3f4f308ab, type: 3}
+  rampGhostPrefab: {fileID: 3166283859120847890, guid: ee233b3f2bb7d40b3870cfa9452a57c2, type: 3}
 --- !u!1 &6075755152283341952
 GameObject:
   m_ObjectHideFlags: 0
@@ -4970,7 +5012,7 @@ Transform:
   m_GameObject: {fileID: 6798716122349789597}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 0, y: 1.733, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5771,7 +5813,7 @@ Transform:
   m_GameObject: {fileID: 8200403549697412414}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.0564, z: 0}
+  m_LocalPosition: {x: 0, y: 0.099, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -6,6 +6,7 @@ using Unity.Netcode;
 public class PlayerFarm : NetworkBehaviour
 {
     private Animator animator;
+    private Movement movement;
     private float farmRange = 0.5f;
     [SerializeField] private LayerMask treeLayer;
     [SerializeField] private Transform farmPoint;
@@ -15,15 +16,23 @@ public class PlayerFarm : NetworkBehaviour
     private void Start()
     {
         animator = GetComponent<Animator>();
+        movement = GetComponent<Movement>();
     }
 
     void Update()
     {
         if (!IsOwner) return;
 
-        if (Input.GetMouseButtonDown(0) && !isFarming && Movement.isGrounded)
+        if (movement.moveDirection.magnitude < 0.1f && Input.GetMouseButton(0) && !isFarming && Movement.isGrounded)
         {
-            StartCoroutine(PerformFarmRoutine());
+            // StartCoroutine(PerformFarmRoutine());
+            isFarming = true;
+            animator.SetTrigger("farm");
+        }
+
+        if (movement.moveDirection.magnitude > 0.1f)
+        {
+            isFarming = false;
         }
     }
 
@@ -32,21 +41,34 @@ public class PlayerFarm : NetworkBehaviour
         Gizmos.DrawWireSphere(farmPoint.position, farmRange);
     }
 
+    public void StartFarm()
+    {
+        // Debug.Log("Start Farming");
+    }
+
+    public void StopFarm()
+    {
+        isFarming = false;
+        // Debug.Log("Stop Farming");
+    }
+
     IEnumerator PerformFarmRoutine()
     {
-        isFarming = true;
-        animator.SetTrigger("farm");
-        Debug.Log("Farming");
-        yield return new WaitForSeconds(0.5f);
+        yield return null;
+        // isFarming = true;
+        // animator.SetTrigger("farm");
+        // Debug.Log("Farming");
+        // yield return new WaitForSeconds(0.1f);
 
-        CheckHit();
+        // CheckHit();
 
-        yield return new WaitForSeconds(0.3f);
-        isFarming = false;
+        // yield return new WaitForSeconds(0.4f);
+        // isFarming = false;
     }
 
     void CheckHit()
     {
+        Debug.Log("Checking hit");
         Collider[] hitColliders = Physics.OverlapSphere(
             farmPoint.position,
             farmRange,

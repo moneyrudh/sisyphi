@@ -364,6 +364,8 @@ GameObject:
   - component: {fileID: 956195671692201421}
   - component: {fileID: 1602254241450251877}
   - component: {fileID: 677399297375895243}
+  - component: {fileID: 4824457651677172162}
+  - component: {fileID: 910102633118572550}
   m_Layer: 8
   m_Name: 1
   m_TagString: Untagged
@@ -473,6 +475,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859cdf6c874824640b0ee665e66fdcd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: aed12c224fbc8704d8eaa07a52e88f44, type: 3}
 --- !u!65 &677399297375895243
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -494,6 +497,56 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 2, z: 2}
   m_Center: {x: 0, y: 2, z: 0}
+--- !u!114 &4824457651677172162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576746246073761970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 929c1dc767a6e49cbb45ed1095b5456e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  edges:
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+--- !u!65 &910102633118572550
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576746246073761970}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.2, y: 0.44000036, z: 2.2}
+  m_Center: {x: 0, y: 0.78, z: -0.00000011920929}
 --- !u!1 &1822422685835286037
 GameObject:
   m_ObjectHideFlags: 0
@@ -744,6 +797,7 @@ GameObject:
   - component: {fileID: 7125601863804683670}
   - component: {fileID: 6812007398208093084}
   - component: {fileID: 7086285994522148472}
+  - component: {fileID: 7473014724577059054}
   m_Layer: 0
   m_Name: Tree_10
   m_TagString: Untagged
@@ -838,6 +892,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300024, guid: 73f90bdd5e7539740a292cdd00817d1a, type: 3}
+--- !u!114 &7473014724577059054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3980880964339369953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 3
 --- !u!1 &6830633822522182821
 GameObject:
   m_ObjectHideFlags: 0
