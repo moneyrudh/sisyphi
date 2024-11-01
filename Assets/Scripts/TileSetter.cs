@@ -194,7 +194,8 @@ public class TileSetter : NetworkBehaviour
             // string response = @"{""tiles"":[[2,2,2,2,2,2,2,2,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,2,2,2,2,2,2,2]]}";
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
             yield return null;
-            StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+            // StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+            StartCoroutine(SetNetworkTiles(tiles, 0, 0));
         }
         else
         {
@@ -202,7 +203,8 @@ public class TileSetter : NetworkBehaviour
             yield return new WaitUntil(() => task.IsCompleted);
             Debug.Log(anthropicResponse);
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(anthropicResponse).tiles;
-            StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+            // StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+            StartCoroutine(SetNetworkTiles(tiles, 0, 0));
         }
     }
 
@@ -215,7 +217,8 @@ public class TileSetter : NetworkBehaviour
             // string response = @"{""tiles"":[[2,2,2,2,2,2,2,2,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,2,2,2,2,2,2,2]]}";
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
             yield return null;
-            StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+            // StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
+            StartCoroutine(SetNetworkTiles(tiles, 0, 0));
         }
         else
         {
@@ -299,11 +302,11 @@ public class TileSetter : NetworkBehaviour
             curX = 0;
             curZ += width * demultiplier;
         }
-        GameObject waterGO = Instantiate(WaterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        waterGO.SetActive(true);
-        // waterGO.transform.parent = parent.transform;
-        waterGO.transform.GetChild(0).transform.localScale = new Vector3(sizeMultiplier * 2f, waterGO.transform.localScale.y, sizeMultiplier * 2f);
-        waterGO.transform.position = new Vector3((tiles.Length - 1) * demultiplier * (width / 2f), waterGO.transform.position.y, (tiles.Length - 1) * demultiplier * (width / 2f));
+        // GameObject waterGO = Instantiate(WaterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        // waterGO.SetActive(true);
+        // // waterGO.transform.parent = parent.transform;
+        // waterGO.transform.GetChild(0).transform.localScale = new Vector3(sizeMultiplier * 2f, waterGO.transform.localScale.y, sizeMultiplier * 2f);
+        // waterGO.transform.position = new Vector3((tiles.Length - 1) * demultiplier * (width / 2f), waterGO.transform.position.y, (tiles.Length - 1) * demultiplier * (width / 2f));
         isIce = false;
         isTilesSet = true;
         // isLoading = false;

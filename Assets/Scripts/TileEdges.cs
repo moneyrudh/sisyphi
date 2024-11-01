@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public enum EdgeDirection
 {
@@ -19,22 +20,74 @@ public class TileEdge
     public bool isOccupied;
 }
 
-public class TileEdges : MonoBehaviour
+public class TileEdges : NetworkBehaviour
 {
     public TileEdge[] edges = new TileEdge[4];
     private float sizeMultiplier = 2f;
     private float demultiplier = 0.91f;
 
-    private void Awake()
+    // private void Awake()
+    // {
+    //     InitializeEdges();
+    // }
+
+    public override void OnNetworkSpawn()
     {
-        InitializeEdges();
+        base.OnNetworkSpawn();
+        if (IsServer)
+        {
+            InitializeEdges();
+        }
     }
 
     private void InitializeEdges()
     {
         Vector3 tilePos = transform.position;
         float tileSize = GetComponent<Renderer>().bounds.size.x * sizeMultiplier * demultiplier;
-        float halfSize = tileSize / 2f;
+        float halfSize = tileSize / 4f;
+
+        // North
+        edges[0] = new TileEdge
+        {
+            startPoint = new Vector3(tilePos.x - halfSize, tilePos.y + halfSize, tilePos.z + halfSize),
+            endPoint = new Vector3(tilePos.x + halfSize, tilePos.y + halfSize, tilePos.z + halfSize),
+            direction = EdgeDirection.North
+        };
+
+        // East
+        edges[1] = new TileEdge
+        {
+            startPoint = new Vector3(tilePos.x + halfSize, tilePos.y + halfSize, tilePos.z + halfSize),
+            endPoint = new Vector3(tilePos.x + halfSize, tilePos.y + halfSize, tilePos.z - halfSize),
+            direction = EdgeDirection.East
+        };
+
+        // South
+        edges[2] = new TileEdge
+        {
+            startPoint = new Vector3(tilePos.x - halfSize, tilePos.y + halfSize, tilePos.z - halfSize),
+            endPoint = new Vector3(tilePos.x + halfSize, tilePos.y + halfSize, tilePos.z - halfSize),
+            direction = EdgeDirection.South
+        };
+
+        // West
+        edges[3] = new TileEdge
+        {
+            startPoint = new Vector3(tilePos.x - halfSize, tilePos.y + halfSize, tilePos.z - halfSize),
+            endPoint = new Vector3(tilePos.x - halfSize, tilePos.y + halfSize, tilePos.z + halfSize),
+            direction = EdgeDirection.West
+        };
+
+        if (IsServer)
+        {
+            SyncEdgesClientRpc(tilePos, halfSize);
+        }
+    }
+
+    [ClientRpc]
+    private void SyncEdgesClientRpc(Vector3 tilePos, float halfSize)
+    {
+        if (IsHost) return;
 
         // North
         edges[0] = new TileEdge

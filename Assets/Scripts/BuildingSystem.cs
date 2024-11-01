@@ -22,32 +22,27 @@ public class BuildingSystem : NetworkBehaviour
 
     private Movement movement;
     
-    // Start is called before the first frame update
-    void Start()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+        Debug.Log($"BuildingSystem spawned - IsHost: {IsHost} | IsClient: {IsClient} | IsOwner: {IsOwner} | IsServer: {IsServer}");
+    
+        if (IsOwner)
+        {
+            InitializePreview();
+        }
+    }
+    // Start is called before the first frame update
+    private void InitializePreview()
+    {
+        Debug.Log("Initialize Preview");
         mainCamera = Camera.main;
         rampPreview = Instantiate(rampGhostPrefab);
         if (rampPreview != null)
         {
-            // Make it semi-transparent for debugging
-            var renderers = rampPreview.GetComponentsInChildren<Renderer>();
-            foreach (var renderer in renderers)
-            {
-                Material previewMaterial = new Material(renderer.material);
-                previewMaterial.color = new Color(1f, 1f, 0f, 0.5f); // Yellow semi-transparent
-                renderer.material = previewMaterial;
-            }
-            
-            // For debugging, we'll keep it visible
             rampPreview.SetActive(true);
             rampPreviewComponent = rampPreview.GetComponent<RampObject>();
             
-            // Ensure it doesn't have a NetworkObject component
-            NetworkObject netObj = rampPreview.GetComponent<NetworkObject>();
-            if (netObj != null)
-            {
-                Destroy(netObj);
-            }
         }
 
         movement = GetComponent<Movement>();
@@ -56,7 +51,7 @@ public class BuildingSystem : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        // if (!IsOwner) return;
+        if (!IsOwner) return;
 
         if (Input.GetKeyDown(KeyCode.B))
         {
@@ -69,12 +64,14 @@ public class BuildingSystem : NetworkBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
-            // TryPlaceRamp();
+            TryPlaceRamp();
         }
     }
 
     private void HandleMouseDetection()
     {
+        if (!IsOwner) return;
+
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
@@ -93,6 +90,7 @@ public class BuildingSystem : NetworkBehaviour
             TileEdges tile = hit.collider.GetComponent<TileEdges>();
             if (tile != null)
             {
+                // Debug.Log($"[{Time.frameCount}] FindClosestEdge called by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner}");
                 FindClosestEdge(tile, hit.point);
             }
         }
@@ -114,6 +112,7 @@ public class BuildingSystem : NetworkBehaviour
 
             float distance = PointToLineDistance(hitPoint, edge.startPoint, edge.endPoint);
 
+            // Debug.Log("Tryna find closest edge by: " + (IsHost ? "Host" : "Client") + " | IsOwner: " + IsOwner + " | Distance: " + distance);
             if (distance < closestDistance)
             {
                 closestDistance = distance;
@@ -126,6 +125,7 @@ public class BuildingSystem : NetworkBehaviour
         {
             if (currentEdge != closestEdge)
             {
+                // Debug.Log($"[{Time.frameCount}] Found closest edge by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner}");
                 currentEdge = closestEdge;
                 UpdateRampPreview(closestEdge);
             }
@@ -154,15 +154,14 @@ public class BuildingSystem : NetworkBehaviour
 
     private void UpdateRampPreview(TileEdge edge)
     {
+        // Debug.Log($"UpdateRampPreview called by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner} | IsServer: {IsServer} | IsClient: {IsClient}");
+    
         if (rampPreview == null) return;
 
         rampPreview.SetActive(true);
 
         Vector3 position = (edge.startPoint + edge.endPoint) / 2f;
         Quaternion rotation = GetRampRotation(edge.direction);
-        Debug.Log("Edge Direction: " + edge.direction);
-        Debug.Log("Position: " + position);
-        Debug.Log("Rotation: " + rotation.eulerAngles);
         rampPreview.transform.position = position;
         rampPreview.transform.rotation = rotation;
     }
@@ -184,45 +183,58 @@ public class BuildingSystem : NetworkBehaviour
         }
     }
 
-    // private void TryPlaceRamp()
-    // {
-    //     if (currentEdge == null) return;
-
-    //     // Check if player has enough wood
-
-    //     // Check movement related logic
-
-    //     PlaceRampServerRpc(
-    //         rampPreview.transform.position,
-    //         rampPreview.transform.rotation,
-    //         NetworkBehaviourReference.Create(currentEdge.GetComponent<NetworkBehaviour>())
-    //     );
-    // }
-
-    [ServerRpc]
-    private void PlaceRampServerRpc(Vector3 position, Quaternion rotation, NetworkBehaviourReference edgeRef)
+    private void TryPlaceRamp()
     {
+        if (currentEdge == null) return;
+
+        // Check if player has enough wood
+
+        // Check movement related logic
+
+        PlaceRampServerRpc(
+            rampPreview.transform.position,
+            rampPreview.transform.rotation,
+            currentEdge.startPoint,
+            currentEdge.endPoint,
+            currentEdge.direction
+        );
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaceRampServerRpc(Vector3 position, Quaternion rotation, Vector3 edgeStart, Vector3 edgeEnd, EdgeDirection direction)
+    {
+        Debug.Log($"PlaceRampServerRpc called by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner} | IsServer: {IsServer} | IsClient: {IsClient}");
         GameObject ramp = Instantiate(rampPrefab, position, rotation);
         NetworkObject networkObject = ramp.GetComponent<NetworkObject>();
         networkObject.Spawn();
 
-        if (edgeRef.TryGet(out NetworkBehaviour edge))
-        {
-            // UpdateEdgeStateClientRpc(NetworkBehaviourReference.Create(edge));
-        }
+        UpdateEdgeStateClientRpc(edgeStart, edgeEnd, direction);
+        // if (edgeRef.TryGet(out NetworkBehaviour edge))
+        // {
+        // }
 
         // Update inventory
     }
 
     [ClientRpc]
-    private void UpdateEdgeStateClientRpc(NetworkBehaviourReference edgeRef)
+    private void UpdateEdgeStateClientRpc(Vector3 edgeStart, Vector3 edgeEnd, EdgeDirection direction)
     {
-        if (edgeRef.TryGet(out NetworkBehaviour edgeBehaviour))
+        Collider[] colliders = Physics.OverlapSphere(edgeStart, 0.1f, tileLayer);
+        foreach (Collider collider in colliders)
         {
-            TileEdge edge = edgeBehaviour.GetComponent<TileEdge>();
-            if (edge != null)
+            TileEdges tile = collider.GetComponent<TileEdges>();
+            if (tile != null)
             {
-                edge.isOccupied = true;
+                foreach (TileEdge edge in tile.edges)
+                {
+                    if (Vector3.Distance(edge.startPoint, edgeStart) < 0.1f &&
+                        Vector3.Distance(edge.endPoint, edgeEnd) < 0.1f &&
+                        edge.direction == direction)
+                    {
+                        edge.isOccupied = true;
+                        break;
+                    }
+                }
             }
         }
     }
