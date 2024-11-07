@@ -6,6 +6,7 @@ using Unity.Netcode;
 
 public class Movement : NetworkBehaviour
 {
+    [Header("References")]
     public InputActionReference movement;
     public InputActionReference jump;
     public GameObject pushingColliders;
@@ -16,16 +17,22 @@ public class Movement : NetworkBehaviour
 
     private GameObject rock;
 
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
+    public float sprintMultiplier = 1.5f;
+    public float pushSpeed = 1.5f;
     public float jumpForce = 5f;
+    public float rotationSpeed = 72f;
+    public float rotationFromCameraSpeed = 10f;
     public float groundCheckDistance = 0.1f;
     public float gravityMultiplier = 2.5f;
     public float fallMultiplier = 2.5f;
-    public float rotationSpeed = 72f;
     public float rotationSmoothTime = 0.1f;
     private Vector3 currentRotationVelocity;
     [System.NonSerialized] public Vector2 moveDirection;
     private Rigidbody rb;
+    private Camera playerCamera;
+    private CameraController cameraController;
     private Animator animator;
     private bool isJumping;
     public static bool isGrounded;
@@ -53,29 +60,32 @@ public class Movement : NetworkBehaviour
         }
     }
 
-    // private void OnNetworkSpawn()
-    // {
-    //     if (IsOwner)
-    //     {
-    //         movement.action.Enable();
-    //         jump.action.started += Jump;
-    //     }
-    // }
-
-    // private void OnNetworkDespawn()
-    // {
-    //     if (IsOwner)
-    //     {
-    //         movement.action.Disable();
-    //         jump.action.started -= Jump;
-    //     }
-    // }
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            base.OnNetworkSpawn();
+            Debug.Log("Calling TileSetter");
+            FindObjectOfType<TileSetter>().SetInitialGrid();
+        }
+    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        cameraController = GetComponent<CameraController>();
         rock = GameObject.FindWithTag("Rock");
+        if (IsOwner)
+        {
+            StartCoroutine(WaitForCamera());
+        }
+    }
+
+    private System.Collections.IEnumerator WaitForCamera()
+    {
+        yield return new WaitForEndOfFrame();
+        playerCamera = GameObject.Find($"PlayerCamera_{OwnerClientId}")?.GetComponent<Camera>();
     }
 
     void Update()
@@ -96,11 +106,13 @@ public class Movement : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (IsOwner)
+        if (IsOwner) 
         {
-            Move();
-            Rotate();
+            // Move();
+            MoveRelativeToCamera();
+            // Rotate();
             ApplyGravity();
+            CheckPushing();
             // UpdateNetworkPositionServerRpc(transform.position, transform.rotation);
         }
     }
@@ -115,11 +127,56 @@ public class Movement : NetworkBehaviour
     private void Move()
     {
         if (!IsOwner) return;
+        if (playerCamera == null) return;
+
         Vector3 movement = new Vector3(moveDirection.x, 0, moveDirection.y).normalized;
         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
         // if (pushing) {
         //     rock.GetComponent<Rigidbody>().MovePosition(rock.GetComponent<Rigidbody>().position + movement * moveSpeed / 3f * Time.fixedDeltaTime);
         // }
+    }
+
+    private void MoveRelativeToCamera()
+    {
+        if (playerCamera == null) return;
+        
+        Vector3 forward = Vector3.ProjectOnPlane(playerCamera.transform.forward, Vector3.up).normalized;
+        Vector3 right = Vector3.ProjectOnPlane(playerCamera.transform.right, Vector3.up).normalized;
+
+        Vector3 movement = (forward * moveDirection.y + right * moveDirection.x).normalized;
+
+        float currentSpeed = pushing ? pushSpeed : (Input.GetKey(KeyCode.LeftShift) ? moveSpeed * sprintMultiplier : moveSpeed);
+        rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
+        // Quaternion targetRotation = Quaternion.LookRotation(movement);
+        if (movement != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(movement);
+            rb.MoveRotation(Quaternion.Lerp(rb.rotation, targetRotation, rotationFromCameraSpeed * Time.fixedDeltaTime));
+        }
+    }
+
+    private void CheckPushing()
+    {
+        if (!IsOwner) return;
+        if (pushing) 
+        {
+            Vector3 relativePos = (rock.transform.position - transform.position).normalized;
+            // Quaternion toRotation = Quaternion.LookRotation(relativePos, Vector3.up);
+            // transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.fixedDeltaTime);
+
+            relativePos.y = 0;
+
+            Vector3 smoothedForward = Vector3.SmoothDamp(
+                transform.forward,
+                relativePos,
+                ref currentRotationVelocity,
+                rotationSmoothTime
+            );
+            
+            if (smoothedForward != Vector3.zero) {
+                transform.rotation = Quaternion.LookRotation(smoothedForward);
+            }
+        }
     }
 
     private void Rotate() {
@@ -173,16 +230,8 @@ public class Movement : NetworkBehaviour
 
     private void CheckRockProximity()
     {
-        if (Physics.Raycast(proximityCheck.position, transform.TransformDirection(Vector3.forward), 0.75f, boulderLayer))
-        {
-            pushing = true;
-            pushingColliders.SetActive(true);
-        }
-        else
-        {
-            pushing = false;
-            pushingColliders.SetActive(false);
-        }
+        pushing = Physics.Raycast(proximityCheck.position, transform.TransformDirection(Vector3.forward), 0.75f, boulderLayer);
+        pushingColliders.SetActive(pushing);
     }
 
     private void ApplyGravity()
@@ -200,36 +249,51 @@ public class Movement : NetworkBehaviour
     private void UpdateAnimator()
     {
         bool isMoving = moveDirection.magnitude > 0.1f;
-        if (pushing && isGrounded) {
-            animator.SetBool("pushing", true);
-            if (Input.GetKey(KeyCode.LeftShift)) {
-                animator.SetBool("fast-push", true);
-                moveSpeed = 2.5f;
-            } else {
-                animator.SetBool("fast-push", false);
-                moveSpeed = 1.5f;
-            }
-            if (!isMoving) {
-                animator.speed = 0.1f;
-            } else {
-                animator.speed = 1;
-            }
-            return;
-        }
+        // if (pushing && isGrounded) {
+        //     animator.SetBool("pushing", true);
+        //     if (Input.GetKey(KeyCode.LeftShift)) {
+        //         animator.SetBool("fast-push", true);
+        //         moveSpeed = 2.5f;
+        //     } else {
+        //         animator.SetBool("fast-push", false);
+        //         moveSpeed = 1.5f;
+        //     }
+        //     if (!isMoving) {
+        //         animator.speed = 0.1f;
+        //     } else {
+        //         animator.speed = 1;
+        //     }
+        //     return;
+        // }
 
-        animator.speed = 1;
-        if (!pushing) {
-            animator.SetBool("pushing", pushing);
-            if (Input.GetKey(KeyCode.LeftShift)) {
-                animator.SetBool("sprint", isMoving && isGrounded);
-                animator.SetBool("run", false);
-                moveSpeed = 7.5f;
-            } else {
-                animator.SetBool("run", isMoving && isGrounded);
-                animator.SetBool("sprint", false);
-                moveSpeed = 5f;
-            }
-            animator.SetBool("idle", !isMoving && isGrounded && rb.velocity.x <= 0.1f);
+        // animator.speed = 1;
+        // if (!pushing) {
+        //     animator.SetBool("pushing", pushing);
+        //     if (Input.GetKey(KeyCode.LeftShift)) {
+        //         animator.SetBool("sprint", isMoving && isGrounded);
+        //         animator.SetBool("run", false);
+        //         moveSpeed = 7.5f;
+        //     } else {
+        //         animator.SetBool("run", isMoving && isGrounded);
+        //         animator.SetBool("sprint", false);
+        //         moveSpeed = 5f;
+        //     }
+        //     animator.SetBool("idle", !isMoving && isGrounded && rb.velocity.x <= 0.1f);
+        // }
+
+        if (pushing && isGrounded)
+        {
+            animator.SetBool("pushing", true);
+            animator.SetBool("fast-push", Input.GetKey(KeyCode.LeftShift));
+            animator.speed = isMoving ? 1f : 0.1f;
+        }
+        else
+        {
+            animator.speed = 1f;
+            animator.SetBool("pushing", false);
+            animator.SetBool("sprint", isMoving && isGrounded && Input.GetKey(KeyCode.LeftShift));
+            animator.SetBool("run", isMoving && isGrounded && !Input.GetKey(KeyCode.LeftShift));
+            animator.SetBool("idle", !isMoving && isGrounded);
         }
     }
 }

@@ -73,10 +73,6 @@ public class TileSetter : NetworkBehaviour
 
         initParent = new GameObject("InitParent");
         SetOriginalWaterValues();
-        float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
-        string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
-        int[][] initTiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
-        // StartCoroutine(SetTiles(initTiles, initParent, 0, 0 - width * 9));
     }
 
     void Update()
@@ -314,6 +310,16 @@ public class TileSetter : NetworkBehaviour
 
     public void RestartScene() {
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    public void SetInitialGrid() 
+    {
+        Debug.Log("Setting initial grid");
+        float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+        string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
+        int[][] initTiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
+        // StartCoroutine(SetTiles(initTiles, initParent, 0, 0 - width * 9));
+        StartCoroutine(SetNetworkTiles(initTiles, 0, 0 - width * 9));
     }
 
     public void GenerateMap() {

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.InputSystem;
 
 public class BuildingSystem : NetworkBehaviour
 {
@@ -10,12 +11,17 @@ public class BuildingSystem : NetworkBehaviour
     public float maxBuildDistance = 1000f;
     public LayerMask tileLayer;
 
+    [Header("Input")]
+    public InputActionReference buildToggle;
+    public InputActionReference buildConfirm;
+
     [Header("References")]
     private GameObject rampPreview;
     public GameObject rampPrefab;
     public GameObject rampGhostPrefab;
 
-    private Camera mainCamera;
+    // private Camera mainCamera;
+    private Camera playerCamera;
     private RampObject rampPreviewComponent;
     private TileEdge currentEdge;
     private bool inBuildMode = false;
@@ -29,14 +35,86 @@ public class BuildingSystem : NetworkBehaviour
     
         if (IsOwner)
         {
-            InitializePreview();
+            // InitializePreview();
+            StartCoroutine(InitializeWithDelay());
+            EnableInputs();
         }
     }
+
+    private void OnEnable()
+    {
+        if (IsOwner)
+        {
+            EnableInputs();
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (IsOwner)
+        {
+            DisableInputs();
+        }
+    }
+
+    private void EnableInputs()
+    {
+        if (buildToggle != null)
+        {
+            buildToggle.action.Enable();
+            buildToggle.action.started += HandleBuildToggle;
+        }
+        
+        if (buildConfirm != null)
+        {
+            buildConfirm.action.Enable();
+            buildConfirm.action.started += HandleBuildConfirm;
+        }
+    }
+
+    private void DisableInputs()
+    {
+        if (buildToggle != null)
+        {
+            buildToggle.action.Disable();
+            buildToggle.action.started -= HandleBuildToggle;
+        }
+        
+        if (buildConfirm != null)
+        {
+            buildConfirm.action.Disable();
+            buildConfirm.action.started -= HandleBuildConfirm;
+        }
+    }
+
+    private void HandleBuildToggle(InputAction.CallbackContext context)
+    {
+        ToggleBuildMode();
+    }
+
+    private void HandleBuildConfirm(InputAction.CallbackContext context)
+    {
+        TryPlaceRamp();
+    }
+
+    private IEnumerator InitializeWithDelay()
+    {
+        yield return new WaitForEndOfFrame();
+        InitializePreview();
+    }
+
     // Start is called before the first frame update
     private void InitializePreview()
     {
         Debug.Log("Initialize Preview");
-        mainCamera = Camera.main;
+        playerCamera = GameObject.Find($"PlayerCamera_{OwnerClientId}")?.GetComponent<Camera>();
+        if (playerCamera == null)
+        {
+            Debug.LogError($"Could not find camera for player {OwnerClientId}");
+            return;
+        }
+
+
         rampPreview = Instantiate(rampGhostPrefab);
         if (rampPreview != null)
         {
@@ -51,35 +129,26 @@ public class BuildingSystem : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!IsOwner) return;
+        if (!IsOwner || playerCamera == null) return;
 
-        if (Input.GetKeyDown(KeyCode.B))
+        if (inBuildMode)
         {
-            ToggleBuildMode();
-        }
-
-        // if (!inBuildMode) return;
-
-        HandleMouseDetection();
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            TryPlaceRamp();
+            HandleMouseDetection();
         }
     }
 
     private void HandleMouseDetection()
     {
-        if (!IsOwner) return;
+        if (!IsOwner || playerCamera == null) return;
 
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.red, 1f);
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, tileLayer))
+        // Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.red, 1f);
+        if (Physics.Raycast(ray, out hit, 1000f, tileLayer))
         {
             // Debug.Log("Hit");
-            Debug.DrawLine(ray.origin, hit.point, Color.red);
+            // Debug.DrawLine(ray.origin, hit.point, Color.red);
 
             // if (Vector3.Distance(transform.position, hit.point) > maxBuildDistance)
             // {
@@ -97,7 +166,8 @@ public class BuildingSystem : NetworkBehaviour
         else
         {
             // Debug.Log("No hit");
-            // HideRampPreview();
+            HideRampPreview();
+            currentEdge = null;
         }
     }
 
@@ -121,16 +191,12 @@ public class BuildingSystem : NetworkBehaviour
 
         }
 
-        if (closestEdge != null)
+        if (closestEdge != null && currentEdge != closestEdge)
         {
-            if (currentEdge != closestEdge)
-            {
-                // Debug.Log($"[{Time.frameCount}] Found closest edge by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner}");
-                currentEdge = closestEdge;
-                UpdateRampPreview(closestEdge);
-            }
+            currentEdge = closestEdge;
+            UpdateRampPreview(closestEdge);
         }
-        else
+        else if (closestEdge == null)
         {
             HideRampPreview();
             currentEdge = null;
@@ -156,12 +222,15 @@ public class BuildingSystem : NetworkBehaviour
     {
         // Debug.Log($"UpdateRampPreview called by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner} | IsServer: {IsServer} | IsClient: {IsClient}");
     
-        if (rampPreview == null) return;
+        if (rampPreview == null || !inBuildMode) return;
 
         rampPreview.SetActive(true);
 
         Vector3 position = (edge.startPoint + edge.endPoint) / 2f;
         Quaternion rotation = GetRampRotation(edge.direction);
+
+        position += Vector3.up * 0.01f;
+
         rampPreview.transform.position = position;
         rampPreview.transform.rotation = rotation;
     }
