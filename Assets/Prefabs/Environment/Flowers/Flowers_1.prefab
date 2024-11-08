@@ -348,6 +348,8 @@ GameObject:
   - component: {fileID: 4319606541658330672}
   - component: {fileID: 316887614658295956}
   - component: {fileID: -978460121216804898}
+  - component: {fileID: 3544536234554860545}
+  - component: {fileID: 2810383233811931253}
   m_Layer: 0
   m_Name: Flowers_1
   m_TagString: Untagged
@@ -449,7 +451,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
+  GlobalObjectIdHash: 4071401541
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -458,6 +460,56 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!65 &3544536234554860545
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1791704232334602389}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.2, y: 0.44000036, z: 2.2}
+  m_Center: {x: 0, y: 0.78, z: -0.00000011920929}
+--- !u!114 &2810383233811931253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1791704232334602389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 929c1dc767a6e49cbb45ed1095b5456e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  edges:
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
 --- !u!1 &1820957792365714968
 GameObject:
   m_ObjectHideFlags: 0

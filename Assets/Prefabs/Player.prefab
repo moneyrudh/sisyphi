@@ -4084,7 +4084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3715926696
+  GlobalObjectIdHash: 2427064709
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4112,7 +4112,7 @@ MonoBehaviour:
   groundCheck: {fileID: 6654591264043039490}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 584
   boulderLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -4324,15 +4324,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13ea07336b72a496e8607c6e87e5d25b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentBuildType: 0
+  rampPrefab: {fileID: 3166283859120847890, guid: 0ae00ae7119e24cf8912efb3f4f308ab, type: 3}
+  rampGhostPrefab: {fileID: 3166283859120847890, guid: ee233b3f2bb7d40b3870cfa9452a57c2, type: 3}
+  connectorPrefab: {fileID: 5703708199491098136, guid: 9ae7fa1bce45e41acb1ead7a7ee0541d, type: 3}
+  connectorGhostPrefab: {fileID: 5703708199491098136, guid: fc7a450234f5c4dbe9e9a549ec2398d3, type: 3}
   snapDistance: 1
   maxBuildDistance: 5
   tileLayer:
     serializedVersion: 2
     m_Bits: 264
+  buildableLayer:
+    serializedVersion: 2
+    m_Bits: 512
   buildToggle: {fileID: 6339385412579230819, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   buildConfirm: {fileID: 7112439953257795887, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
-  rampPrefab: {fileID: 3166283859120847890, guid: 0ae00ae7119e24cf8912efb3f4f308ab, type: 3}
-  rampGhostPrefab: {fileID: 3166283859120847890, guid: ee233b3f2bb7d40b3870cfa9452a57c2, type: 3}
 --- !u!114 &-2442251563675163270
 MonoBehaviour:
   m_ObjectHideFlags: 0

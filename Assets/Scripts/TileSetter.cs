@@ -86,6 +86,11 @@ public class TileSetter : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.P)) {
             SpawnTileServerRpc(0, 0, 10, -1, 10, sizeMultiplier);
         }
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            GenerateMap();
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]

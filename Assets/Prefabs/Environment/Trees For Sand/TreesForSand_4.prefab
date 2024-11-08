@@ -43,6 +43,10 @@ GameObject:
   m_Component:
   - component: {fileID: 3193606796543188916}
   - component: {fileID: -959215622422553988}
+  - component: {fileID: -2867196494672930168}
+  - component: {fileID: -6859600291659596023}
+  - component: {fileID: -5607030782056019974}
+  - component: {fileID: 6769471526181945825}
   m_Layer: 0
   m_Name: TreesForSand_4
   m_TagString: Untagged
@@ -82,7 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
+  GlobalObjectIdHash: 2275510805
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -91,6 +95,90 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!65 &-2867196494672930168
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272614561653470083}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2}
+  m_Center: {x: 0, y: 2, z: 0}
+--- !u!114 &-6859600291659596023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272614561653470083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 859cdf6c874824640b0ee665e66fdcd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: aed12c224fbc8704d8eaa07a52e88f44, type: 3}
+--- !u!114 &-5607030782056019974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272614561653470083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 929c1dc767a6e49cbb45ed1095b5456e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  edges:
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+--- !u!65 &6769471526181945825
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272614561653470083}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1714064006295453631
 GameObject:
   m_ObjectHideFlags: 0

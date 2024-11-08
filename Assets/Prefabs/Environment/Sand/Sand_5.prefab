@@ -328,6 +328,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2336402037512818879}
   - component: {fileID: -7599785650479803036}
+  - component: {fileID: 3778243647311288547}
+  - component: {fileID: 5130944430765206421}
   m_Layer: 3
   m_Name: Sand_5
   m_TagString: Untagged
@@ -368,7 +370,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1469444197
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -377,6 +379,56 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &3778243647311288547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4129399193521104259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 929c1dc767a6e49cbb45ed1095b5456e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  edges:
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+  - startPoint: {x: 0, y: 0, z: 0}
+    endPoint: {x: 0, y: 0, z: 0}
+    direction: 0
+    isOccupied: 0
+--- !u!65 &5130944430765206421
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4129399193521104259}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 1, z: 2}
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &4805753747194978704
 GameObject:
   m_ObjectHideFlags: 0

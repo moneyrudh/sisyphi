@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1920409865434481743}
-  - component: {fileID: 3416992406571655942}
-  - component: {fileID: 8812865362897810483}
-  - component: {fileID: 4852096249517715933}
+  - component: {fileID: -5475005011471368391}
+  - component: {fileID: 9065125816903142748}
+  - component: {fileID: -8017624149372217626}
   m_Layer: 9
-  m_Name: Connector
+  m_Name: ConnectorPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,7 +35,7 @@ Transform:
   - {fileID: 3324468600846817699}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3416992406571655942
+--- !u!114 &-5475005011471368391
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2446013433
+  GlobalObjectIdHash: 2569805910
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -56,7 +56,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!65 &8812865362897810483
+--- !u!65 &9065125816903142748
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -77,7 +77,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 0.01, z: 4}
   m_Center: {x: 0, y: 0, z: 2}
---- !u!114 &4852096249517715933
+--- !u!114 &-8017624149372217626
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -155,7 +155,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6a76d4055f6516b45ac249d8b1889464, type: 2}
+  - {fileID: 2100000, guid: 1aba322e790a54fee812e8fafc35cc52, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
