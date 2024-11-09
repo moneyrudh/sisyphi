@@ -44,7 +44,7 @@ public class RampObject : BuildableObject
         connectableEdges.Add(new BuildableEdge{
             localPosition = topEdgePoint.localPosition,
             direction = EdgeDirection.North,
-            allowedConnections = new[] { BuildableType.Connector, BuildableType.Platform }
+            allowedConnections = new[] { BuildableType.Ramp, BuildableType.Connector, BuildableType.Platform }
         });
     }
 

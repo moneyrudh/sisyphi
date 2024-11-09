@@ -3,17 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 public class BuildingSystem : NetworkBehaviour
 {
     [Header("Building Types")]
     public BuildableType currentBuildType = BuildableType.Ramp;
 
-    [Header("Building Prefabs")]
+    [Header("Ramp Prefabs")]
     public GameObject rampPrefab;
     public GameObject rampGhostPrefab;
+
+    [Header("Ramp Prefabs")]
     public GameObject connectorPrefab;
     public GameObject connectorGhostPrefab;
+
+    [Header("Ramp Prefabs")]
+    public GameObject platformPrefab;
+    public GameObject platformGhostPrefab;
+
+    [Header("Preview Materials")]
+    public Material validPreviewMaterial;
+    public Material invalidPreviewMaterial;
 
     [Header("Building Settings")]
     public float snapDistance = 1f;
@@ -35,6 +46,8 @@ public class BuildingSystem : NetworkBehaviour
     private BuildableObject ghostBuildableObject;
     private bool inBuildMode = false;
     private Movement movement;
+
+    private bool isValidPlacement = true;
     
     public override void OnNetworkSpawn()
     {
@@ -147,6 +160,10 @@ public class BuildingSystem : NetworkBehaviour
         {
             SetBuildType(BuildableType.Connector);
         }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            SetBuildType(BuildableType.Platform);
+        }
 
         if (inBuildMode)
         {
@@ -184,6 +201,9 @@ public class BuildingSystem : NetworkBehaviour
             case BuildableType.Connector:
                 buildPreview = Instantiate(connectorGhostPrefab);
                 break;
+            case BuildableType.Platform:
+                buildPreview = Instantiate(platformGhostPrefab);
+                break;
         }
 
         if (buildPreview != null)
@@ -206,6 +226,9 @@ public class BuildingSystem : NetworkBehaviour
             case BuildableType.Connector:
                 HandleConnectorPlacement(ray);
                 break;
+            case BuildableType.Platform:
+                HandlePlatformPlacement(ray);
+                break;
         }
         // Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.red, 1f);
     }
@@ -226,6 +249,14 @@ public class BuildingSystem : NetworkBehaviour
             {
                 // Debug.Log($"[{Time.frameCount}] FindClosestEdge called by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner}");
                 FindClosestEdge(tile, hit.point);
+            }
+        }
+        else if (Physics.Raycast(ray, out hit, 1000f, buildableLayer))
+        {
+            BuildableObject targetObject = hit.collider.GetComponentInParent<BuildableObject>();
+            if (targetObject != null)
+            {
+                FindClosestBuildableEdge(targetObject, hit.point);
             }
         }
         else
@@ -255,14 +286,34 @@ public class BuildingSystem : NetworkBehaviour
         }
     }
 
+    private void HandlePlatformPlacement(Ray ray)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 1000f, buildableLayer))
+        {
+            BuildableObject targetObject = hit.collider.GetComponentInParent<BuildableObject>();
+            if (targetObject != null)
+            {
+                FindClosestBuildableEdge(targetObject, hit.point);
+            }
+            else
+            {
+                HideBuildPreview();
+                currentBuildableEdge = null;
+                targetBuildableObject = null;
+            }
+        }
+    }
+
     private void FindClosestBuildableEdge(BuildableObject target, Vector3 hitPoint)
     {
-        Debug.Log("FindClosestBuildableEdge called at hitpoint: " + hitPoint);
         float closestDistance = snapDistance;
         BuildableEdge closestEdge = null;
 
         foreach (BuildableEdge edge in target.GetAvailableEdges())
         {
+            if (!edge.allowedConnections.Contains(currentBuildType)) continue;
+
             Vector3 edgeWorldPos = target.GetWorldEdgePosition(edge);
             float distance = Vector3.Distance(hitPoint, edgeWorldPos);
 
@@ -273,11 +324,25 @@ public class BuildingSystem : NetworkBehaviour
             }
         }
 
+
         if (closestEdge != null && (currentBuildableEdge != closestEdge || targetBuildableObject != target))
         {
+            if (closestEdge.isOccupied) return;
             currentBuildableEdge = closestEdge;
             targetBuildableObject = target;
-            UpdateConnectorPreview(target, closestEdge);
+
+            switch (currentBuildType)
+            {
+                case BuildableType.Ramp:
+                    UpdateRampPreviewOnBuildable(target, closestEdge);
+                    break;
+                case BuildableType.Connector:
+                    UpdateConnectorPreview(target, closestEdge);
+                    break;
+                case BuildableType.Platform:
+                    UpdateConnectorPreview(target, closestEdge);
+                    break;
+            }
         }
         else if (closestEdge == null)
         {
@@ -285,6 +350,21 @@ public class BuildingSystem : NetworkBehaviour
             currentBuildableEdge = null;
             targetBuildableObject = null;
         }
+    }
+
+    private void UpdateRampPreviewOnBuildable(BuildableObject target, BuildableEdge edge)
+    {
+        if (buildPreview == null || !inBuildMode) return;
+
+        buildPreview.SetActive(true);
+        Vector3 edgeWorldPos = target.GetWorldEdgePosition(edge);
+        EdgeDirection oppositeDirection = GetOppositeDirection(edge.direction);
+
+        Quaternion targetRotation = target.transform.rotation;
+        Quaternion rampRotation = GetRampRotation(oppositeDirection);
+
+        buildPreview.transform.position = edgeWorldPos;
+        buildPreview.transform.rotation = targetRotation;
     }
 
     private void UpdateConnectorPreview(BuildableObject target, BuildableEdge edge)
@@ -295,11 +375,22 @@ public class BuildingSystem : NetworkBehaviour
         Vector3 edgeWorldPos = target.GetWorldEdgePosition(edge);
         EdgeDirection oppositeDirection = GetOppositeDirection(edge.direction);
 
-        Quaternion targetRotation = target.transform.rotation;
-        Quaternion connectorRotation = GetConnectorRotation(oppositeDirection);
-
         buildPreview.transform.position = edgeWorldPos;
-        buildPreview.transform.rotation = targetRotation * connectorRotation;
+        buildPreview.transform.rotation = target.transform.rotation;
+
+        buildPreview.transform.Rotate(0, GetConnectorRotationAngle(edge.direction), 0);
+    }
+
+    private float GetConnectorRotationAngle (EdgeDirection direction)
+    {
+        switch (direction)
+        {
+            case EdgeDirection.North: return 0;
+            case EdgeDirection.South: return 180;
+            case EdgeDirection.East: return 90;
+            case EdgeDirection.West: return 270;
+            default: return 0;
+        }
     }
 
     private EdgeDirection GetOppositeDirection(EdgeDirection direction)
@@ -443,25 +534,39 @@ public class BuildingSystem : NetworkBehaviour
             case BuildableType.Connector:
                 TryPlaceConnector();
                 break;
+            case BuildableType.Platform:
+                TryPlacePlatform();
+                break;
         }
     }
 
     private void TryPlaceRamp()
     {
 
-        if (currentTileEdge == null) return;
+        if (currentTileEdge != null)
+        {
+            PlaceRampServerRpc(
+                buildPreview.transform.position,
+                buildPreview.transform.rotation,
+                currentTileEdge.startPoint,
+                currentTileEdge.endPoint,
+                currentTileEdge.direction
+            );
+        }
+        else if (currentBuildableEdge != null && targetBuildableObject != null)
+        {
+            PlaceRampOnBuildableServerRpc(
+                buildPreview.transform.position,
+                buildPreview.transform.rotation,
+                targetBuildableObject.NetworkObjectId,
+                currentBuildableEdge.localPosition
+            );
+        }
 
         // Check if player has enough wood
 
         // Check movement related logic
 
-        PlaceRampServerRpc(
-            buildPreview.transform.position,
-            buildPreview.transform.rotation,
-            currentTileEdge.startPoint,
-            currentTileEdge.endPoint,
-            currentTileEdge.direction
-        );
     }
 
     private void TryPlaceConnector()
@@ -469,6 +574,18 @@ public class BuildingSystem : NetworkBehaviour
         if (currentBuildableEdge == null || targetBuildableObject == null) return;
 
         PlaceConnectorServerRpc(
+            buildPreview.transform.position,
+            buildPreview.transform.rotation,
+            targetBuildableObject.NetworkObjectId,
+            currentBuildableEdge.localPosition
+        );
+    }
+
+    private void TryPlacePlatform()
+    {
+        if (currentBuildableEdge == null || targetBuildableObject == null) return;
+
+        PlacePlatformServerRpc(
             buildPreview.transform.position,
             buildPreview.transform.rotation,
             targetBuildableObject.NetworkObjectId,
@@ -537,20 +654,60 @@ public class BuildingSystem : NetworkBehaviour
     [ClientRpc]
     private void UpdateBuildableEdgeStateClientRpc(ulong targetObjectId, Vector3 targetEdgeLocalPos)
     {
-        NetworkObject targetNetObj = null;
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.ContainsKey(targetObjectId))
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetObjectId,out NetworkObject targetNetObj)) return;
+
+        BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
+        if (targetBuildable == null) return;
+
+        BuildableEdge targetEdge = targetBuildable.connectableEdges.Find(e => Vector3.Distance(e.localPosition, targetEdgeLocalPos) < 0.1f);
+        if (targetEdge != null)
         {
-            targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
-            BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
-            if (targetBuildable != null)
-            {
-                var edge = targetBuildable.connectableEdges.Find(e => Vector3.Distance(e.localPosition, targetEdgeLocalPos) < 0.1f);
-                if (edge != null)
-                {
-                    edge.isOccupied = true;
-                }
-            }
+            targetEdge.isOccupied = true;
+            // Vector3 connectionWorldPos = targetBuildable.GetWorldEdgePosition(targetEdge);
+
+            // Collider[] colliders = Physics.OverlapSphere(connectionWorldPos, 0.5f, buildableLayer);
+            // foreach (Collider col in colliders)
+            // {
+            //     BuildableObject nearbyBuildable = col.GetComponentInParent<BuildableObject>();
+            //     if (nearbyBuildable != null && nearbyBuildable != targetBuildable)
+            //     {
+            //         foreach (BuildableEdge edge in nearbyBuildable.connectableEdges)
+            //         {
+            //             Vector3 edgeWorldPos = nearbyBuildable.GetWorldEdgePosition(edge);
+            //             if (Vector3.Distance(edgeWorldPos, connectionWorldPos) < 0.5f)
+            //             {
+            //                 edge.isOccupied = true;
+            //             }
+            //         }
+            //     }
+            // }
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlacePlatformServerRpc(Vector3 position, Quaternion rotation, ulong targetObjectId, Vector3 targetEdgeLocalPos)
+    {
+        GameObject platform = Instantiate(platformPrefab, position, rotation);
+        NetworkObject networkObject = platform.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+
+        NetworkObject targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
+        BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
+
+        UpdateBuildableEdgeStateClientRpc(targetObjectId, targetEdgeLocalPos);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaceRampOnBuildableServerRpc(Vector3 position, Quaternion rotation, ulong targetObjectId, Vector3 targetEdgeLocalPos)
+    {
+        GameObject ramp = Instantiate(rampPrefab, position, rotation);
+        NetworkObject networkObject = ramp.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+
+        NetworkObject targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
+        BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
+
+        UpdateBuildableEdgeStateClientRpc(targetObjectId, targetEdgeLocalPos);
     }
 
     [ClientRpc]

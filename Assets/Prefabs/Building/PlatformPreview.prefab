@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6a76d4055f6516b45ac249d8b1889464, type: 2}
+  - {fileID: 2100000, guid: 1aba322e790a54fee812e8fafc35cc52, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -106,7 +106,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300498, guid: 73f90bdd5e7539740a292cdd00817d1a, type: 3}
---- !u!1 &789732785619043493
+--- !u!1 &3764755589811738535
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -114,7 +114,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7907625218795056679}
+  - component: {fileID: 4704872397312202838}
   m_Layer: 0
   m_Name: SnapPoint
   m_TagString: Untagged
@@ -122,16 +122,16 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7907625218795056679
+--- !u!4 &4704872397312202838
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 789732785619043493}
+  m_GameObject: {fileID: 3764755589811738535}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.05, z: 4.079}
+  m_LocalPosition: {x: -0, y: -0.05, z: 4.097}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -146,11 +146,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3936374716839388371}
-  - component: {fileID: 16875901818694791}
-  - component: {fileID: 6527008152153520361}
-  - component: {fileID: 8796607395889401753}
+  - component: {fileID: 4946868312467218068}
+  - component: {fileID: 8714022870894158604}
+  - component: {fileID: 4064964217451580161}
   m_Layer: 0
-  m_Name: Platform
+  m_Name: PlatformPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -170,10 +170,10 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5074521671083199088}
-  - {fileID: 7907625218795056679}
+  - {fileID: 4704872397312202838}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!65 &16875901818694791
+--- !u!65 &4946868312467218068
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -194,7 +194,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 0.02, z: 4}
   m_Center: {x: 0, y: 0, z: 2}
---- !u!114 &6527008152153520361
+--- !u!114 &8714022870894158604
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2251621277
+  GlobalObjectIdHash: 3787747441
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -215,7 +215,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &8796607395889401753
+--- !u!114 &4064964217451580161
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -229,6 +229,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 2
   connectableEdges: []
-  edgePoints:
-  - {fileID: 7907625218795056679}
+  edgePoints: []
   snapDirection: {x: 0, y: 0, z: 0}

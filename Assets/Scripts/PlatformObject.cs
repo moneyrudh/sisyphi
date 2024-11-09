@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ConnectorObject : BuildableObject
+public class PlatformObject : BuildableObject
 {
-    [SerializeField] Transform[] edgePoints;
+    [SerializeField] private Transform[] edgePoints;
     public Vector3 snapDirection;
 
     private void Awake()
     {
-        type = BuildableType.Connector;
+        type = BuildableType.Platform;
         InitializeEdges();
     }
 
@@ -17,46 +17,31 @@ public class ConnectorObject : BuildableObject
     {
         snapDirection = transform.forward;
         connectableEdges = new List<BuildableEdge>();
-        
-        // North edge
-        connectableEdges.Add(new BuildableEdge{
+
+        connectableEdges.Add(new BuildableEdge
+        {
             localPosition = Vector3.zero,
-            direction = EdgeDirection.South,
-            allowedConnections = new[] { BuildableType.Ramp, BuildableType.Platform, BuildableType.Connector},
-            isOccupied = true
+            direction = EdgeDirection.North,
+            allowedConnections = new[] { BuildableType.Ramp, BuildableType.Platform, BuildableType.Connector }
         });
-        
+
         if (edgePoints != null)
         {
-            for (int i=0; i<edgePoints.Length; i++)
+            foreach (Transform edge in edgePoints)
             {
-                if (edgePoints[i] != null)
+                if (edge != null)
                 {
-                    EdgeDirection direction;
-                    switch(i)
-                    {
-                        case 0: direction = EdgeDirection.West; break;
-                        case 1: direction = EdgeDirection.North; break;
-                        case 2: direction = EdgeDirection.East; break;
-                        default: direction = EdgeDirection.South; break;
-                    }
- 
                     connectableEdges.Add(new BuildableEdge
                     {
-                        localPosition = edgePoints[i].localPosition,
-                        direction = direction,
-                        allowedConnections = new[] { BuildableType.Ramp, BuildableType.Platform, BuildableType.Connector },
-                        isOccupied = false
+                        localPosition = edge.localPosition,
+                        direction = DetermineEdgeDirection(edge.localPosition),
+                        allowedConnections = new[] { BuildableType.Ramp, BuildableType.Platform, BuildableType.Connector }
                     });
                 }
             }
-            // foreach (var edge in connectableEdges)
-            // {
-            //     Debug.Log($"Edge direction: {edge.direction}");
-            // }
         }
     }
-
+    
     private EdgeDirection DetermineEdgeDirection(Vector3 localPos)
     {
         float xAbs = Mathf.Abs(localPos.x);
@@ -76,15 +61,15 @@ public class ConnectorObject : BuildableObject
     {
         if (connectableEdges == null || connectableEdges.Count == 0) return;
 
-        Gizmos.color = Color.red;
-        foreach (var edge in connectableEdges)
+        Gizmos.color = Color.blue;
+        foreach (BuildableEdge edge in connectableEdges)
         {
             Vector3 worldPos = GetWorldEdgePosition(edge);
             Gizmos.DrawSphere(worldPos, 0.2f);
-            Gizmos.DrawRay(worldPos, transform.TransformDirection(GetDirectionVector(edge.direction)) * 0.5f);
+            Gizmos.DrawRay(worldPos, transform.TransformDirection(GetDirectionVector(edge.direction)));
         }
     }
-
+    
     private Vector3 GetDirectionVector(EdgeDirection direction)
     {
         switch (direction)
