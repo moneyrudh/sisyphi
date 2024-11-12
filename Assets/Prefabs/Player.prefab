@@ -4084,7 +4084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2427064709
+  GlobalObjectIdHash: 3715926696
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4334,7 +4334,7 @@ MonoBehaviour:
   validPreviewMaterial: {fileID: 2100000, guid: 1aba322e790a54fee812e8fafc35cc52, type: 2}
   invalidPreviewMaterial: {fileID: 2100000, guid: 53dfca88d781f4908bb0e868df6bc2c3, type: 2}
   snapDistance: 1
-  maxBuildDistance: 5
+  maxBuildDistance: 10
   tileLayer:
     serializedVersion: 2
     m_Bits: 264
@@ -4343,6 +4343,7 @@ MonoBehaviour:
     m_Bits: 512
   buildToggle: {fileID: 6339385412579230819, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   buildConfirm: {fileID: 7112439953257795887, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
+  isValidPlacement: 1
 --- !u!114 &-2442251563675163270
 MonoBehaviour:
   m_ObjectHideFlags: 0

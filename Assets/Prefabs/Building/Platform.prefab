@@ -148,8 +148,8 @@ GameObject:
   - component: {fileID: 3936374716839388371}
   - component: {fileID: 16875901818694791}
   - component: {fileID: 6527008152153520361}
-  - component: {fileID: 8796607395889401753}
-  m_Layer: 0
+  - component: {fileID: 8556283557651035311}
+  m_Layer: 9
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -215,7 +215,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &8796607395889401753
+--- !u!114 &8556283557651035311
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -224,7 +224,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6112975311550532115}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4878edab2c434dc5ae720562b299ec2, type: 3}
+  m_Script: {fileID: 11500000, guid: 10c58fa32228642d49ce8fcb8b9d20cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   type: 2

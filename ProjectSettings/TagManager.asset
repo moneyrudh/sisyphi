@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Rock
   - FarmPoint
+  - Buildable
   layers:
   - Default
   - TransparentFX

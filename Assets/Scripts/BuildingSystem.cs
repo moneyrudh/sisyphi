@@ -28,7 +28,7 @@ public class BuildingSystem : NetworkBehaviour
 
     [Header("Building Settings")]
     public float snapDistance = 1f;
-    public float maxBuildDistance = 1000f;
+    public float maxBuildDistance = 10f;
     public LayerMask tileLayer;
     public LayerMask buildableLayer;
 
@@ -47,8 +47,12 @@ public class BuildingSystem : NetworkBehaviour
     private bool inBuildMode = false;
     private Movement movement;
 
-    private bool isValidPlacement = true;
-    
+    [Header("Validity")]
+    public bool isValidPlacement = true;
+    private List<Renderer> previewRenderers = new List<Renderer>();
+    private bool isColliding = false;
+    private HashSet<Collider> overlappingColliders = new HashSet<Collider>();
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -142,6 +146,24 @@ public class BuildingSystem : NetworkBehaviour
             buildPreview.SetActive(true);
             ghostBuildableObject = buildPreview.GetComponent<BuildableObject>();
             rampPreviewComponent = buildPreview.GetComponent<RampObject>();
+
+            previewRenderers.AddRange(buildPreview.GetComponentsInChildren<Renderer>());
+
+            foreach (Collider col in buildPreview.GetComponentsInChildren<Collider>())
+            {
+                col.isTrigger = true;
+            }
+
+            PreviewTriggerHandler triggerHandler = null;
+            if (currentBuildType != BuildableType.Ramp)
+            {
+                triggerHandler = buildPreview.AddComponent<PreviewTriggerHandler>();
+            }
+            else
+            {
+                triggerHandler = buildPreview.transform.GetChild(0).gameObject.AddComponent<PreviewTriggerHandler>();
+            }
+            triggerHandler.Initialize(this);
         }
 
         movement = GetComponent<Movement>();
@@ -192,24 +214,38 @@ public class BuildingSystem : NetworkBehaviour
             Destroy(buildPreview);
         }
 
+        previewRenderers.Clear();
+        overlappingColliders.Clear();
+
+        GameObject prefabToSpawn = null;
         switch (currentBuildType)
         {
             case BuildableType.Ramp:
-                buildPreview = Instantiate(rampGhostPrefab);
-                rampPreviewComponent = buildPreview.GetComponent<RampObject>();
+                prefabToSpawn = rampGhostPrefab;
                 break;
             case BuildableType.Connector:
-                buildPreview = Instantiate(connectorGhostPrefab);
+                prefabToSpawn = connectorGhostPrefab;
                 break;
             case BuildableType.Platform:
-                buildPreview = Instantiate(platformGhostPrefab);
+                prefabToSpawn = platformGhostPrefab;
                 break;
         }
 
-        if (buildPreview != null)
+        if (prefabToSpawn != null)
         {
-            buildPreview.SetActive(false);
+            buildPreview = Instantiate(prefabToSpawn);
+            buildPreview.SetActive(true);
             ghostBuildableObject = buildPreview.GetComponent<BuildableObject>();
+
+            previewRenderers.AddRange(buildPreview.GetComponentsInChildren<Renderer>());
+
+            foreach (Collider col in buildPreview.GetComponentsInChildren<Collider>())
+            {
+                col.isTrigger = true;
+            }
+
+            var triggerHandler = buildPreview.AddComponent<PreviewTriggerHandler>();
+            triggerHandler.Initialize(this);
         }
     }
 
@@ -236,34 +272,39 @@ public class BuildingSystem : NetworkBehaviour
     private void HandleRampPlacement(Ray ray)
     {
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 1000f, tileLayer))
+        bool isValidPlacement = false;
+        
+        if (Physics.Raycast(ray, out hit, maxBuildDistance, tileLayer))
         {
-            // if (Vector3.Distance(transform.position, hit.point) > maxBuildDistance)
-            // {
-            //     HideBuildPreview();
-            //     return;
-            // }
-
             TileEdges tile = hit.collider.GetComponent<TileEdges>();
             if (tile != null && currentBuildType == BuildableType.Ramp)
             {
                 // Debug.Log($"[{Time.frameCount}] FindClosestEdge called by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner}");
+                isValidPlacement = true;
                 FindClosestEdge(tile, hit.point);
+                return;
             }
         }
-        else if (Physics.Raycast(ray, out hit, 1000f, buildableLayer))
+
+        if (!isValidPlacement && Physics.Raycast(ray, out hit, maxBuildDistance, buildableLayer))
         {
             BuildableObject targetObject = hit.collider.GetComponentInParent<BuildableObject>();
             if (targetObject != null)
             {
+                isValidPlacement = true;
                 FindClosestBuildableEdge(targetObject, hit.point);
+                return;
             }
         }
-        else
+        
+        if (!isValidPlacement || hit.collider == null)
         {
+            if (currentTileEdge != null) return;
             // Debug.Log("No hit");
             HideBuildPreview();
             currentTileEdge = null;
+            // currentBuildableEdge = null;
+            // targetBuildableObject = null;
         }
     }
 
@@ -313,6 +354,7 @@ public class BuildingSystem : NetworkBehaviour
         foreach (BuildableEdge edge in target.GetAvailableEdges())
         {
             if (!edge.allowedConnections.Contains(currentBuildType)) continue;
+            if (edge.isOccupied) continue;
 
             Vector3 edgeWorldPos = target.GetWorldEdgePosition(edge);
             float distance = Vector3.Distance(hitPoint, edgeWorldPos);
@@ -340,7 +382,7 @@ public class BuildingSystem : NetworkBehaviour
                     UpdateConnectorPreview(target, closestEdge);
                     break;
                 case BuildableType.Platform:
-                    UpdateConnectorPreview(target, closestEdge);
+                    UpdatePlatformPreview(target, closestEdge);
                     break;
             }
         }
@@ -353,6 +395,21 @@ public class BuildingSystem : NetworkBehaviour
     }
 
     private void UpdateRampPreviewOnBuildable(BuildableObject target, BuildableEdge edge)
+    {
+        if (buildPreview == null || !inBuildMode) return;
+
+        buildPreview.SetActive(true);
+        Vector3 edgeWorldPos = target.GetWorldEdgePosition(edge);
+        EdgeDirection oppositeDirection = GetOppositeDirection(edge.direction);
+
+        Quaternion targetRotation = target.transform.rotation;
+        Quaternion rampRotation = GetRampRotation(oppositeDirection);
+
+        buildPreview.transform.position = edgeWorldPos;
+        buildPreview.transform.rotation = targetRotation;
+    }
+
+    private void UpdatePlatformPreview(BuildableObject target, BuildableEdge edge)
     {
         if (buildPreview == null || !inBuildMode) return;
 
@@ -542,6 +599,7 @@ public class BuildingSystem : NetworkBehaviour
 
     private void TryPlaceRamp()
     {
+        if (!isValidPlacement) return;
 
         if (currentTileEdge != null)
         {
@@ -571,6 +629,7 @@ public class BuildingSystem : NetworkBehaviour
 
     private void TryPlaceConnector()
     {
+        if (!isValidPlacement) return;
         if (currentBuildableEdge == null || targetBuildableObject == null) return;
 
         PlaceConnectorServerRpc(
@@ -583,6 +642,7 @@ public class BuildingSystem : NetworkBehaviour
 
     private void TryPlacePlatform()
     {
+        if (!isValidPlacement) return;
         if (currentBuildableEdge == null || targetBuildableObject == null) return;
 
         PlacePlatformServerRpc(
@@ -747,6 +807,40 @@ public class BuildingSystem : NetworkBehaviour
         if (buildPreview != null)
         {
             buildPreview.SetActive(false);
+        }
+    }
+
+    public void HandleCollisionEnter(bool colliding, Collider other)
+    {
+        Debug.Log("Target object: " + targetBuildableObject);
+        if (targetBuildableObject != null && other.transform.IsChildOf(targetBuildableObject.transform)) return;
+
+        if (currentTileEdge != null)
+        {
+            var tileEdges = other.GetComponent<TileEdges>();
+            if (tileEdges != null && tileEdges.edges.Contains(currentTileEdge)) return;
+        }
+
+
+        if (colliding) overlappingColliders.Add(other);
+        else overlappingColliders.Remove(other);
+
+        UpdatePreviewValidity();
+    }
+
+    private void UpdatePreviewValidity()
+    {
+        isValidPlacement = overlappingColliders.Count == 0;
+        UpdatePreviewMaterial(isValidPlacement);
+    }
+
+    private void UpdatePreviewMaterial(bool isValid)
+    {
+        Material materialToUse = isValid ? validPreviewMaterial : invalidPreviewMaterial;
+        Debug.Log("isValid: " + isValid);
+        foreach (Renderer renderer in previewRenderers)
+        {
+            renderer.material = materialToUse;
         }
     }
 }

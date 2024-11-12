@@ -99,7 +99,7 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
@@ -148,8 +148,8 @@ GameObject:
   - component: {fileID: 3936374716839388371}
   - component: {fileID: 4946868312467218068}
   - component: {fileID: 8714022870894158604}
-  - component: {fileID: 4064964217451580161}
-  m_Layer: 0
+  - component: {fileID: 5958350055920492245}
+  m_Layer: 9
   m_Name: PlatformPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3787747441
+  GlobalObjectIdHash: 2790909248
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -215,7 +215,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &4064964217451580161
+--- !u!114 &5958350055920492245
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -224,10 +224,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6112975311550532115}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4878edab2c434dc5ae720562b299ec2, type: 3}
+  m_Script: {fileID: 11500000, guid: 10c58fa32228642d49ce8fcb8b9d20cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   type: 2
   connectableEdges: []
-  edgePoints: []
+  edgePoints:
+  - {fileID: 4704872397312202838}
   snapDirection: {x: 0, y: 0, z: 0}

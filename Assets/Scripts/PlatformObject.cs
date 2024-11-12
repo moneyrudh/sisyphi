@@ -21,24 +21,18 @@ public class PlatformObject : BuildableObject
         connectableEdges.Add(new BuildableEdge
         {
             localPosition = Vector3.zero,
-            direction = EdgeDirection.North,
+            direction = EdgeDirection.South,
             allowedConnections = new[] { BuildableType.Ramp, BuildableType.Platform, BuildableType.Connector }
         });
 
         if (edgePoints != null)
         {
-            foreach (Transform edge in edgePoints)
+            connectableEdges.Add(new BuildableEdge
             {
-                if (edge != null)
-                {
-                    connectableEdges.Add(new BuildableEdge
-                    {
-                        localPosition = edge.localPosition,
-                        direction = DetermineEdgeDirection(edge.localPosition),
-                        allowedConnections = new[] { BuildableType.Ramp, BuildableType.Platform, BuildableType.Connector }
-                    });
-                }
-            }
+                localPosition = edgePoints[0].localPosition,
+                direction = EdgeDirection.North,
+                allowedConnections = new[] { BuildableType.Ramp, BuildableType.Platform, BuildableType.Connector }
+            });
         }
     }
     
