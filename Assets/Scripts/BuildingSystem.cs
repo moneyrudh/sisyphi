@@ -50,7 +50,6 @@ public class BuildingSystem : NetworkBehaviour
     [Header("Validity")]
     public bool isValidPlacement = true;
     private List<Renderer> previewRenderers = new List<Renderer>();
-    private bool isColliding = false;
     private HashSet<Collider> overlappingColliders = new HashSet<Collider>();
 
     public override void OnNetworkSpawn()
@@ -269,43 +268,150 @@ public class BuildingSystem : NetworkBehaviour
         // Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.red, 1f);
     }
 
+    // private void HandleRampPlacement(Ray ray)
+    // {
+    //     RaycastHit hit;
+    //     bool isValidPlacement = false;
+        
+    //     if (Physics.Raycast(ray, out hit, maxBuildDistance, tileLayer))
+    //     {
+    //         TileEdges tile = hit.collider.GetComponent<TileEdges>();
+    //         if (tile != null && currentBuildType == BuildableType.Ramp)
+    //         {
+    //             // Debug.Log($"[{Time.frameCount}] FindClosestEdge called by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner}");
+    //             isValidPlacement = true;
+    //             FindClosestEdge(tile, hit.point);
+    //             return;
+    //         }
+    //     }
+
+    //     if (!isValidPlacement && Physics.Raycast(ray, out hit, maxBuildDistance, buildableLayer))
+    //     {
+    //         BuildableObject targetObject = hit.collider.GetComponentInParent<BuildableObject>();
+    //         if (targetObject != null)
+    //         {
+    //             isValidPlacement = true;
+    //             FindClosestBuildableEdge(targetObject, hit.point);
+    //             return;
+    //         }
+    //     }
+        
+    //     if (!isValidPlacement || hit.collider == null)
+    //     {
+    //         if (currentTileEdge != null) return;
+    //         // Debug.Log("No hit");
+    //         HideBuildPreview();
+    //         currentTileEdge = null;
+    //         // currentBuildableEdge = null;
+    //         // targetBuildableObject = null;
+    //     }
+    // }
+
     private void HandleRampPlacement(Ray ray)
     {
         RaycastHit hit;
-        bool isValidPlacement = false;
-        
-        if (Physics.Raycast(ray, out hit, maxBuildDistance, tileLayer))
+        bool hitSomething = false;
+        float maxPreviewDistance = maxBuildDistance + 2f;
+
+        if (Physics.Raycast(ray, out hit, maxPreviewDistance, tileLayer | buildableLayer))
         {
-            TileEdges tile = hit.collider.GetComponent<TileEdges>();
-            if (tile != null && currentBuildType == BuildableType.Ramp)
+            hitSomething = true;
+            float distanceToHit = Vector3.Distance(transform.position, hit.point);
+
+            if (distanceToHit > maxBuildDistance) 
             {
-                // Debug.Log($"[{Time.frameCount}] FindClosestEdge called by: {(IsHost ? "Host" : "Client")} | IsOwner: {IsOwner}");
-                isValidPlacement = true;
-                FindClosestEdge(tile, hit.point);
+                HideBuildPreview();
+                currentTileEdge = null;
+                currentBuildableEdge = null;
+                targetBuildableObject = null;
                 return;
             }
         }
 
-        if (!isValidPlacement && Physics.Raycast(ray, out hit, maxBuildDistance, buildableLayer))
+        if (!hitSomething)
+        {
+            HideBuildPreview();
+            currentTileEdge = null;
+            currentBuildableEdge = null;
+            targetBuildableObject = null;
+            return;
+        }
+
+        bool foundValidPlacement = false;
+
+        if (Physics.Raycast(ray, out hit, maxBuildDistance, tileLayer))
+        {
+            Debug.Log($"Hit tile at {hit.point}");
+            TileEdges tile = hit.collider.GetComponent<TileEdges>();
+            if (tile != null && currentBuildType == BuildableType.Ramp)
+            {
+                foundValidPlacement = true;
+
+                if (currentTileEdge == null || !IsSameEdge(currentTileEdge, tile, hit.point))
+                {
+                    FindClosestEdge(tile, hit.point);
+                }
+                return;
+            }
+        }
+
+        if (!foundValidPlacement && Physics.Raycast(ray, out hit, maxBuildDistance, buildableLayer))
         {
             BuildableObject targetObject = hit.collider.GetComponentInParent<BuildableObject>();
             if (targetObject != null)
             {
-                isValidPlacement = true;
-                FindClosestBuildableEdge(targetObject, hit.point);
+                if (targetBuildableObject != targetObject ||
+                    currentBuildableEdge == null ||
+                    !IsSameEdge(currentBuildableEdge, targetObject, hit.point))
+                {
+                    FindClosestBuildableEdge(targetObject, hit.point);
+                }
                 return;
             }
         }
-        
-        if (!isValidPlacement || hit.collider == null)
+    }
+
+    private bool IsSameEdge(TileEdge currentEdge, TileEdges tile, Vector3 hitPoint)
+    {
+        float closestDistance = snapDistance;
+        TileEdge closestEdge = null;
+
+        foreach (TileEdge edge in tile.edges)
         {
-            if (currentTileEdge != null) return;
-            // Debug.Log("No hit");
-            HideBuildPreview();
-            currentTileEdge = null;
-            // currentBuildableEdge = null;
-            // targetBuildableObject = null;
+            if (edge.isOccupied) continue;
+
+            float distance = PointToLineDistance(hitPoint, edge.startPoint, edge.endPoint);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEdge = edge;
+            }
         }
+
+        return closestEdge == currentEdge;
+    }
+
+    private bool IsSameEdge(BuildableEdge currentEdge, BuildableObject targetObject, Vector3 hitPoint)
+    {
+        float closestDistance = snapDistance;
+        BuildableEdge closestEdge = null;
+
+        foreach (BuildableEdge edge in targetObject.GetAvailableEdges())
+        {
+            if (!edge.allowedConnections.Contains(currentBuildType)) continue;
+            if (edge.isOccupied) continue;
+
+            Vector3 edgeWorldPos = targetObject.GetWorldEdgePosition(edge);
+            float distance = Vector3.Distance(hitPoint, edgeWorldPos);
+
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEdge = edge;
+            }
+        }
+
+        return closestEdge == currentEdge;
     }
 
     private void HandleConnectorPlacement(Ray ray)
