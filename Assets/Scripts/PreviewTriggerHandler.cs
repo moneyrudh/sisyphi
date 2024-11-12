@@ -10,7 +10,7 @@ public class PreviewTriggerHandler : MonoBehaviour
     {
         buildingSystem = system;
     }
-
+    
     private void OnTriggerStay(Collider other)
     {
         Debug.Log("Trigger entered: " + other.name);

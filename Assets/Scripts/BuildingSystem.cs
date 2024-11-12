@@ -812,7 +812,7 @@ public class BuildingSystem : NetworkBehaviour
 
     public void HandleCollisionEnter(bool colliding, Collider other)
     {
-        Debug.Log("Target object: " + targetBuildableObject);
+        // Debug.Log("Target object: " + targetBuildableObject);
         if (targetBuildableObject != null && other.transform.IsChildOf(targetBuildableObject.transform)) return;
 
         if (currentTileEdge != null)
@@ -837,7 +837,6 @@ public class BuildingSystem : NetworkBehaviour
     private void UpdatePreviewMaterial(bool isValid)
     {
         Material materialToUse = isValid ? validPreviewMaterial : invalidPreviewMaterial;
-        Debug.Log("isValid: " + isValid);
         foreach (Renderer renderer in previewRenderers)
         {
             renderer.material = materialToUse;

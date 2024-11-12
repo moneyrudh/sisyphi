@@ -7,6 +7,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
 {
     [Header("Spawn Settings")]
     public Vector3[] spawnPoints;
+    public GameObject boulderPrefab;
 
     public override void OnNetworkSpawn()
     {
@@ -20,6 +21,8 @@ public class PlayerSpawnHandler : NetworkBehaviour
         {
             RequestSpawnPositionServerRpc();
         }
+
+        if (IsOwner) SpawnBoulderServerRpc();
     }
 
     private void SetInitialPosition(ulong clientId)
@@ -40,5 +43,17 @@ public class PlayerSpawnHandler : NetworkBehaviour
     private void SyncPositionClientRpc(Vector3 position)
     {
         if (!IsServer) transform.position = position;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SpawnBoulderServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        ulong clientId = serverRpcParams.Receive.SenderClientId;
+        NetworkObject playerObject = NetworkManager.ConnectedClients[clientId].PlayerObject;
+
+        Vector3 spawnPosition = playerObject.transform.position + new Vector3(0, 1f, 4f);
+        GameObject boulder = Instantiate(boulderPrefab, transform.position + new Vector3(0, 1f, 4f), Quaternion.identity);
+        NetworkObject networkObject = boulder.GetComponent<NetworkObject>();
+        networkObject.Spawn();
     }
 }

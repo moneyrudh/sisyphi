@@ -4084,7 +4084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3715926696
+  GlobalObjectIdHash: 2427064709
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4125,7 +4125,7 @@ MonoBehaviour:
   groundCheckDistance: 0.2
   gravityMultiplier: 3
   fallMultiplier: 3
-  rotationSmoothTime: 0.1
+  rotationSmoothTime: 1
 --- !u!114 &6470093790754881284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4200,7 +4200,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.28
   m_Height: 1.78
@@ -4384,6 +4384,7 @@ MonoBehaviour:
   spawnPoints:
   - {x: 10, y: 3.5, z: -40}
   - {x: 25, y: 3.5, z: -40}
+  boulderPrefab: {fileID: 6887029233247754709, guid: 3c760d0d83d3345ffa478b380743fa3b, type: 3}
 --- !u!1 &6075755152283341952
 GameObject:
   m_ObjectHideFlags: 0

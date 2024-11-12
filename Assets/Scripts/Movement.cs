@@ -138,6 +138,7 @@ public class Movement : NetworkBehaviour
 
     private void MoveRelativeToCamera()
     {
+        if (!IsOwner) return;
         if (playerCamera == null) return;
         
         Vector3 forward = Vector3.ProjectOnPlane(playerCamera.transform.forward, Vector3.up).normalized;
@@ -230,8 +231,13 @@ public class Movement : NetworkBehaviour
 
     private void CheckRockProximity()
     {
-        pushing = Physics.Raycast(proximityCheck.position, transform.TransformDirection(Vector3.forward), 0.75f, boulderLayer);
+        RaycastHit hit;
+        pushing = Physics.Raycast(proximityCheck.position, transform.TransformDirection(Vector3.forward), out hit, 0.75f, boulderLayer);
         pushingColliders.SetActive(pushing);
+        if (pushing)
+        {
+            rock = hit.collider.gameObject;
+        }
     }
 
     private void ApplyGravity()
