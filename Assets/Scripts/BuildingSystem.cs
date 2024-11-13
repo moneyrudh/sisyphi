@@ -43,6 +43,7 @@ public class BuildingSystem : NetworkBehaviour
     private TileEdge currentTileEdge;
     private BuildableEdge currentBuildableEdge;
     private BuildableObject targetBuildableObject;
+    private ulong targetBuildableObjectId;
     private BuildableObject ghostBuildableObject;
     private bool inBuildMode = false;
     private Movement movement;
@@ -324,6 +325,7 @@ public class BuildingSystem : NetworkBehaviour
                 currentTileEdge = null;
                 currentBuildableEdge = null;
                 targetBuildableObject = null;
+                targetBuildableObjectId = 0;
                 return;
             }
         }
@@ -334,6 +336,7 @@ public class BuildingSystem : NetworkBehaviour
             currentTileEdge = null;
             currentBuildableEdge = null;
             targetBuildableObject = null;
+            targetBuildableObjectId = 0;
             return;
         }
 
@@ -341,7 +344,6 @@ public class BuildingSystem : NetworkBehaviour
 
         if (Physics.Raycast(ray, out hit, maxBuildDistance, tileLayer))
         {
-            Debug.Log($"Hit tile at {hit.point}");
             TileEdges tile = hit.collider.GetComponent<TileEdges>();
             if (tile != null && currentBuildType == BuildableType.Ramp)
             {
@@ -429,6 +431,7 @@ public class BuildingSystem : NetworkBehaviour
                 HideBuildPreview();
                 currentBuildableEdge = null;
                 targetBuildableObject = null;
+                targetBuildableObjectId = 0;
             }
         }
     }
@@ -448,6 +451,7 @@ public class BuildingSystem : NetworkBehaviour
                 HideBuildPreview();
                 currentBuildableEdge = null;
                 targetBuildableObject = null;
+                targetBuildableObjectId = 0;
             }
         }
     }
@@ -478,6 +482,7 @@ public class BuildingSystem : NetworkBehaviour
             if (closestEdge.isOccupied) return;
             currentBuildableEdge = closestEdge;
             targetBuildableObject = target;
+            targetBuildableObjectId = target.NetworkObjectId;
 
             switch (currentBuildType)
             {
@@ -497,6 +502,7 @@ public class BuildingSystem : NetworkBehaviour
             HideBuildPreview();
             currentBuildableEdge = null;
             targetBuildableObject = null;
+            targetBuildableObjectId = 0;
         }
     }
 
@@ -509,10 +515,24 @@ public class BuildingSystem : NetworkBehaviour
         EdgeDirection oppositeDirection = GetOppositeDirection(edge.direction);
 
         Quaternion targetRotation = target.transform.rotation;
-        Quaternion rampRotation = GetRampRotation(oppositeDirection);
+        Quaternion rotation = Quaternion.identity;
+        switch (target.type)
+        {
+            case BuildableType.Ramp:
+                rotation = GetRampRotation(oppositeDirection);
+                buildPreview.transform.rotation = targetRotation;
+                break;
+            case BuildableType.Platform:
+                rotation = GetRampRotation(oppositeDirection);
+                buildPreview.transform.rotation = targetRotation;
+                break;
+            case BuildableType.Connector:
+                buildPreview.transform.rotation = targetRotation;
+                buildPreview.transform.Rotate(0, GetConnectorRotationAngle(edge.direction), 0);
+                break;
+        }
 
         buildPreview.transform.position = edgeWorldPos;
-        buildPreview.transform.rotation = targetRotation;
     }
 
     private void UpdatePlatformPreview(BuildableObject target, BuildableEdge edge)
@@ -524,10 +544,24 @@ public class BuildingSystem : NetworkBehaviour
         EdgeDirection oppositeDirection = GetOppositeDirection(edge.direction);
 
         Quaternion targetRotation = target.transform.rotation;
-        Quaternion rampRotation = GetRampRotation(oppositeDirection);
+        Quaternion rotation = Quaternion.identity;
+        switch(target.type)
+        {
+            case BuildableType.Ramp:
+                rotation = GetRampRotation(oppositeDirection);
+                buildPreview.transform.rotation = targetRotation;
+                break;
+            case BuildableType.Platform:
+                rotation = GetRampRotation(oppositeDirection);
+                buildPreview.transform.rotation = targetRotation;
+                break;
+            case BuildableType.Connector:
+                buildPreview.transform.rotation = targetRotation;
+                buildPreview.transform.Rotate(0, GetConnectorRotationAngle(edge.direction), 0);
+                break;
+        }
 
         buildPreview.transform.position = edgeWorldPos;
-        buildPreview.transform.rotation = targetRotation;
     }
 
     private void UpdateConnectorPreview(BuildableObject target, BuildableEdge edge)
@@ -722,7 +756,8 @@ public class BuildingSystem : NetworkBehaviour
             PlaceRampOnBuildableServerRpc(
                 buildPreview.transform.position,
                 buildPreview.transform.rotation,
-                targetBuildableObject.NetworkObjectId,
+                // targetBuildableObject.NetworkObjectId,
+                targetBuildableObjectId,
                 currentBuildableEdge.localPosition
             );
         }
@@ -737,11 +772,13 @@ public class BuildingSystem : NetworkBehaviour
     {
         if (!isValidPlacement) return;
         if (currentBuildableEdge == null || targetBuildableObject == null) return;
-
+        Debug.Log($"TryPlaceConnector - Target Object: {targetBuildableObject.name}, NetworkObjectId: {targetBuildableObject.NetworkObjectId}, IsSpawned: {targetBuildableObject.IsSpawned}");
+    
         PlaceConnectorServerRpc(
             buildPreview.transform.position,
             buildPreview.transform.rotation,
-            targetBuildableObject.NetworkObjectId,
+            // targetBuildableObject.NetworkObjectId,
+            targetBuildableObjectId,
             currentBuildableEdge.localPosition
         );
     }
@@ -750,11 +787,13 @@ public class BuildingSystem : NetworkBehaviour
     {
         if (!isValidPlacement) return;
         if (currentBuildableEdge == null || targetBuildableObject == null) return;
+        Debug.Log($"TryPlacePlatform - Target Object: {targetBuildableObject.name}, NetworkObjectId: {targetBuildableObject.NetworkObjectId}, IsSpawned: {targetBuildableObject.IsSpawned}");
 
         PlacePlatformServerRpc(
             buildPreview.transform.position,
             buildPreview.transform.rotation,
-            targetBuildableObject.NetworkObjectId,
+            // targetBuildableObject.NetworkObjectId,
+            targetBuildableObjectId,
             currentBuildableEdge.localPosition
         );
     }
@@ -912,12 +951,20 @@ public class BuildingSystem : NetworkBehaviour
     {
         if (buildPreview != null)
         {
+            UpdatePreviewMaterial(true);
             buildPreview.SetActive(false);
+            isValidPlacement = true;
         }
     }
 
     public void HandleCollisionEnter(bool colliding, Collider other)
     {
+        if (other == null) 
+        {
+            overlappingColliders.Clear();
+            UpdatePreviewValidity();
+            return;
+        }
         // Debug.Log("Target object: " + targetBuildableObject);
         if (targetBuildableObject != null && other.transform.IsChildOf(targetBuildableObject.transform)) return;
 
