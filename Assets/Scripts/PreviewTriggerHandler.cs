@@ -6,6 +6,7 @@ public class PreviewTriggerHandler : MonoBehaviour
 {
     private BuildingSystem buildingSystem;
     private BoxCollider triggerCollider;
+    private BuildableObject buildableObject;
     private HashSet<Collider> overlappingColliders = new HashSet<Collider>();
     private LineRenderer[] debugLines;
     private Material lineMaterial;
@@ -13,6 +14,12 @@ public class PreviewTriggerHandler : MonoBehaviour
     public void Initialize(BuildingSystem system)
     {
         buildingSystem = system;
+        buildableObject = null;
+        buildableObject = GetComponent<BuildableObject>();
+        if (buildableObject == null)
+        {
+            buildableObject = GetComponentInParent<BuildableObject>();
+        }
         triggerCollider = GetComponent<BoxCollider>();
         CreateDebugLines();
     }
@@ -42,6 +49,7 @@ public class PreviewTriggerHandler : MonoBehaviour
 
     private void Update()
     {
+        if (buildableObject.type == BuildableType.Ramp) return;
         if (buildingSystem == null || triggerCollider == null) return;
 
         Vector3 center = transform.TransformPoint(triggerCollider.center);
@@ -119,17 +127,19 @@ public class PreviewTriggerHandler : MonoBehaviour
     }
 
 
-    // private void OnTriggerStay(Collider other)
-    // {
-    //     Debug.Log("Trigger entered: " + other.name);
-    //     if (buildingSystem == null)
-    //     {
-    //         Debug.LogError("BuildingSystem not initialized");
-    //         return;
-    //     }
+    private void OnTriggerStay(Collider other)
+    {
+        if (buildableObject.type == BuildableType.Connector) return;
+        if (buildableObject.type == BuildableType.Platform) return;
+        Debug.Log("Trigger entered: " + other.name);
+        if (buildingSystem == null)
+        {
+            Debug.LogError("BuildingSystem not initialized");
+            return;
+        }
 
-    //     buildingSystem.HandleCollisionEnter(true, other);
-    // }
+        buildingSystem.HandleCollisionEnter(true, other);
+    }
 
     private void OnTriggerExit(Collider other)
     {
