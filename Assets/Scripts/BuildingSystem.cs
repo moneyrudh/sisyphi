@@ -143,7 +143,7 @@ public class BuildingSystem : NetworkBehaviour
         buildPreview = Instantiate(rampGhostPrefab);
         if (buildPreview != null)
         {
-            buildPreview.SetActive(true);
+            buildPreview.SetActive(false);
             ghostBuildableObject = buildPreview.GetComponent<BuildableObject>();
             rampPreviewComponent = buildPreview.GetComponent<RampObject>();
 
@@ -163,7 +163,7 @@ public class BuildingSystem : NetworkBehaviour
             {
                 triggerHandler = buildPreview.transform.GetChild(0).gameObject.AddComponent<PreviewTriggerHandler>();
             }
-            triggerHandler.Initialize(this);
+            triggerHandler.Initialize(this, buildPreview.GetComponent<BuildableObject>());
         }
 
         movement = GetComponent<Movement>();
@@ -245,7 +245,7 @@ public class BuildingSystem : NetworkBehaviour
             }
 
             var triggerHandler = buildPreview.AddComponent<PreviewTriggerHandler>();
-            triggerHandler.Initialize(this);
+            triggerHandler.Initialize(this, buildPreview.GetComponent<BuildableObject>());
         }
     }
 

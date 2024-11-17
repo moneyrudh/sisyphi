@@ -4112,7 +4112,7 @@ MonoBehaviour:
   groundCheck: {fileID: 6654591264043039490}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 584
+    m_Bits: 969
   boulderLayer:
     serializedVersion: 2
     m_Bits: 128

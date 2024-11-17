@@ -43,7 +43,9 @@ public class TileEdges : NetworkBehaviour
     private void InitializeEdges()
     {
         Vector3 tilePos = transform.position;
-        float tileSize = GetComponent<Renderer>().bounds.size.x * sizeMultiplier * demultiplier;
+        float tileSize;
+        if (GetComponent<Renderer>() == null) tileSize = 2f * sizeMultiplier * demultiplier;
+        else tileSize = GetComponent<Renderer>().bounds.size.x * sizeMultiplier * demultiplier;
         float halfSize = tileSize / 4f;
 
         // North

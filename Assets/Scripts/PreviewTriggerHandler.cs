@@ -11,15 +11,11 @@ public class PreviewTriggerHandler : MonoBehaviour
     private LineRenderer[] debugLines;
     private Material lineMaterial;
 
-    public void Initialize(BuildingSystem system)
+    public void Initialize(BuildingSystem system, BuildableObject buildable)
     {
         buildingSystem = system;
         buildableObject = null;
-        buildableObject = GetComponent<BuildableObject>();
-        if (buildableObject == null)
-        {
-            buildableObject = GetComponentInParent<BuildableObject>();
-        }
+        buildableObject = buildable;
         triggerCollider = GetComponent<BoxCollider>();
         CreateDebugLines();
     }
@@ -49,8 +45,8 @@ public class PreviewTriggerHandler : MonoBehaviour
 
     private void Update()
     {
-        if (buildableObject.type == BuildableType.Ramp) return;
         if (buildingSystem == null || triggerCollider == null) return;
+        if (buildableObject.type == BuildableType.Ramp) return;
 
         Vector3 center = transform.TransformPoint(triggerCollider.center);
         Vector3 halfExtents = Vector3.Scale(triggerCollider.size * 0.5f, transform.lossyScale);

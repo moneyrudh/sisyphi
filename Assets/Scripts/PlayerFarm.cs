@@ -23,17 +23,17 @@ public class PlayerFarm : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (movement.moveDirection.magnitude < 0.1f && Input.GetMouseButton(0) && !isFarming && Movement.isGrounded)
-        {
-            // StartCoroutine(PerformFarmRoutine());
-            isFarming = true;
-            animator.SetTrigger("farm");
-        }
+        // if (movement.moveDirection.magnitude < 0.1f && Input.GetMouseButton(0) && !isFarming && Movement.isGrounded)
+        // {
+        //     // StartCoroutine(PerformFarmRoutine());
+        //     isFarming = true;
+        //     animator.SetTrigger("farm");
+        // }
 
-        if (movement.moveDirection.magnitude > 0.1f)
-        {
-            isFarming = false;
-        }
+        // if (movement.moveDirection.magnitude > 0.1f)
+        // {
+        //     isFarming = false;
+        // }
     }
 
     private void OnDrawGizmosSelected() {
