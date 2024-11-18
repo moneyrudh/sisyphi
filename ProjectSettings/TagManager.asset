@@ -7,6 +7,9 @@ TagManager:
   - Rock
   - FarmPoint
   - Buildable
+  - Wood
+  - Boulder
+  - Ramp
   layers:
   - Default
   - TransparentFX

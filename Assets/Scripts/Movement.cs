@@ -15,7 +15,7 @@ public class Movement : NetworkBehaviour
     public LayerMask groundLayer;
     public LayerMask boulderLayer;
 
-    private GameObject rock;
+    private GameObject boulder;
 
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
@@ -75,7 +75,7 @@ public class Movement : NetworkBehaviour
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         cameraController = GetComponent<CameraController>();
-        rock = GameObject.FindWithTag("Rock");
+        boulder = GameObject.FindWithTag("Boulder");
         if (IsOwner)
         {
             StartCoroutine(WaitForCamera());
@@ -132,7 +132,7 @@ public class Movement : NetworkBehaviour
         Vector3 movement = new Vector3(moveDirection.x, 0, moveDirection.y).normalized;
         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
         // if (pushing) {
-        //     rock.GetComponent<Rigidbody>().MovePosition(rock.GetComponent<Rigidbody>().position + movement * moveSpeed / 3f * Time.fixedDeltaTime);
+        //     boulder.GetComponent<Rigidbody>().MovePosition(boulder.GetComponent<Rigidbody>().position + movement * moveSpeed / 3f * Time.fixedDeltaTime); 
         // }
     }
 
@@ -161,7 +161,7 @@ public class Movement : NetworkBehaviour
         if (!IsOwner) return;
         if (pushing) 
         {
-            Vector3 relativePos = (rock.transform.position - transform.position).normalized;
+            Vector3 relativePos = (boulder.transform.position - transform.position).normalized;
             // Quaternion toRotation = Quaternion.LookRotation(relativePos, Vector3.up);
             // transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.fixedDeltaTime);
 
@@ -184,7 +184,7 @@ public class Movement : NetworkBehaviour
         if (!IsOwner) return;
         if (pushing) 
         {
-            Vector3 relativePos = (rock.transform.position - transform.position).normalized;
+            Vector3 relativePos = (boulder.transform.position - transform.position).normalized;
             // Quaternion toRotation = Quaternion.LookRotation(relativePos, Vector3.up);
             // transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.fixedDeltaTime);
 
@@ -236,7 +236,7 @@ public class Movement : NetworkBehaviour
         pushingColliders.SetActive(pushing);
         if (pushing)
         {
-            rock = hit.collider.gameObject;
+            boulder = hit.collider.gameObject;
         }
     }
 

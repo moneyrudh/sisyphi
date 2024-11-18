@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 296431170702474911}
   - component: {fileID: 6646021209489047361}
   - component: {fileID: 2029692410264361314}
+  - component: {fileID: 6370204840509277775}
   m_Layer: 0
   m_Name: Tree_8
   m_TagString: Untagged
@@ -106,6 +107,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300028, guid: 73f90bdd5e7539740a292cdd00817d1a, type: 3}
+--- !u!114 &6370204840509277775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306795006285400457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 3
 --- !u!1 &565668148706482011
 GameObject:
   m_ObjectHideFlags: 0
@@ -782,6 +796,7 @@ GameObject:
   - component: {fileID: 7962742240640965987}
   - component: {fileID: 6912150018878939173}
   - component: {fileID: 695626046165275750}
+  - component: {fileID: 6714214967825620537}
   m_Layer: 0
   m_Name: Tree_8 (1)
   m_TagString: Untagged
@@ -876,6 +891,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300028, guid: 73f90bdd5e7539740a292cdd00817d1a, type: 3}
+--- !u!114 &6714214967825620537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3919715988807486510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 1
 --- !u!1 &3941416293646705140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1195,6 +1223,7 @@ GameObject:
   - component: {fileID: 2333035424585321111}
   - component: {fileID: 8672242261477516220}
   - component: {fileID: 964209626206971778}
+  - component: {fileID: 3459999407910192698}
   m_Layer: 0
   m_Name: Tree_9
   m_TagString: Untagged
@@ -1289,6 +1318,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300026, guid: 73f90bdd5e7539740a292cdd00817d1a, type: 3}
+--- !u!114 &3459999407910192698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5361977513744488536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 3
 --- !u!1 &6091531248931015883
 GameObject:
   m_ObjectHideFlags: 0
@@ -1301,6 +1343,7 @@ GameObject:
   - component: {fileID: 6512816948273163473}
   - component: {fileID: 4417309787368533536}
   - component: {fileID: 5312018579116271746}
+  - component: {fileID: 5445718009490690414}
   m_Layer: 0
   m_Name: Tree_3
   m_TagString: Untagged
@@ -1395,6 +1438,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300004, guid: 73f90bdd5e7539740a292cdd00817d1a, type: 3}
+--- !u!114 &5445718009490690414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6091531248931015883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 1
 --- !u!1 &7072848524621244168
 GameObject:
   m_ObjectHideFlags: 0
@@ -1824,7 +1880,7 @@ GameObject:
   - component: {fileID: -814611436783788660}
   - component: {fileID: -4102648989453733123}
   - component: {fileID: -2433532728009692009}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: TreesForGrass_7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1914,7 +1970,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2862866085
+  GlobalObjectIdHash: 3619969635
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1985,7 +2041,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859cdf6c874824640b0ee665e66fdcd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: aed12c224fbc8704d8eaa07a52e88f44, type: 3}
+  onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
 --- !u!65 &-2433532728009692009
 BoxCollider:
   m_ObjectHideFlags: 0

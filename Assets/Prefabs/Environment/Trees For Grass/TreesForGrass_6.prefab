@@ -765,6 +765,7 @@ GameObject:
   - component: {fileID: 5146202862482015567}
   - component: {fileID: 7986065239306427264}
   - component: {fileID: 9038672906409545537}
+  - component: {fileID: 7035351479156331935}
   m_Layer: 0
   m_Name: Tree_14
   m_TagString: Untagged
@@ -859,6 +860,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300016, guid: 73f90bdd5e7539740a292cdd00817d1a, type: 3}
+--- !u!114 &7035351479156331935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5759614421692576268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 2
 --- !u!1 &6403338213973493359
 GameObject:
   m_ObjectHideFlags: 0
@@ -1015,7 +1029,7 @@ GameObject:
   - component: {fileID: -8467206274171157756}
   - component: {fileID: -5387687378917647251}
   - component: {fileID: -8378726981264447822}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: TreesForGrass_6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1103,7 +1117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3092576964
+  GlobalObjectIdHash: 1078434110
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1174,7 +1188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859cdf6c874824640b0ee665e66fdcd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: aed12c224fbc8704d8eaa07a52e88f44, type: 3}
+  onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
 --- !u!65 &-8378726981264447822
 BoxCollider:
   m_ObjectHideFlags: 0

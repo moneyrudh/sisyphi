@@ -10,11 +10,11 @@ public class PreviewTriggerHandler : MonoBehaviour
     private HashSet<Collider> overlappingColliders = new HashSet<Collider>();
     private LineRenderer[] debugLines;
     private Material lineMaterial;
+    private Collider[] overlapResults = new Collider[10];
 
     public void Initialize(BuildingSystem system, BuildableObject buildable)
     {
         buildingSystem = system;
-        buildableObject = null;
         buildableObject = buildable;
         triggerCollider = GetComponent<BoxCollider>();
         CreateDebugLines();
@@ -45,9 +45,75 @@ public class PreviewTriggerHandler : MonoBehaviour
 
     private void Update()
     {
-        if (buildingSystem == null || triggerCollider == null) return;
-        if (buildableObject.type == BuildableType.Ramp) return;
+        if (buildingSystem == null) return;
+        if (buildableObject.type == BuildableType.Ramp)
+        {
+            HandleRampCollision();
+        }
+        else
+        {
+            HandleNonRampCollision();
+        }
+    }
 
+    private void HandleRampCollision()
+    {
+        Collider previewCollider = GetComponent<Collider>();
+        Bounds bounds = previewCollider.bounds;
+        Vector3 center = bounds.center;
+        Vector3 halfExtents = bounds.extents / 1.2f;
+        Debug.Log(transform.parent.rotation);
+
+        float yRotation = transform.parent.rotation.eulerAngles.y;
+        if (Mathf.Approximately(yRotation, 90f) || Mathf.Approximately(yRotation, 270f))
+        {
+            float temp = halfExtents.x;
+            halfExtents.x = halfExtents.z;
+            halfExtents.z = temp;
+        }
+        
+        int hitCount = Physics.OverlapBoxNonAlloc(
+            center,
+            halfExtents,
+            overlapResults,
+            transform.parent.rotation
+        );
+
+        UpdateDebugBox(center, halfExtents, transform.parent.rotation);
+
+        bool hasValidCollision = false;
+        Collider validCollider = null;
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider hitCollider = overlapResults[i];
+            
+            // Skip if it's part of the preview
+            if (hitCollider.gameObject.tag == "Rock") continue;
+            if (hitCollider.gameObject.tag == "Ramp") continue;
+            if (hitCollider.transform.IsChildOf(transform)) continue;
+            if (hitCollider.isTrigger) continue;
+            // For debugging
+            Debug.Log($"Found collision with: {hitCollider.gameObject.name}");
+
+            hasValidCollision = true;
+            validCollider = hitCollider;
+            overlappingColliders.Add(hitCollider);
+        }
+
+        // Notify building system of the collision state
+        buildingSystem.HandleCollisionEnter(hasValidCollision, validCollider);
+
+        Color color = hasValidCollision ? Color.red : Color.green;
+        foreach (var line in debugLines)
+        {
+            line.startColor = color;
+            line.endColor = color;
+        }
+    }
+
+    private void HandleNonRampCollision()
+    {
         Vector3 center = transform.TransformPoint(triggerCollider.center);
         Vector3 halfExtents = Vector3.Scale(triggerCollider.size * 0.5f, transform.lossyScale);
         

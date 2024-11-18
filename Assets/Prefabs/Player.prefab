@@ -4022,6 +4022,7 @@ GameObject:
   - component: {fileID: -895039447018581072}
   - component: {fileID: -2442251563675163270}
   - component: {fileID: 6505856498458587469}
+  - component: {fileID: 5087495146834746033}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -4182,7 +4183,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!136 &494675050741522454
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -4385,6 +4386,19 @@ MonoBehaviour:
   - {x: 10, y: 3.5, z: -40}
   - {x: 25, y: 3.5, z: -40}
   boulderPrefab: {fileID: 6887029233247754709, guid: 3c760d0d83d3345ffa478b380743fa3b, type: 3}
+--- !u!114 &5087495146834746033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5751469025688621471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7094120f24b4806bb2dad40565d3de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wood: 0
 --- !u!1 &6075755152283341952
 GameObject:
   m_ObjectHideFlags: 0

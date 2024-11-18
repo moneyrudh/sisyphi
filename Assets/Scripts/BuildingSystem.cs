@@ -47,6 +47,7 @@ public class BuildingSystem : NetworkBehaviour
     private BuildableObject ghostBuildableObject;
     private bool inBuildMode = false;
     private Movement movement;
+    private PlayerInventory inventory;
 
     [Header("Validity")]
     public bool isValidPlacement = true;
@@ -63,6 +64,7 @@ public class BuildingSystem : NetworkBehaviour
             // InitializePreview();
             StartCoroutine(InitializeWithDelay());
             EnableInputs();
+            inventory = GetComponent<PlayerInventory>();
         }
     }
 
@@ -244,7 +246,15 @@ public class BuildingSystem : NetworkBehaviour
                 col.isTrigger = true;
             }
 
-            var triggerHandler = buildPreview.AddComponent<PreviewTriggerHandler>();
+            PreviewTriggerHandler triggerHandler = null;
+            if (currentBuildType != BuildableType.Ramp)
+            {
+                triggerHandler = buildPreview.AddComponent<PreviewTriggerHandler>();
+            }
+            else
+            {
+                triggerHandler = buildPreview.transform.GetChild(0).gameObject.AddComponent<PreviewTriggerHandler>();
+            }
             triggerHandler.Initialize(this, buildPreview.GetComponent<BuildableObject>());
         }
     }
@@ -726,12 +736,15 @@ public class BuildingSystem : NetworkBehaviour
         switch (currentBuildType)
         {
             case BuildableType.Ramp:
+                if (inventory.wood < 2) return;
                 TryPlaceRamp();
                 break;
             case BuildableType.Connector:
+                if (inventory.wood < 1) return;
                 TryPlaceConnector();
                 break;
             case BuildableType.Platform:
+                if (inventory.wood < 2) return;
                 TryPlacePlatform();
                 break;
         }
@@ -815,6 +828,7 @@ public class BuildingSystem : NetworkBehaviour
         GameObject ramp = Instantiate(rampPrefab, position, rotation);
         NetworkObject networkObject = ramp.GetComponent<NetworkObject>();
         networkObject.Spawn();
+        inventory.RemoveWood(2);
 
         UpdateEdgeStateClientRpc(edgeStart, edgeEnd, direction);
         // Update inventory
@@ -849,6 +863,7 @@ public class BuildingSystem : NetworkBehaviour
         GameObject connector = Instantiate(connectorPrefab, position, rotation);
         NetworkObject networkObject = connector.GetComponent<NetworkObject>();
         networkObject.Spawn();
+        inventory.RemoveWood(1);
 
         NetworkObject targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
         BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
@@ -895,6 +910,7 @@ public class BuildingSystem : NetworkBehaviour
         GameObject platform = Instantiate(platformPrefab, position, rotation);
         NetworkObject networkObject = platform.GetComponent<NetworkObject>();
         networkObject.Spawn();
+        inventory.RemoveWood(2);
 
         NetworkObject targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
         BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
@@ -908,6 +924,7 @@ public class BuildingSystem : NetworkBehaviour
         GameObject ramp = Instantiate(rampPrefab, position, rotation);
         NetworkObject networkObject = ramp.GetComponent<NetworkObject>();
         networkObject.Spawn();
+        inventory.RemoveWood(2);
 
         NetworkObject targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
         BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();

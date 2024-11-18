@@ -39,6 +39,7 @@ public class TileSetter : NetworkBehaviour
     private float curZ;
     private bool isIce = false;
     private bool isTilesSet = false;
+    private float iceCooldown = 10f;
     private Dictionary<string, float> originalWaterValues = new Dictionary<string, float>();
     // private bool isLoading = true;
     [SerializeField] private GameObject tilesParent;
@@ -78,9 +79,9 @@ public class TileSetter : NetworkBehaviour
     void Update()
     {
         // if (isLoading) return;
-        if (isTilesSet && !isIce && Input.GetKeyDown(KeyCode.Space))
+        if (IsHost && isTilesSet && !isIce) 
         {
-            // StartCoroutine(SetIce());
+            StartCoroutine(SetIce());
         }
 
         if (Input.GetKeyDown(KeyCode.P)) {
@@ -393,14 +394,14 @@ public class TileSetter : NetworkBehaviour
         WaterMaterial.SetFloat("_WavesAmplitude", iceWavesAmplitude);
         WaterMaterial.SetFloat("_WavesAmount", iceWavesAmount);
 
-        Transform waterGO = tilesParent.transform.Find("WaterGO(Clone)");
+        Transform waterGO = GameObject.Find("WaterGO").transform;
         if (waterGO == null)
         {
             Debug.LogError("Water not found");
             RestoreOriginalWaterValues();
             yield break;
         }
-        GameObject water = tilesParent.transform.Find("WaterGO(Clone)").GetChild(0).gameObject;
+        GameObject water = waterGO.GetChild(0).gameObject;
         if (water == null)
         {
             Debug.LogError("Water not found");
@@ -434,6 +435,7 @@ public class TileSetter : NetworkBehaviour
         WaterMaterial.SetFloat("_WavesAmplitude", originalWavesAmplitude);
         WaterMaterial.SetFloat("_WavesAmount", originalWavesAmount);
 
+        yield return new WaitForSeconds(iceCooldown);
         isIce = false;
     }
 

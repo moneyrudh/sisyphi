@@ -28,7 +28,7 @@ public class DamageTree : NetworkBehaviour
     public void Damage()
     {
         if (!IsServer) return;
-        if (isDestroyed.Value) return;
+        if (isDestroyed.Value || health.Value < 0) return;
 
         Debug.Log("Tree Damaged. Current Health: " + health.Value);
         health.Value --;
@@ -45,11 +45,15 @@ public class DamageTree : NetworkBehaviour
         // transform.Find("Remains").gameObject.SetActive(true);
         Destroy(gameObject, 5f);
         GameObject trees = transform.Find("Trees").gameObject;
+        if (trees == null) return;
         foreach (Transform child in trees.transform)
         {
-            int logCount = child.gameObject.GetComponent<LogCount>().count;
-            int logIndex = logCount - 1;
+            LogCount logCount = child.gameObject.GetComponent<LogCount>();
+            int count = logCount.count;
+            int logIndex = count - 1;
             GameObject log = Instantiate(tileSetter.logs[logIndex].log, child.position, Quaternion.identity);
+            count *= 3;
+            log.AddComponent<LogCount>().count = count;
             child.gameObject.SetActive(false);
         }
         transform.Find("Trees").gameObject.SetActive(false);

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1725177277120663444}
   - component: {fileID: 6005151276248685005}
   - component: {fileID: 8996924889675245924}
+  - component: {fileID: 5567809711432325165}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -46,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3953791312
+  GlobalObjectIdHash: 775408939
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -179,3 +180,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8d9ac8c788a4c96ac5b1f3b29f2f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5567809711432325165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3841992414128498506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f386bcd2709c247ef9ccf03e3e06ded5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  day: {fileID: 2100000, guid: b2c0069f85b67499e85bb2b9ecbfdaff, type: 2}
+  night: {fileID: 2100000, guid: 4d3d863937ae2436d8ee99fbb12dbcc1, type: 2}
+  blend: {fileID: 2100000, guid: e80041794f487438c86875ca1f6a50ab, type: 2}
