@@ -221,7 +221,14 @@ public class Movement : NetworkBehaviour
 
     private void CheckGrounded()
     {
-        isGrounded = Physics.Raycast(groundCheck.position, Vector3.down, groundCheckDistance, groundLayer);
+        isGrounded = Physics.SphereCast(
+            groundCheck.position + Vector3.up * 0.2f, // Start slightly above to avoid false negatives
+            0.2f, // Radius of sphere
+            Vector3.down,
+            out RaycastHit hit,
+            groundCheckDistance + 0.1f,
+            groundLayer
+        );
 
         if (isGrounded && rb.velocity.y < 0.1f)
         {
@@ -254,38 +261,7 @@ public class Movement : NetworkBehaviour
 
     private void UpdateAnimator()
     {
-        bool isMoving = moveDirection.magnitude > 0.1f;
-        // if (pushing && isGrounded) {
-        //     animator.SetBool("pushing", true);
-        //     if (Input.GetKey(KeyCode.LeftShift)) {
-        //         animator.SetBool("fast-push", true);
-        //         moveSpeed = 2.5f;
-        //     } else {
-        //         animator.SetBool("fast-push", false);
-        //         moveSpeed = 1.5f;
-        //     }
-        //     if (!isMoving) {
-        //         animator.speed = 0.1f;
-        //     } else {
-        //         animator.speed = 1;
-        //     }
-        //     return;
-        // }
-
-        // animator.speed = 1;
-        // if (!pushing) {
-        //     animator.SetBool("pushing", pushing);
-        //     if (Input.GetKey(KeyCode.LeftShift)) {
-        //         animator.SetBool("sprint", isMoving && isGrounded);
-        //         animator.SetBool("run", false);
-        //         moveSpeed = 7.5f;
-        //     } else {
-        //         animator.SetBool("run", isMoving && isGrounded);
-        //         animator.SetBool("sprint", false);
-        //         moveSpeed = 5f;
-        //     }
-        //     animator.SetBool("idle", !isMoving && isGrounded && rb.velocity.x <= 0.1f);
-        // }
+        bool isMoving = moveDirection.magnitude > 0;
 
         if (pushing && isGrounded)
         {
