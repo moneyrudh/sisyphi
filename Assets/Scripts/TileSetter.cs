@@ -79,10 +79,10 @@ public class TileSetter : NetworkBehaviour
     void Update()
     {
         // if (isLoading) return;
-        if (IsHost && isTilesSet && !isIce) 
-        {
-            StartCoroutine(SetIce());
-        }
+        // if (IsHost && isTilesSet && !isIce) 
+        // {
+        //     StartCoroutine(SetIce());
+        // }
 
         if (Input.GetKeyDown(KeyCode.P)) {
             SpawnTileServerRpc(0, 0, 10, -1, 10, sizeMultiplier);
