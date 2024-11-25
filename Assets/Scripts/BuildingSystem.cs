@@ -64,8 +64,9 @@ public class BuildingSystem : NetworkBehaviour
             // InitializePreview();
             StartCoroutine(InitializeWithDelay());
             EnableInputs();
-            inventory = GetComponent<PlayerInventory>();
         }
+        
+        inventory = GetComponent<PlayerInventory>();
     }
 
     private void OnEnable()

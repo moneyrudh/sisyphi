@@ -18,6 +18,7 @@ public class BoatPlacementSystem : NetworkBehaviour
     public float maxPlacementDistance = 10f;
     public LayerMask waterLayer;
     public LayerMask obstructionLayer;
+    public LayerMask boatLayer;
 
     [Header("Removal Settings")]
 
@@ -261,23 +262,29 @@ public class BoatPlacementSystem : NetworkBehaviour
 
         if (placedBoat != null)
         {
-            Collider[] obstacles = Physics.OverlapSphere(
-                placedBoat.transform.position,
-                removeCheckRadius,
-                removalObstructionLayer
-            );
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-            if (obstacles.Length == 0)
+            if (Physics.Raycast(ray, out hit, maxPlacementDistance, boatLayer))
             {
-                // BoatController boatController = placedBoat.GetComponent<BoatController>();
-                // if (boatController != null)
-                // {
-                //     boatController.OnBoatRemoved();
-                // }
-                UpdatePlacementStateClientRpc();
-                if (OwnerClientId != placedBoat.OwnerClientId) return;
-                placedBoat.Despawn();
-                Destroy(placedBoat.gameObject);
+                Collider[] obstacles = Physics.OverlapSphere(
+                    placedBoat.transform.position,
+                    removeCheckRadius,
+                    removalObstructionLayer
+                );
+
+                if (obstacles.Length == 0)
+                {
+                    // BoatController boatController = placedBoat.GetComponent<BoatController>();
+                    // if (boatController != null)
+                    // {
+                    //     boatController.OnBoatRemoved();
+                    // }
+                    UpdatePlacementStateClientRpc();
+                    if (OwnerClientId != placedBoat.OwnerClientId) return;
+                    placedBoat.Despawn();
+                    Destroy(placedBoat.gameObject);
+                }
             }
         }
     }

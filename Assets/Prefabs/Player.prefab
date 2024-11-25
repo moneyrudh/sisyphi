@@ -4086,7 +4086,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2427064709
+  GlobalObjectIdHash: 3715926696
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4114,7 +4114,7 @@ MonoBehaviour:
   groundCheck: {fileID: 6654591264043039490}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 969
+    m_Bits: 5065
   boulderLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -4416,13 +4416,16 @@ MonoBehaviour:
   boatGhostPrefab: {fileID: 7265504619516684512, guid: 9c8ff51d9cbda4f8fa0a940bd050ddd7, type: 3}
   validPreviewMaterial: {fileID: 2100000, guid: 1aba322e790a54fee812e8fafc35cc52, type: 2}
   invalidPreviewMaterial: {fileID: 2100000, guid: 53dfca88d781f4908bb0e868df6bc2c3, type: 2}
-  maxPlacementDistance: 10
+  maxPlacementDistance: 15
   waterLayer:
     serializedVersion: 2
     m_Bits: 16
   obstructionLayer:
     serializedVersion: 2
-    m_Bits: 1992
+    m_Bits: 4040
+  boatLayer:
+    serializedVersion: 2
+    m_Bits: 4096
   removeCheckRadius: 1
   removalObstructionLayer:
     serializedVersion: 2
