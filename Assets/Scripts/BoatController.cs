@@ -145,56 +145,29 @@ public class BoatController : NetworkBehaviour
     {
         if (playerCamera == null) return;
 
-        Vector3 forward = Vector3.ProjectOnPlane(playerCamera.transform.forward, Vector3.up).normalized;
-        Vector3 right = Vector3.ProjectOnPlane(playerCamera.transform.right, Vector3.up).normalized;
-
-        Vector3 _movement = (forward * moveDirection.y + right * moveDirection.x).normalized;
-
-        if (_movement != Vector3.zero)
+        // Handle rotation
+        if (moveDirection.x != 0)
         {
-            // Calculate new position
-            Vector3 newPosition = rb.position + _movement * moveSpeed * Time.fixedDeltaTime;
+            // Direct rotation without smoothing for turning
+            Quaternion targetRotation = transform.rotation * Quaternion.Euler(0f, moveDirection.x * rotationSpeed * Time.fixedDeltaTime, 0f);
+            rb.MoveRotation(targetRotation);
+        }
+
+        // Handle forward/backward movement
+        if (moveDirection.y != 0)
+        {
+            Vector3 moveDir = transform.forward * moveDirection.y;
+            Vector3 newPosition = rb.position + moveDir * moveSpeed * Time.fixedDeltaTime;
 
             if (Physics.Raycast(newPosition + Vector3.up * 2, Vector3.down, out RaycastHit hit, 10f, waterLayer))
             {
                 newPosition.y = hit.point.y;
-
-                // Calculate rotationz
-                Vector3 smoothedForward = Vector3.SmoothDamp(
-                    transform.forward,
-                    _movement,
-                    ref currentRotationVelocity,
-                    rotationSmoothTime
-                );
-
-                Quaternion newRotation = Quaternion.LookRotation(smoothedForward);
-
-                // transform.position = newPosition;
-                // transform.rotation = newRotation;
                 rb.MovePosition(newPosition);
-                rb.MoveRotation(newRotation);
-
-                // Sync to network
-                UpdateBoatTransformServerRpc(newPosition, newRotation);
             }
         }
-        // float vertical = Input.GetAxis("Vertical");
-        // float horizontal = Input.GetAxis("Horizontal");
 
-        // Vector3 moveDirection = transform.forward * vertical;
-        // float rotation = horizontal * rotationSpeed * Time.deltaTime;
-
-        // if (vertical != 0 || horizontal != 0)
-        // {
-        //     Vector3 newPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
-        //     Quaternion newRotation = transform.rotation * Quaternion.Euler(0, rotation, 0);
-
-        //     if (Physics.Raycast(newPosition + Vector3.up * 2, Vector3.down, out RaycastHit hit, 10f, waterLayer))
-        //     {
-        //         newPosition.y = hit.point.y;
-        //         UpdateBoatTransformServerRpc(newPosition, newRotation);
-        //     }
-        // }
+        // Always sync position and rotation to network
+        UpdateBoatTransformServerRpc(rb.position, rb.rotation);
     }
 
     [ServerRpc]

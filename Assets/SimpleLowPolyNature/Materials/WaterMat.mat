@@ -78,7 +78,7 @@ Material:
     - _WaterSmoothness: 1
     - _WaterSpecular: 0.3
     - _WavesAmount: 8
-    - _WavesAmplitude: 0.1
+    - _WavesAmplitude: 0.05
     - __dirty: 0
     m_Colors:
     - _Color: {r: 0.4292453, g: 0.7559531, b: 1, a: 1}
