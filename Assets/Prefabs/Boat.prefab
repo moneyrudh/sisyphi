@@ -262,6 +262,37 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.11, y: 0.4, z: 1.09}
   m_Center: {x: -0.76, y: 0.1, z: -0.61}
+--- !u!1 &3832976581474733149
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1273093836888443190}
+  m_Layer: 0
+  m_Name: ObstructionTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1273093836888443190
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3832976581474733149}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.294, z: 1.508}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5859483222349116920}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5097796683761389932
 GameObject:
   m_ObjectHideFlags: 0
@@ -501,6 +532,7 @@ Transform:
   - {fileID: 4027620014051101985}
   - {fileID: 1942580463604510065}
   - {fileID: 7935701213240745558}
+  - {fileID: 1273093836888443190}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8457232959948196248
@@ -545,6 +577,10 @@ MonoBehaviour:
   waterLayer:
     serializedVersion: 2
     m_Bits: 16
+  obstructionLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  obstructionTransform: {fileID: 1273093836888443190}
   interactAction: {fileID: 2835967775205859358, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   movement: {fileID: 4963347509809246797, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
 --- !u!65 &1119334695808655507
