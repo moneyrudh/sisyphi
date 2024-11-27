@@ -38,8 +38,8 @@ public class BoatPlacementSystem : NetworkBehaviour
     private bool isValidPlacement = true;
 
     private NetworkObject placedBoat;
-    private bool hasPlacedBoat = false;
-    private bool canRemoveBoat = true;
+    private NetworkVariable<bool> hasPlacedBoat = new NetworkVariable<bool>(false);
+    private NetworkVariable<bool> canRemoveBoat = new NetworkVariable<bool>(true);
 
     public override void OnNetworkSpawn()
     {
@@ -55,6 +55,7 @@ public class BoatPlacementSystem : NetworkBehaviour
         //         DisablePlacementMode();
         //     }
         // };
+        hasPlacedBoat.OnValueChanged += OnHasPlacedBoatChanged;
     }
 
     private void EnableInputs()
@@ -99,6 +100,14 @@ public class BoatPlacementSystem : NetworkBehaviour
         }
     }
 
+    private void OnHasPlacedBoatChanged(bool previousValue, bool newValue)
+    {
+        if (!newValue && IsOwner)
+        {
+            StartCoroutine(ReinitializePreview());
+        }
+    }
+
     private IEnumerator InitializeWithDelay()
     {
         yield return new WaitForEndOfFrame();
@@ -107,6 +116,8 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void InitializePreview()
     {
+        if (!IsOwner) return;
+
         playerCamera = GameObject.Find($"PlayerCamera_{OwnerClientId}")?.GetComponent<Camera>();
         if (playerCamera == null)
         {
@@ -114,9 +125,16 @@ public class BoatPlacementSystem : NetworkBehaviour
             return;
         }
 
+        if (boatPreview != null)
+        {
+            Destroy(boatPreview);
+            boatPreview = null;
+        }
+
         boatPreview = Instantiate(boatGhostPrefab);
         boatPreview.SetActive(false);
 
+        previewRenderers.Clear();
         previewRenderers.AddRange(boatPreview.GetComponentsInChildren<Renderer>());
 
         var triggerHandler = boatPreview.AddComponent<BoatPreviewTrigger>();
@@ -126,13 +144,31 @@ public class BoatPlacementSystem : NetworkBehaviour
         {
             col.isTrigger = true;
         }
+
+        inPlacementMode = false;
+    }
+
+    private IEnumerator ReinitializePreview()
+    {
+        yield return new WaitForEndOfFrame();
+
+        playerCamera = GameObject.Find($"PlayerCamera_{OwnerClientId}")?.GetComponent<Camera>();
+
+        if (boatPreview != null)
+        {
+            Destroy(boatPreview);
+            boatPreview = null;
+        }
+
+        InitializePreview();
+        EnableInputs();
     }
     
     private void Update()
     {
         if (!IsOwner || playerCamera == null || !inPlacementMode) return;
 
-        if (hasPlacedBoat)
+        if (hasPlacedBoat.Value)
         {
             DisablePlacementMode();
             return;
@@ -143,6 +179,13 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void UpdatePreviewPosition()
     {
+        if (boatPreview == null)
+        {
+            Debug.LogWarning("Preview is null in UpdatePreviewPosition, reinitializing...");
+            StartCoroutine(ReinitializePreview());
+            return;
+        }
+
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
@@ -164,25 +207,47 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void HandleBoatToggle(InputAction.CallbackContext context)
     {
-        Debug.Log(hasPlacedBoat + " Toggling");
-        if (hasPlacedBoat) return;
+        Debug.Log(hasPlacedBoat.Value + " Toggling");
+        if (hasPlacedBoat.Value) return;
+
+        if (boatPreview == null)
+        {
+            StartCoroutine(ReinitializePreview());
+            return;
+        }
+
         TogglePlacementMode();
     }
 
     private void HandleBoatConfirm(InputAction.CallbackContext context)
     {
-        if (!inPlacementMode || !isValidPlacement || hasPlacedBoat) return;
+        if (!inPlacementMode || !isValidPlacement || hasPlacedBoat.Value) return;
+        if (boatPreview == null)
+        {
+            Debug.LogWarning("Boat preview is null, reinitializing...");
+            StartCoroutine(ReinitializePreview());
+            return;
+        }
         PlaceBoatServerRpc(boatPreview.transform.position, boatPreview.transform.rotation);
     }
 
     private void HandleBoatRemoval(InputAction.CallbackContext context)
     {
         Debug.Log("Attempting to remove boat.");
-        Debug.Log("hasPlacedBoat" + hasPlacedBoat + "canRemoveBoat" + canRemoveBoat);
-        if (!hasPlacedBoat || !canRemoveBoat) return;
+        if (!hasPlacedBoat.Value || !canRemoveBoat.Value) return;
+
+        if (playerCamera == null)
+        {
+            Debug.LogError("Player Camera is null");
+            return;
+        }
 
         if (placedBoat != null)
         {
+            if (playerCamera != null && playerCamera.gameObject.name != $"PlayerCamera_{OwnerClientId}")
+            {
+                playerCamera = GameObject.Find($"PlayerCamera_{OwnerClientId}")?.GetComponent<Camera>();
+            }
             Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, maxPlacementDistance, boatLayer))
             {
@@ -240,35 +305,34 @@ public class BoatPlacementSystem : NetworkBehaviour
     [ServerRpc(RequireOwnership=false)]
     private void PlaceBoatServerRpc(Vector3 position, Quaternion rotation)
     {
-        if (hasPlacedBoat) return;
+        if (hasPlacedBoat.Value) return;
 
         GameObject boat = Instantiate(boatPrefab, position, rotation);
         NetworkObject networkObject = boat.GetComponent<NetworkObject>();
         networkObject.SpawnWithOwnership(OwnerClientId);
 
+        hasPlacedBoat.Value = true;
         UpdateBoatPlacedStateClientRpc(true, networkObject);
-
-        var boatController = boat.GetComponent<BoatController>();
-        if (boatController != null)
-        {
-            // boatController.InitializeOwnership(OwnerClientId);
-        }
     }
 
     [ClientRpc]
     private void UpdateBoatPlacedStateClientRpc(bool placed, NetworkObjectReference boatRef)
     {
-        hasPlacedBoat = placed;
         if (boatRef.TryGet(out NetworkObject boatObj))
         {
             placedBoat = boatObj;
+        }
+
+        if (IsOwner)
+        {
+            DisablePlacementMode();
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void RemoveBoatServerRpc()
     {
-        if (!hasPlacedBoat || !canRemoveBoat) return;
+        if (!hasPlacedBoat.Value || !canRemoveBoat.Value) return;
 
         if (placedBoat != null)
         {
@@ -282,15 +346,11 @@ public class BoatPlacementSystem : NetworkBehaviour
 
             if (obstacles.Length == 0)
             {
-                // BoatController boatController = placedBoat.GetComponent<BoatController>();
-                // if (boatController.isMounted) return;
-                // if (boatController != null)
-                // {
-                //     boatController.OnBoatRemoved();
-                // }
                 ulong boatId = placedBoat.NetworkObjectId;
                 placedBoat.Despawn();
                 Destroy(placedBoat.gameObject);
+
+                hasPlacedBoat.Value = false;
                 UpdatePlacementStateClientRpc(boatId);
             }
         }
@@ -301,31 +361,29 @@ public class BoatPlacementSystem : NetworkBehaviour
     {
         if (placedBoat != null && placedBoat.NetworkObjectId == boatId && placedBoat.OwnerClientId == OwnerClientId)
         {
-            hasPlacedBoat = false;
             placedBoat = null;
-            EnableInputs();
         }
-        StartCoroutine(UpdatePlacementState());
-    }
-
-    private IEnumerator UpdatePlacementState()
-    {
-        yield return new WaitForSeconds(0.2f);
+        StartCoroutine(ReinitializePreview());
     }
 
     public void SetBoatRemovable(bool canRemove)
     {
-        canRemoveBoat = canRemove;
+        canRemoveBoat.Value = canRemove;
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void SetBoatRemovableServerRpc(bool canRemove)
     {
-        canRemoveBoat = canRemove;
+        canRemoveBoat.Value = canRemove;
     }
 
     private void OnDestroy()
     {
+        if (IsSpawned && hasPlacedBoat.Value != null)
+        {
+            hasPlacedBoat.OnValueChanged -= OnHasPlacedBoatChanged;
+        }
+
         DisableInputs();
         if (boatPreview != null)
         {
