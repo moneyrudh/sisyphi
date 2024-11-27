@@ -164,6 +164,7 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void HandleBoatToggle(InputAction.CallbackContext context)
     {
+        Debug.Log(hasPlacedBoat + " Toggling");
         if (hasPlacedBoat) return;
         TogglePlacementMode();
     }
@@ -182,19 +183,28 @@ public class BoatPlacementSystem : NetworkBehaviour
 
         if (placedBoat != null)
         {
-            Collider[] obstacles = Physics.OverlapSphere(
-                placedBoat.transform.position,
-                removeCheckRadius,
-                removalObstructionLayer
-            );
-
-            if (obstacles.Length == 0)
+            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, maxPlacementDistance, boatLayer))
             {
-                RemoveBoatServerRpc();
+                // Then check for obstacles
+                Collider[] obstacles = Physics.OverlapSphere(
+                    placedBoat.transform.position,
+                    removeCheckRadius,
+                    removalObstructionLayer
+                );
+
+                if (obstacles.Length == 0)
+                {
+                    RemoveBoatServerRpc();
+                }
+                else
+                {
+                    Debug.Log("Cannot remove boat - obstacles detected");
+                }
             }
             else
             {
-                Debug.Log("Cannot remove boat -  obstacles detected");
+                Debug.Log("Must look at boat to remove it");
             }
         }
     }
@@ -262,45 +272,45 @@ public class BoatPlacementSystem : NetworkBehaviour
 
         if (placedBoat != null)
         {
-            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
+            if (placedBoat.OwnerClientId != OwnerClientId) return;
 
-            if (Physics.Raycast(ray, out hit, maxPlacementDistance, boatLayer))
+            Collider[] obstacles = Physics.OverlapSphere(
+                placedBoat.transform.position,
+                removeCheckRadius,
+                removalObstructionLayer
+            );
+
+            if (obstacles.Length == 0)
             {
-                Collider[] obstacles = Physics.OverlapSphere(
-                    placedBoat.transform.position,
-                    removeCheckRadius,
-                    removalObstructionLayer
-                );
-
-                if (obstacles.Length == 0)
-                {
-                    // BoatController boatController = placedBoat.GetComponent<BoatController>();
-                    // if (boatController != null)
-                    // {
-                    //     boatController.OnBoatRemoved();
-                    // }
-                    UpdatePlacementStateClientRpc();
-                    if (OwnerClientId != placedBoat.OwnerClientId) return;
-                    placedBoat.Despawn();
-                    Destroy(placedBoat.gameObject);
-                }
+                // BoatController boatController = placedBoat.GetComponent<BoatController>();
+                // if (boatController.isMounted) return;
+                // if (boatController != null)
+                // {
+                //     boatController.OnBoatRemoved();
+                // }
+                ulong boatId = placedBoat.NetworkObjectId;
+                placedBoat.Despawn();
+                Destroy(placedBoat.gameObject);
+                UpdatePlacementStateClientRpc(boatId);
             }
         }
     }
 
     [ClientRpc]
-    private void UpdatePlacementStateClientRpc()
+    private void UpdatePlacementStateClientRpc(ulong boatId)
     {
-        if (OwnerClientId != placedBoat.OwnerClientId) return;
+        if (placedBoat != null && placedBoat.NetworkObjectId == boatId && placedBoat.OwnerClientId == OwnerClientId)
+        {
+            hasPlacedBoat = false;
+            placedBoat = null;
+            EnableInputs();
+        }
         StartCoroutine(UpdatePlacementState());
     }
 
     private IEnumerator UpdatePlacementState()
     {
         yield return new WaitForSeconds(0.2f);
-        hasPlacedBoat = false;
-        placedBoat = null;
     }
 
     public void SetBoatRemovable(bool canRemove)
