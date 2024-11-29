@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1105703474665924903}
   - component: {fileID: 3100481735263366785}
   - component: {fileID: 4654658830373096238}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Child
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 1375871743873555000}
   - component: {fileID: 5521321304431503099}
   - component: {fileID: 8215822143763773335}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Child
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -181,7 +181,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1942580463604510065}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -219,7 +219,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5981637530988669853}
   - component: {fileID: 786850723065917518}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Child
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -271,7 +271,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1273093836888443190}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: ObstructionTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -302,7 +302,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7935701213240745558}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MountPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -335,7 +335,7 @@ GameObject:
   - component: {fileID: 6699722365408512697}
   - component: {fileID: 93150246593815495}
   - component: {fileID: 6020833478482996012}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Child
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -411,7 +411,7 @@ GameObject:
   - component: {fileID: 2009583336520548327}
   - component: {fileID: 1716705730480279534}
   - component: {fileID: 3571338006626371567}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Child
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -509,7 +509,7 @@ GameObject:
   - component: {fileID: 3795359375341381110}
   - component: {fileID: 1119334695808655507}
   - component: {fileID: 3751243851065618961}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Boat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -579,7 +579,7 @@ MonoBehaviour:
     m_Bits: 16
   obstructionLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 4105
   obstructionTransform: {fileID: 1273093836888443190}
   interactAction: {fileID: 2835967775205859358, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   movement: {fileID: 4963347509809246797, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
@@ -740,7 +740,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1.3110085, y: 0.3, z: 2.55}
-  m_Center: {x: 0, y: 0, z: -0.24424326}
+  m_Center: {x: 0, y: 0, z: -0.3}
 --- !u!65 &1288407185740271018
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -782,7 +782,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1.19, y: 0.4004551, z: 0.15}
-  m_Center: {x: 0, y: 0.09977247, z: 0.92}
+  m_Center: {x: 0, y: 0.09977247, z: 0.91}
 --- !u!65 &3019807889257769612
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -856,7 +856,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4498078097136330136}
   - component: {fileID: 7455571520548092475}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Child
   m_TagString: Untagged
   m_Icon: {fileID: 0}

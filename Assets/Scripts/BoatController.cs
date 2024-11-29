@@ -27,6 +27,10 @@ public class BoatController : NetworkBehaviour
     private NetworkVariable<Vector3> targetPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> targetRotation = new NetworkVariable<Quaternion>();
 
+    private NetworkVariable<NetworkObjectReference> mountedPlayerRef = new NetworkVariable<NetworkObjectReference>();
+    private NetworkVariable<Vector3> mountedPlayerPosition = new NetworkVariable<Vector3>();
+    private NetworkVariable<Quaternion> mountedPlayerRotation = new NetworkVariable<Quaternion>();
+
     private Movement playerMovement;
     private NetworkObject mountedPlayer;
     private Vector3 currentVelocity;
@@ -96,13 +100,11 @@ public class BoatController : NetworkBehaviour
     {
         if (!IsSpawned) return;
 
-
-
         if (IsOwner && isMounted.Value)
         {
             // HandleBoatMovement();
-            moveDirection = movement.action.ReadValue<Vector2>();
             UpdateMountedPlayerPosition();
+            moveDirection = movement.action.ReadValue<Vector2>();
         }
     }
 
@@ -300,7 +302,7 @@ public class BoatController : NetworkBehaviour
         }
         else if (IsCollidingWithLayerMask(obstructionTransform, obstructionLayer))
         {
-            HandleCollisionResponse(moveDir);
+            HandleCollisionResponse(transform.forward);
         }
     }
 
@@ -336,12 +338,52 @@ public class BoatController : NetworkBehaviour
 
     private bool AnyRayHitsObstacle((Ray main, Ray right, Ray left, Ray topRight, Ray topLeft) rays, float moveDistance)
     {
-        return Physics.Raycast(rays.main, moveDistance * 1.25f, obstructionLayer)
-            || Physics.Raycast(rays.right, moveDistance / 1.5f, obstructionLayer)
-            || Physics.Raycast(rays.left, moveDistance / 1.5f, obstructionLayer)
-            || Physics.Raycast(rays.topRight, moveDistance, obstructionLayer)
-            || Physics.Raycast(rays.topLeft, moveDistance, obstructionLayer)
-            || IsCollidingWithLayerMask(obstructionTransform, obstructionLayer);
+        bool IsValidObstacle(Ray ray, float distance)
+        {
+            RaycastHit[] hits = Physics.RaycastAll(ray, distance, obstructionLayer);
+            foreach (RaycastHit hit in hits)
+            {
+                NetworkObject netObj = hit.collider.GetComponentInParent<NetworkObject>();
+                if (netObj != null && netObj.gameObject.layer == 12)
+                {
+                    // If it's a boat, only count if it's another player's
+                    if (netObj.OwnerClientId != OwnerClientId) return true;
+                }
+                else
+                {
+                    // If it's not a boat (land/terrain), it's always valid
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool IsValidSphereHit()
+        {
+            Collider[] hits = Physics.OverlapSphere(obstructionTransform.position, 0.1f, obstructionLayer);
+            foreach (Collider hit in hits)
+            {
+                NetworkObject netObj = hit.GetComponentInParent<NetworkObject>();
+                if (netObj != null && netObj.gameObject.layer == 12)
+                {
+                    // If it's a boat, only count if it's another player's
+                    if (netObj.OwnerClientId != OwnerClientId) return true;
+                }
+                else
+                {
+                    // If it's not a boat (land/terrain), it's always valid
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return (moveDirection.y > 0 ? IsValidObstacle(rays.main, moveDistance * 1.5f) : IsValidObstacle(rays.main, moveDistance))
+            || IsValidObstacle(rays.right, moveDistance / 1.5f)
+            || IsValidObstacle(rays.left, moveDistance / 1.5f)
+            || IsValidObstacle(rays.topRight, moveDistance)
+            || IsValidObstacle(rays.topLeft, moveDistance)
+            || IsValidSphereHit();
     }
 
     private void HandleCollisionResponse(Vector3 direction)
@@ -439,7 +481,8 @@ public class BoatController : NetworkBehaviour
         NetworkObject player = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
         if (player != null)
         {
-            mountedPlayer = player;
+            // mountedPlayer = player;
+            mountedPlayerRef.Value = new NetworkObjectReference(player);
             isMounted.Value = true;
             HandleMountClientRpc(new NetworkObjectReference(player));
         }
@@ -458,6 +501,12 @@ public class BoatController : NetworkBehaviour
                 playerMovement.enabled = false;
             }
         }
+
+        if (IsServer)
+        {
+            mountedPlayerPosition.Value = mountPoint.position;
+            mountedPlayerRotation.Value = mountPoint.rotation;
+        }
     }
 
     [ServerRpc]
@@ -470,7 +519,8 @@ public class BoatController : NetworkBehaviour
 
         isMounted.Value = false;
         HandleDismountClientRpc(new NetworkObjectReference(mountedPlayer));
-        mountedPlayer = null;
+        // mountedPlayer = null;
+        mountedPlayerRef.Value = default;
     }
 
     [ClientRpc]
@@ -490,9 +540,40 @@ public class BoatController : NetworkBehaviour
 
     private void UpdateMountedPlayerPosition()
     {
-        if (!isMounted.Value || mountPoint == null || mountedPlayer == null) return;
+        // if (mountPoint == null)
+        // {
+        //     Debug.LogError("MOUNT POINT WTF");
+            
+        // }
+        // if (mountedPlayer == null)
+        // {
+        //     Debug.LogError("WTF BRUH");
+        // }
+        // if (!isMounted.Value)
+        // {
+        //     Debug.LogError("Bro stop.");
+        // }
+        if (!isMounted.Value || mountPoint == null) return;
 
-        mountedPlayer.transform.position = mountPoint.position;
-        mountedPlayer.transform.rotation = mountPoint.rotation;
+        if (mountedPlayerRef.Value.TryGet(out NetworkObject playerObj))
+        {
+            if (IsOwner && playerObj.IsOwner)
+            {
+                playerObj.transform.position = mountPoint.position;
+                playerObj.transform.rotation = mountPoint.rotation;
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void UpdateMountedPlayerTransformClientRpc(Vector3 position, Quaternion rotation)
+    {
+        if (IsOwner) return; // Skip the owner as they've already updated
+
+        if (mountedPlayer != null)
+        {
+            mountedPlayer.transform.position = position;
+            mountedPlayer.transform.rotation = rotation;
+        }
     }
 }
