@@ -228,7 +228,18 @@ public class BoatPlacementSystem : NetworkBehaviour
             StartCoroutine(ReinitializePreview());
             return;
         }
-        PlaceBoatServerRpc(boatPreview.transform.position, boatPreview.transform.rotation);
+
+        // Do a local water check before sending RPC
+        Vector3 previewPos = boatPreview.transform.position;
+        if (Physics.Raycast(previewPos + Vector3.up * 2, Vector3.down, out RaycastHit waterHit, 10f, waterLayer))
+        {
+            PlaceBoatServerRpc(previewPos, boatPreview.transform.rotation);
+        }
+        else
+        {
+            Debug.LogWarning("Invalid boat placement position");
+            StartCoroutine(ReinitializePreview());
+        }
     }
 
     private void HandleBoatRemoval(InputAction.CallbackContext context)
@@ -303,17 +314,41 @@ public class BoatPlacementSystem : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership=false)]
-    private void PlaceBoatServerRpc(Vector3 position, Quaternion rotation)
+    private void PlaceBoatServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
         if (hasPlacedBoat.Value) return;
 
-        GameObject boat = Instantiate(boatPrefab, position, rotation);
-        NetworkObject networkObject = boat.GetComponent<NetworkObject>();
-        networkObject.SpawnWithOwnership(OwnerClientId);
+        // Verify position is valid by doing a server-side water check
+        if (Physics.Raycast(position + Vector3.up * 2, Vector3.down, out RaycastHit waterHit, 10f, waterLayer))
+        {
+            // Use the water hit point to ensure consistent Y position
+            Vector3 finalPosition = waterHit.point;
+            finalPosition.x = position.x;
+            finalPosition.z = position.z;
 
-        hasPlacedBoat.Value = true;
-        UpdateBoatPlacedStateClientRpc(true, networkObject);
+            GameObject boat = Instantiate(boatPrefab, finalPosition, rotation);
+            NetworkObject networkObject = boat.GetComponent<NetworkObject>();
+            networkObject.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+
+            hasPlacedBoat.Value = true;
+            UpdateBoatPlacedStateClientRpc(true, networkObject);
+        }
+        else
+        {
+            // If water check fails, notify client to retry
+            RetryBoatPlacementClientRpc(rpcParams.Receive.SenderClientId);
+        }
     }
+
+    [ClientRpc]
+    private void RetryBoatPlacementClientRpc(ulong clientId)
+    {
+        if (IsOwner && OwnerClientId == clientId)
+        {
+            StartCoroutine(ReinitializePreview());
+        }
+    }
+
 
     [ClientRpc]
     private void UpdateBoatPlacedStateClientRpc(bool placed, NetworkObjectReference boatRef)
