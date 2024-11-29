@@ -1360,9 +1360,10 @@ GameObject:
   - component: {fileID: 1471621325403545279}
   - component: {fileID: 6645795181485212885}
   - component: {fileID: 3283834109312981762}
+  - component: {fileID: 4238627234581693252}
   m_Layer: 0
   m_Name: Tree_2
-  m_TagString: Untagged
+  m_TagString: Tree
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1467,6 +1468,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   count: 2
+--- !u!114 &4238627234581693252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5856573938361582083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlesPrefab: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
 --- !u!1 &6092964991246757133
 GameObject:
   m_ObjectHideFlags: 0

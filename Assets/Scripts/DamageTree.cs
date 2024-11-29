@@ -41,7 +41,7 @@ public class DamageTree : NetworkBehaviour
 
     private void OnTreeDestroyed()
     {
-        GameObject gameObject = Instantiate(onDestroyedParticlesGO, new(transform.position.x, transform.position.y + 3f, transform.position.z), Quaternion.identity);
+        GameObject gameObject = Instantiate(onDestroyedParticlesGO, new(transform.position.x, transform.position.y + 2.5f, transform.position.z), Quaternion.identity);
         // transform.Find("Remains").gameObject.SetActive(true);
         Destroy(gameObject, 5f);
         GameObject trees = transform.Find("Trees").gameObject;

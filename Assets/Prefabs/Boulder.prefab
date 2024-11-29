@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3959384301281437202}
   - component: {fileID: 6634942402420577885}
   - component: {fileID: 1752648284258405585}
+  - component: {fileID: 6660538233823883936}
   m_Layer: 7
   m_Name: Boulder
   m_TagString: Boulder
@@ -146,7 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1599261419
+  GlobalObjectIdHash: 1580327592
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -155,3 +156,16 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &6660538233823883936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6887029233247754709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37ea5947c4717435f955552886145cfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  breakVelocityThreshold: 0.25
