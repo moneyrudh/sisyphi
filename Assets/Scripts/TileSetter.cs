@@ -8,22 +8,30 @@ using System.Threading.Tasks;
 using System;
 using Unity.Netcode;
 
+public enum APIProvider {
+    OpenAI,
+    Anthropic,
+    Groq
+}
+
+[System.Serializable]
+public class TileGroup
+{
+    public string name;
+    public List<GameObject> tiles;
+}
+
+[System.Serializable]
+public class Logs
+{
+    public int wood;
+    public GameObject log;
+}
+
 public class TileSetter : NetworkBehaviour
 {
-    [System.Serializable]
-    public class TileGroup
-    {
-        public string name;
-        public List<GameObject> tiles;
-    }
     public List<TileGroup> environmentTileGroups;
 
-    [System.Serializable]
-    public class Logs
-    {
-        public int wood;
-        public GameObject log;
-    }
     [SerializeField] public List<Logs> logs;
 
     public GameObject[] tileParents = new GameObject[13];
@@ -52,11 +60,7 @@ public class TileSetter : NetworkBehaviour
     private bool isSetTilesParent = false;
     // Start is called before the first frame update
 
-    public enum APIProvider {
-        OpenAI,
-        Anthropic,
-        Groq
-    }
+
 
     public APIProvider apiProvider = APIProvider.Groq;
 
@@ -146,7 +150,7 @@ public class TileSetter : NetworkBehaviour
             }
             catch (System.Exception e)
             {
-                const string fallbackResponse = @"{""tiles"":[[0,0,8,8,8,8,8,8,0,0],[0,8,8,9,9,9,9,8,8,0],[8,8,9,9,9,9,9,9,8,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,8,9,9,9,9,9,9,8,8],[0,8,8,9,9,9,9,8,8,0],[0,0,8,8,8,8,8,8,0,0]]}";
+                const string fallbackResponse = @"{""tiles"":[[0,0,0,5,5,5,5,0,0,0],[0,5,5,5,9,9,5,5,0,0],[0,5,9,9,9,9,9,5,5,0],[5,5,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,5,9,9,9,9,9,9,5,0],[0,5,5,9,9,9,9,5,5,0],[0,0,5,5,9,9,5,5,0,0],[0,0,0,5,5,5,5,0,0,0]]}";
                 int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(fallbackResponse).tiles;
                 StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
                 Debug.LogError("Error while parsing response: " + e);
@@ -154,7 +158,7 @@ public class TileSetter : NetworkBehaviour
         }
         else
         {
-            const string fallbackResponse = @"{""tiles"":[[0,0,8,8,8,8,8,8,0,0],[0,8,8,9,9,9,9,8,8,0],[8,8,9,9,9,9,9,9,8,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,8,9,9,9,9,9,9,8,8],[0,8,8,9,9,9,9,8,8,0],[0,0,8,8,8,8,8,8,0,0]]}";
+            const string fallbackResponse = @"{""tiles"":[[0,0,0,5,5,5,5,0,0,0],[0,5,5,5,9,9,5,5,0,0],[0,5,9,9,9,9,9,5,5,0],[5,5,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,5,9,9,9,9,9,9,5,0],[0,5,5,9,9,9,9,5,5,0],[0,0,5,5,9,9,5,5,0,0],[0,0,0,5,5,5,5,0,0,0]]}";
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(fallbackResponse).tiles;
             StartCoroutine(SetTiles(tiles, tilesParent, 0, 0));
             Debug.LogError("Error while requesting model: " + response);
@@ -192,7 +196,7 @@ public class TileSetter : NetworkBehaviour
         if (setting == "" || setting == null) 
         {
             setting = "A circular pond surrounded by trees.";
-            string response = @"{""tiles"":[[0,0,8,8,8,8,8,8,0,0],[0,8,8,9,9,9,9,8,8,0],[8,8,9,9,9,9,9,9,8,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,8,9,9,9,9,9,9,8,8],[0,8,8,9,9,9,9,8,8,0],[0,0,8,8,8,8,8,8,0,0]]}";
+            string response = @"{""tiles"":[[0,0,0,5,5,5,5,0,0,0],[0,5,5,5,9,9,5,5,0,0],[0,5,9,9,9,9,9,5,5,0],[5,5,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,5,9,9,9,9,9,9,5,0],[0,5,5,9,9,9,9,5,5,0],[0,0,5,5,9,9,5,5,0,0],[0,0,0,5,5,5,5,0,0,0]]}";
             // string response = @"{""tiles"":[[2,2,2,2,2,2,2,2,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,2,2,2,2,2,2,2]]}";
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
             yield return null;
@@ -215,7 +219,7 @@ public class TileSetter : NetworkBehaviour
         if (setting == "" || setting == null) 
         {
             setting = "A circular pond surrounded by trees.";
-            string response = @"{""tiles"":[[0,0,8,8,8,8,8,8,0,0],[0,8,8,9,9,9,9,8,8,0],[8,8,9,9,9,9,9,9,8,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,8,9,9,9,9,9,9,8,8],[0,8,8,9,9,9,9,8,8,0],[0,0,8,8,8,8,8,8,0,0]]}";
+            string response = @"{""tiles"":[[0,0,0,5,5,5,5,0,0,0],[0,5,5,5,9,9,5,5,0,0],[0,5,9,9,9,9,9,5,5,0],[5,5,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,5,9,9,9,9,9,9,5,0],[0,5,5,9,9,9,9,5,5,0],[0,0,5,5,9,9,5,5,0,0],[0,0,0,5,5,5,5,0,0,0]]}";
             // string response = @"{""tiles"":[[2,2,2,2,2,2,2,2,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,0,0,0,0,2,0,0,0,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,0,0,2,0,0,2,2],[2,2,2,2,2,2,2,2,2,2]]}";
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
             yield return null;
@@ -340,19 +344,44 @@ public class TileSetter : NetworkBehaviour
         }
         Debug.Log("Generating map with text: " + inputField.text);
 
-        switch(apiProvider) {
-            case APIProvider.OpenAI:
-                StartCoroutine(CallOpenAICoroutine(inputField.text));
-                break;
-            case APIProvider.Anthropic:
-                StartCoroutine(CallAnthropicCoroutine(inputField.text));
-                break;
-            case APIProvider.Groq:
-                StartCoroutine(CallGroqCoroutine(inputField.text));
-                break;
-            default:
-                apiManager.SendRequest(inputField.text, HandleResponse);
-                break;
+        // switch(apiProvider) {
+        //     case APIProvider.OpenAI:
+        //         StartCoroutine(CallOpenAICoroutine(inputField.text));
+        //         break;
+        //     case APIProvider.Anthropic:
+        //         StartCoroutine(CallAnthropicCoroutine(inputField.text));
+        //         break;
+        //     case APIProvider.Groq:
+        //         StartCoroutine(CallGroqCoroutine(inputField.text));
+        //         break;
+        //     default:
+        //         apiManager.SendRequest(inputField.text, HandleResponse);
+        //         break;
+        // }
+
+        string setting = string.IsNullOrEmpty(inputField.text)
+            ? "A circular pond surrounded by trees."
+            : inputField.text;
+
+        _ = CallServer(setting);
+    }
+
+    private async Task CallServer(string setting)
+    {
+        try
+        {
+            string response = await GetComponent<APIManager>().SendServerRequest(setting, apiProvider);
+            Debug.Log($"Response from server: {response}");
+
+            int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
+            StartCoroutine(SetNetworkTiles(tiles, 0, 0));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error while calling server: {e}");
+            const string fallbackResponse = @"{""tiles"":[[0,0,8,8,8,8,8,8,0,0],[0,8,8,9,9,9,9,8,8,0],[8,8,9,9,9,9,9,9,8,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,8,9,9,9,9,9,9,8,8],[0,8,8,9,9,9,9,8,8,0],[0,0,8,8,8,8,8,8,0,0]]}";
+            int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(fallbackResponse).tiles;
+            StartCoroutine(SetNetworkTiles(tiles, 0, 0));
         }
     }
 

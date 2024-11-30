@@ -17,6 +17,62 @@ public class APIManager : MonoBehaviour
     private readonly string GroqApiKey = "KEY";
     private const string GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
+    public async Task<string> SendServerRequest(string setting, APIProvider provider)
+    {
+        string endpoint = "";
+        switch (provider)
+        {
+            case APIProvider.OpenAI:
+                endpoint = "openai";
+                break;
+            case APIProvider.Anthropic:
+                endpoint = "anthropic";
+                break;
+            case APIProvider.Groq:
+                endpoint = "groq";
+                break;
+            default:
+                throw new System.ArgumentException("Invalid API Provider");
+        }
+
+        string requestBody = JsonUtility.ToJson(new ServerRequestBody { setting = setting });
+
+        using (UnityWebRequest webRequest = new UnityWebRequest($"https://sisyphi.anirudhananth.com/{endpoint}", "POST"))
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(requestBody);
+            webRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            webRequest.downloadHandler = new DownloadHandlerBuffer();
+            webRequest.SetRequestHeader("Content-Type", "application/json");
+            webRequest.certificateHandler = new BypassCertificate();
+
+            try
+            {
+                var operation = webRequest.SendWebRequest();
+                while (!operation.isDone)
+                    await Task.Yield();
+
+                if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
+                    webRequest.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    Debug.LogError($"Error while requesting server: {webRequest.error}");
+                    Debug.LogError($"Response Text: {webRequest.downloadHandler.text}");
+                    const string fallbackResponse = @"{""tiles"":[[0,0,0,5,5,5,5,0,0,0],[0,5,5,5,9,9,5,5,0,0],[0,5,9,9,9,9,9,5,5,0],[5,5,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,5,9,9,9,9,9,9,5,0],[0,5,5,9,9,9,9,5,5,0],[0,0,5,5,9,9,5,5,0,0],[0,0,0,5,5,5,5,0,0,0]]}";
+                    return fallbackResponse;
+                }
+
+                string response = webRequest.downloadHandler.text;
+                Debug.Log($"Response from server ({provider}): {response}");
+                return response;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Error in SendServerRequest: {e.Message}");
+                const string fallbackResponse = @"{""tiles"":[[0,0,0,5,5,5,5,0,0,0],[0,5,5,5,9,9,5,5,0,0],[0,5,9,9,9,9,9,5,5,0],[5,5,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,9,9,9,9,9,9,9,5,0],[5,5,9,9,9,9,9,9,5,0],[0,5,5,9,9,9,9,5,5,0],[0,0,5,5,9,9,5,5,0,0],[0,0,0,5,5,5,5,0,0,0]]}";
+                return fallbackResponse;
+            }
+        }
+    }
+
     public void SendRequest(string prompt, RequestCallback callback)
     {
         StartCoroutine(GetModelResponse(prompt, callback));
@@ -297,6 +353,12 @@ public class APIManager : MonoBehaviour
 public class RequestBody
 {
     public string prompt;
+}
+
+[System.Serializable]
+public class ServerRequestBody
+{
+    public string setting;
 }
 
 public class BypassCertificate : CertificateHandler
