@@ -16,6 +16,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
         if (IsServer)
         {
             SetInitialPosition(OwnerClientId);
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         }
         else if (IsClient && IsOwner)
         {
@@ -23,6 +24,14 @@ public class PlayerSpawnHandler : NetworkBehaviour
         }
 
         if (IsOwner) SpawnBoulderServerRpc();
+    }
+
+    private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
+    {
+        if (clientId == OwnerClientId)
+        {
+            Destroy(GameObject.Find("Boulder_" + OwnerClientId));
+        }
     }
 
     private void SetInitialPosition(ulong clientId)
@@ -53,6 +62,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
         Vector3 spawnPosition = playerObject.transform.position + new Vector3(0, 1f, 4f);
         GameObject boulder = Instantiate(boulderPrefab, transform.position + new Vector3(0, 1f, 4f), Quaternion.identity);
+        boulder.name = "Boulder_" + OwnerClientId;
         NetworkObject networkObject = boulder.GetComponent<NetworkObject>();
         networkObject.Spawn();
     }
