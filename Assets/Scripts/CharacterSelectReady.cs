@@ -35,6 +35,11 @@ public class CharacterSelectReady : NetworkBehaviour
             }
         }
 
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count < 2)
+        {
+            return;
+        }
+
         if (allClientsReady)
         {
             Loader.LoadNetwork(Loader.Scene.GameScene);
