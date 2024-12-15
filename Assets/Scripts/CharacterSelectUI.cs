@@ -20,23 +20,30 @@ public class CharacterSelectUI : MonoBehaviour
             Loader.Load(Loader.Scene.MainMenu); 
         });
         readyButton.onClick.AddListener(() => {
-            isPlayerReady = !isPlayerReady;
-            CharacterSelectReady.Instance.SetPlayerReady(isPlayerReady);
-            mainMenuButton.interactable = !isPlayerReady;
-            readyButtonText.text = isPlayerReady ? "UNREADY" : "READY";
+            UpdateReadyButton(!isPlayerReady);
         });
         readyButton.interactable = false;
     }
 
     private void FixedUpdate()
     {
-        if (!canReady)
+        if (SisyphiGameMultiplayer.Instance.GetPlayerCount() == 2)
         {
-            if (SisyphiGameMultiplayer.Instance.GetPlayerCount() == 2)
-            {
-                canReady = true;
-                readyButton.interactable = true;
-            }
+            canReady = true;
+            readyButton.interactable = true;
         }
+        else
+        {
+            UpdateReadyButton(false);
+            readyButton.interactable = false;
+        }
+    }
+
+    private void UpdateReadyButton(bool ready)
+    {
+        isPlayerReady = ready;
+        CharacterSelectReady.Instance.SetPlayerReady(isPlayerReady);
+        mainMenuButton.interactable = !isPlayerReady;
+        readyButtonText.text = isPlayerReady ? "UNREADY" : "READY";
     }
 }

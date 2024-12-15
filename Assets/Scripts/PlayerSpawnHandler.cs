@@ -50,9 +50,9 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
     private void SetInitialPosition(ulong clientId)
     {
-        int playerIndex = (int)clientId % spawnPoints.Length;
+        int playerIndex = (int) clientId > 0 ? 1 : 0;
         transform.position = spawnPoints[playerIndex];
-        SyncPositionClientRpc(spawnPoints[playerIndex]);
+        // SyncPositionClientRpc(spawnPoints[playerIndex]);
     }
 
     [ServerRpc(RequireOwnership = true)]
@@ -74,7 +74,8 @@ public class PlayerSpawnHandler : NetworkBehaviour
         ulong clientId = serverRpcParams.Receive.SenderClientId;
         NetworkObject playerObject = NetworkManager.ConnectedClients[clientId].PlayerObject;
 
-        Vector3 spawnPosition = spawnPoints[OwnerClientId] + new Vector3(0, 1f, 4f);
+        int index = OwnerClientId == 0 ? 0 : 1;
+        Vector3 spawnPosition = spawnPoints[index] + new Vector3(0, 1f, 4f);
         GameObject boulder = Instantiate(boulderPrefab, spawnPosition, Quaternion.identity);
         boulder.name = "Boulder_" + OwnerClientId;
         NetworkObject networkObject = boulder.GetComponent<NetworkObject>();

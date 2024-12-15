@@ -71,4 +71,10 @@ public class CharacterSelectPlayer : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
+
+    private void OnDestroy()
+    {
+        SisyphiGameMultiplayer.Instance.OnPlayerDataNetworkListChanged -= SisyphiGameMultiplayer_OnPlayerNetworkListChanged;
+        CharacterSelectReady.Instance.OnReadyPlayer -= CharacterSelectReady_OnReadyChanged;
+    }
 }

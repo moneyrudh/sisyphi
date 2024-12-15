@@ -64,11 +64,26 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     public void StartHost() {
         NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
         NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Server_OnClientDisconnectCallback;
         NetworkManager.Singleton.StartHost();
+    }
+
+    private void NetworkManager_Server_OnClientDisconnectCallback(ulong clientId)
+    {
+        for(int i=0; i<playerDataNetworkList.Count; i++)
+        {
+            PlayerData playerData = playerDataNetworkList[i];
+            if (playerData.clientId == clientId)
+            {
+                playerDataNetworkList.RemoveAt(i);
+                currentMaterialCategory.RemoveAt(i);
+            }
+        }
     }
 
     private void NetworkManager_OnClientConnectedCallback(ulong clientId)
     {
+        Debug.Log("Client joined with id " + clientId);
         playerDataNetworkList.Add(new PlayerData {
             clientId = clientId,
             hairColorId = 1,

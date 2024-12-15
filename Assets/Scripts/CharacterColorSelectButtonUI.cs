@@ -64,4 +64,10 @@ public class CharacterColorSelectButtonUI : MonoBehaviour
             selectedGameObject.SetActive(false);
         }
     }
+
+    private void OnDestroy()
+    {
+        SisyphiGameMultiplayer.Instance.OnPlayerDataNetworkListChanged -= SisyphiGameMultiplayer_OnPlayerNetworkListChanged;
+        SisyphiGameMultiplayer.Instance.OnMaterialCategoryNetworkListChanged -= SisyphiGameMultiplayer_OnPlayerNetworkListChanged;
+    }
 }
