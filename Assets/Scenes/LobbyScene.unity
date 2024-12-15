@@ -2136,7 +2136,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4938365429662377069, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
       propertyPath: prefabs.Array.size
-      value: 55
+      value: 56
       objectReference: {fileID: 0}
     - target: {fileID: 4938365429662377069, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
       propertyPath: prefabs.Array.data[54]
@@ -2145,7 +2145,7 @@ PrefabInstance:
     - target: {fileID: 4938365429662377069, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
       propertyPath: prefabs.Array.data[55]
       value: 
-      objectReference: {fileID: 1925289765}
+      objectReference: {fileID: 7265504619516684512, guid: eb693e00483af40cdb94f0500571cff9, type: 3}
     - target: {fileID: 5165095272779784640, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
       propertyPath: m_Name
       value: NetworkManager
@@ -2780,11 +2780,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c293d29f1df7c45a280ec0dbdb1e5bb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hostButton: {fileID: 0}
-  joinButton: {fileID: 0}
-  quitButton: {fileID: 0}
-  playerNameInput: {fileID: 0}
-  lobbySceneName: LobbyScene
 --- !u!4 &1462736585
 Transform:
   m_ObjectHideFlags: 0
@@ -2936,72 +2931,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   messageText: {fileID: 469818692}
   closeButton: {fileID: 737270410}
---- !u!1 &1925289765
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1925289766}
-  - component: {fileID: 1925289768}
-  - component: {fileID: 1925289767}
-  m_Layer: 0
-  m_Name: SisyphiGameMultiplayer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1925289766
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925289765}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1925289767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925289765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0afdd1b24a91d4115bc1221c08fdc69f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1925289768
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925289765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2800594773
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1 &1953650823
 GameObject:
   m_ObjectHideFlags: 0
@@ -3094,6 +3023,71 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &6043906335864954698
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3362315693216478756, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_Name
+      value: SisyphiGameMultiplayer
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6157656982952127821, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458145994685296145, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2918412496
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458145994685296145, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 177446068
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: df6b3424ee1f54e43ab705df6b6cf32c, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3104,4 +3098,4 @@ SceneRoots:
   - {fileID: 510755878}
   - {fileID: 487870715}
   - {fileID: 993732652}
-  - {fileID: 1925289766}
+  - {fileID: 6043906335864954698}

@@ -4086,7 +4086,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3715926696
+  GlobalObjectIdHash: 2427064709
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -4387,6 +4387,26 @@ MonoBehaviour:
   - {x: 10, y: 5, z: -40}
   - {x: 25, y: 5, z: -40}
   boulderPrefab: {fileID: 6887029233247754709, guid: 3c760d0d83d3345ffa478b380743fa3b, type: 3}
+  hairMeshRenderers:
+  - {fileID: 2823193871496379651}
+  - {fileID: 8268760206435104091}
+  - {fileID: 6036490918392757815}
+  - {fileID: 2913203278577936762}
+  - {fileID: 8026874072555342299}
+  skinMeshRenderers:
+  - {fileID: 8423652590786509569}
+  - {fileID: 8802875110082238842}
+  - {fileID: 2161763698477474691}
+  - {fileID: 7026806674776696408}
+  - {fileID: 7563914323323829179}
+  - {fileID: 8742807277083455699}
+  - {fileID: 5222605993419777601}
+  pantMeshRenderer: {fileID: 5046415158337271611}
+  eyesMeshRenderer: {fileID: 2823608046622921552}
+  hairMaterial: {fileID: 2100000, guid: 0ec77e506658168428e174ef6ddb4abe, type: 2}
+  skinMaterial: {fileID: 2100000, guid: 95fcf9331ca635c459a201f2c56f44dc, type: 2}
+  pantMaterial: {fileID: 2100000, guid: fbac7c1722f262145b9ed0c0e940864d, type: 2}
+  eyesMaterial: {fileID: 2100000, guid: 64b04a6e3187c8247b209aac6c56b9fe, type: 2}
 --- !u!114 &5087495146834746033
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,27 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
+using TMPro;
 
 public class CharacterSelectUI : MonoBehaviour
 {
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button readyButton;
+    [SerializeField] private TMP_Text readyButtonText;
+    private bool isPlayerReady = false;
+    private bool canReady = false;
 
     private void Awake()
     {
-        readyButton.onClick.AddListener(() => {
-            CharacterSelectReady.Instance.SetPlayerReady();
+        mainMenuButton.onClick.AddListener(() => {
+            NetworkManager.Singleton.Shutdown();
+            Loader.Load(Loader.Scene.MainMenu); 
         });
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+        readyButton.onClick.AddListener(() => {
+            isPlayerReady = !isPlayerReady;
+            CharacterSelectReady.Instance.SetPlayerReady(isPlayerReady);
+            mainMenuButton.interactable = !isPlayerReady;
+            readyButtonText.text = isPlayerReady ? "UNREADY" : "READY";
+        });
+        readyButton.interactable = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-        
+        if (!canReady)
+        {
+            if (SisyphiGameMultiplayer.Instance.GetPlayerCount() == 2)
+            {
+                canReady = true;
+                readyButton.interactable = true;
+            }
+        }
     }
 }

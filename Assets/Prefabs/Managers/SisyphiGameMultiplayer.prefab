@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3362315693216478756
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6157656982952127821}
+  - component: {fileID: 6458145994685296145}
+  - component: {fileID: 3924101169499540607}
+  m_Layer: 0
+  m_Name: SisyphiGameMultiplayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6157656982952127821
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3362315693216478756}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6458145994685296145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3362315693216478756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 797575610
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &3924101169499540607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3362315693216478756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afdd1b24a91d4115bc1221c08fdc69f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerColors:
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 0, g: 0, b: 0, a: 1}
+  - {r: 0.8490566, g: 0.10012458, b: 0.10012458, a: 1}
+  - {r: 0.8962264, g: 0.43062142, b: 0.097232126, a: 1}
+  - {r: 0.9056604, g: 0.7330896, b: 0.16660735, a: 1}
+  - {r: 0.114542544, g: 0.5304852, b: 0.735849, a: 1}
+  - {r: 0.50803554, g: 0.1788003, b: 0.7735849, a: 1}
+  - {r: 0.8773585, g: 0.29383236, b: 0.7690968, a: 1}
+  - {r: 0.07691008, g: 0.5471698, b: 0.03355288, a: 1}
+  - {r: 0.33681917, g: 0.37366092, b: 0.8207547, a: 1}
+  - {r: 0.50980395, g: 0.35686275, b: 0.27450982, a: 1}
+  - {r: 0.16470589, g: 0.14117648, b: 0.22745098, a: 1}
+  - {r: 0.5176471, g: 0.36862746, b: 0.23921569, a: 1}
+  - {r: 0.8773585, g: 0.7023764, b: 0.5504183, a: 1}

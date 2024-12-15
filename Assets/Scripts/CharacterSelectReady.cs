@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using Unity.Netcode;
 
 public class CharacterSelectReady : NetworkBehaviour
 {
     public static CharacterSelectReady Instance { get; private set; }
+    public event EventHandler OnReadyPlayer;
     private Dictionary<ulong, bool> playerReadyDictionary;
 
     private void Awake()
@@ -15,15 +17,17 @@ public class CharacterSelectReady : NetworkBehaviour
         playerReadyDictionary = new Dictionary<ulong, bool>();
     }
 
-    public void SetPlayerReady()
+    public void SetPlayerReady(bool ready)
     {
-        SetPlayerReadyServerRpc();
+        SetPlayerReadyServerRpc(ready);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
+    private void SetPlayerReadyServerRpc(bool ready, ServerRpcParams serverRpcParams = default)
     {
-        playerReadyDictionary[serverRpcParams.Receive.SenderClientId] = true;
+        SetPlayerReadyClientRpc(serverRpcParams.Receive.SenderClientId, ready);
+
+        playerReadyDictionary[serverRpcParams.Receive.SenderClientId] = ready;
 
         bool allClientsReady = true;
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
@@ -44,5 +48,18 @@ public class CharacterSelectReady : NetworkBehaviour
         {
             Loader.LoadNetwork(Loader.Scene.GameScene);
         }
+    }
+
+    [ClientRpc]
+    private void SetPlayerReadyClientRpc(ulong clientId, bool ready)
+    {
+        playerReadyDictionary[clientId] = ready;
+
+        OnReadyPlayer?.Invoke(this, EventArgs.Empty);
+    }
+
+    public bool IsPlayerReady(ulong clientId)
+    {
+        return playerReadyDictionary.ContainsKey(clientId) && playerReadyDictionary[clientId];
     }
 }
