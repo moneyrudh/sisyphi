@@ -49,7 +49,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 4074431352209462362}
-    PlayerPrefab: {fileID: 5751469025688621471, guid: 43280320d16744c15969c9979a847b89, type: 3}
+    PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 3a82e20748e364ab28bfdf01928e7316, type: 2}
@@ -88,7 +88,7 @@ MonoBehaviour:
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
   m_ConnectTimeoutMS: 1000
-  m_MaxConnectAttempts: 60
+  m_MaxConnectAttempts: 10
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
     Address: 127.0.0.1
@@ -169,3 +169,8 @@ MonoBehaviour:
   - {fileID: 6112975311550532115, guid: 321331c9d170443ac8c2d99478ad3245, type: 3}
   - {fileID: 6887029233247754709, guid: 3c760d0d83d3345ffa478b380743fa3b, type: 3}
   - {fileID: 7265504619516684512, guid: eb693e00483af40cdb94f0500571cff9, type: 3}
+  - {fileID: 3841992414128498506, guid: 06f309f94b5614f86b9b7ed9204c341a, type: 3}
+  - {fileID: 2266380574268447392, guid: 5a43845c02b90467b9c8190dfa159ac0, type: 3}
+  - {fileID: 2266380574268447392, guid: 36652b68da46b40c68c76c0e045cf595, type: 3}
+  - {fileID: 2266380574268447392, guid: e84782f7ba6e6414aa0fc21e25dd7103, type: 3}
+  - {fileID: 2266380574268447392, guid: a29fc5fd7342045788f33714f4a92ace, type: 3}

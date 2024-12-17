@@ -45,7 +45,7 @@ public class BoulderTreeBreak : NetworkBehaviour
         {
             Vector3 particlePos = new(transform.position.x, transform.position.y + 2.5f, transform.position.z);
             GameObject particles = Instantiate(particlesPrefab, particlePos, Quaternion.identity);
-            Destroy(particles, 5f);
+            Destroy(particles, 2.5f);
         }
     }
 }

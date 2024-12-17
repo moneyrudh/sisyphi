@@ -60,7 +60,6 @@ public class CameraController : NetworkBehaviour
         if (Camera.main != null) Camera.main.gameObject.SetActive(false);
 
         targetCameraDistance = distance;
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void LateUpdate()
@@ -107,6 +106,7 @@ public class CameraController : NetworkBehaviour
         }
 
         Vector3 finalPosition = targetPosition + directionToCamera * targetCameraDistance;
+        finalPosition = new (finalPosition.x, Mathf.Max(2, finalPosition.y), finalPosition.z);
         playerCamera.transform.position = finalPosition;
         playerCamera.transform.rotation = targetRotation;
     }

@@ -2,12 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System;
 
 public class PlayerSpawnHandler : NetworkBehaviour
 {
     [Header("Spawn Settings")]
     public Vector3[] spawnPoints;
     public GameObject boulderPrefab;
+
+    [Header("Script References")]
+    [SerializeField] private Movement movement;
+    [SerializeField] private PlayerFarm playerFarm;
+    [SerializeField] private BuildingSystem buildingSystem;
 
     [Header("Renderer References")]
     [SerializeField] private List<SkinnedMeshRenderer> hairMeshRenderers;
@@ -26,6 +32,22 @@ public class PlayerSpawnHandler : NetworkBehaviour
     private Material _pantMaterial;
     private Material _eyesMaterial;
 
+    private void Awake()
+    {
+        SisyphiGameManager.Instance.OnStateChanged += PlayerSpawnHandler_SetPlayerState;
+
+        ToggleScripts(false);
+    }
+
+    private void PlayerSpawnHandler_SetPlayerState(object sender, System.EventArgs e)
+    {
+        if (SisyphiGameManager.Instance.IsGamePlaying())
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            ToggleScripts(true);
+        }
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -35,6 +57,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
             SetInitialPosition(OwnerClientId);
             NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
             SpawnBoulderServerRpc();
+            SisyphiGameManager.Instance.SetPlayerJoinedServerRpc();
         }
 
         SetPlayerColor();
@@ -105,5 +128,12 @@ public class PlayerSpawnHandler : NetworkBehaviour
         _skinMaterial.color = SisyphiGameMultiplayer.Instance.GetPlayerColor(playerData.skinColorId);
         _pantMaterial.color = SisyphiGameMultiplayer.Instance.GetPlayerColor(playerData.pantColorId);
         _eyesMaterial.color = SisyphiGameMultiplayer.Instance.GetPlayerColor(playerData.eyesColorId);
+    }
+
+    private void ToggleScripts(bool active)
+    {
+        movement.enabled = active;
+        buildingSystem.enabled = active;
+        playerFarm.enabled = active;
     }
 }

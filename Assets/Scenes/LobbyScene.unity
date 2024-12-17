@@ -2130,29 +2130,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4074431352209462362, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
-      propertyPath: m_MaxConnectAttempts
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 4938365429662377069, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
       propertyPath: prefabs.Array.size
-      value: 56
+      value: 61
       objectReference: {fileID: 0}
     - target: {fileID: 4938365429662377069, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
-      propertyPath: prefabs.Array.data[54]
+      propertyPath: prefabs.Array.data[57]
       value: 
-      objectReference: {fileID: 6887029233247754709, guid: 3c760d0d83d3345ffa478b380743fa3b, type: 3}
+      objectReference: {fileID: 2266380574268447392, guid: 5a43845c02b90467b9c8190dfa159ac0, type: 3}
     - target: {fileID: 4938365429662377069, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
-      propertyPath: prefabs.Array.data[55]
+      propertyPath: prefabs.Array.data[58]
       value: 
-      objectReference: {fileID: 7265504619516684512, guid: eb693e00483af40cdb94f0500571cff9, type: 3}
+      objectReference: {fileID: 2266380574268447392, guid: 36652b68da46b40c68c76c0e045cf595, type: 3}
+    - target: {fileID: 4938365429662377069, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
+      propertyPath: prefabs.Array.data[59]
+      value: 
+      objectReference: {fileID: 2266380574268447392, guid: e84782f7ba6e6414aa0fc21e25dd7103, type: 3}
+    - target: {fileID: 4938365429662377069, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
+      propertyPath: prefabs.Array.data[60]
+      value: 
+      objectReference: {fileID: 2266380574268447392, guid: a29fc5fd7342045788f33714f4a92ace, type: 3}
     - target: {fileID: 5165095272779784640, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
       propertyPath: m_Name
       value: NetworkManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 5408821196572024376, guid: ad8b04b227d844a5580b788f3faace81, type: 3}
-      propertyPath: NetworkConfig.PlayerPrefab
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
