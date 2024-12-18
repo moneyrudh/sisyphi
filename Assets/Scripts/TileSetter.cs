@@ -77,11 +77,12 @@ public class TileSetter : NetworkBehaviour
         initParent = new GameObject("InitParent");
         SetOriginalWaterValues();
 
-        if (IsServer) SisyphiGameManager.Instance.OnStateChanged += TileSetter_PromptGeneration;
+        if (NetworkManager.Singleton.IsServer) SisyphiGameManager.Instance.OnStateChanged += TileSetter_PromptGeneration;
     }
 
     private async void TileSetter_PromptGeneration(object sender, System.EventArgs e)
     {
+        if (!NetworkManager.Singleton.IsServer) return;
         if (SisyphiGameManager.Instance.IsPromptGenerationState())
         {
             float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
@@ -339,7 +340,7 @@ public class TileSetter : NetworkBehaviour
     {
         Debug.Log("Setting initial grid");
         float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
-        string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
+        string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,5,5,5,5,0,0,0],[0,0,0,5,5,5,5,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
         int[][] initTiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
         // StartCoroutine(SetTiles(initTiles, initParent, 0, 0 - width * 9));
 
@@ -391,6 +392,7 @@ public class TileSetter : NetworkBehaviour
     }
 
     public void GenerateMap() {
+        if (!NetworkManager.Singleton.IsServer) return;
         curX = 0;
         curY = 0;
         curZ = 0;

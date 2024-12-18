@@ -34,6 +34,7 @@ public class SisyphiGameManager: NetworkBehaviour
     {
         Instance = this;
         playerReadyDictionary = new Dictionary<ulong, bool>();
+        state.OnValueChanged += State_OnValueChanged;
     }
 
     [ServerRpc(RequireOwnership=false)]
@@ -65,12 +66,11 @@ public class SisyphiGameManager: NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsServer)
+        if (NetworkManager.Singleton.IsServer)
         {
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
         }
 
-        state.OnValueChanged += State_OnValueChanged;
     }
 
     public void State_OnValueChanged(State previous, State current)

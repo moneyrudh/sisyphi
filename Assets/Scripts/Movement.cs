@@ -62,7 +62,7 @@ public class Movement : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsOwner)
+        if (IsServer)
         {
             base.OnNetworkSpawn();
             Debug.Log("Calling TileSetter");

@@ -1,19 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using Unity.Netcode;
 
 public class CharacterSelectPlayer : MonoBehaviour
 {
     [SerializeField] private int playerIndex;
     [SerializeField] private GameObject readyGameObject;
-    [SerializeField] PlayerVisual playerVisual;
+    [SerializeField] private PlayerVisual playerVisual;
+    [SerializeField] private Button kickButton;
+    [SerializeField] private TextMeshPro playerNameText;
     
+    private void Awake()
+    {
+        kickButton.onClick.AddListener(() => {
+            PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(playerIndex);
+            SisyphiGameMultiplayer.Instance.KickPlayer(playerData.clientId);
+        });
+    }
+
     private void Start()
     {
         SisyphiGameMultiplayer.Instance.OnPlayerDataNetworkListChanged += SisyphiGameMultiplayer_OnPlayerNetworkListChanged;
         CharacterSelectReady.Instance.OnReadyPlayer += CharacterSelectReady_OnReadyChanged;
 
         readyGameObject.SetActive(false);
+        kickButton.gameObject.SetActive(NetworkManager.Singleton.IsServer);
+
         UpdatePlayer();
     }
 
@@ -53,6 +68,8 @@ public class CharacterSelectPlayer : MonoBehaviour
                     color = SisyphiGameMultiplayer.Instance.GetPlayerColor(playerData.eyesColorId);
                     break;
             }
+
+            playerNameText.text = playerData.playerName.ToString();
             
             playerVisual.SetPlayerColor(materialCategory, color);
         }

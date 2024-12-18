@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
+using UnityEditor;
 #if UNITY_EDITOR
 using UnityEditor;
 using Unity.Netcode;

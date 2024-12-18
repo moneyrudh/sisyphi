@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 
 public class SisyphiGameMultiplayer : NetworkBehaviour
 {
-    private const int MAX_PLAYER_AMOUNT = 2;
+    public const int PLAYER_COUNT = 2;
+    private const string PLAYER_PREFS_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
 
     private NetworkList<PlayerData> playerDataNetworkList;
     [SerializeField] private List<Color> playerColors;
@@ -19,6 +20,8 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     public event EventHandler OnPlayerDataNetworkListChanged;
     public event EventHandler OnMaterialCategoryNetworkListChanged;
 
+    private string playerName;
+
     private void Awake() {
         Instance = this;
         DontDestroyOnLoad(gameObject);
@@ -28,6 +31,8 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
         
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
         currentMaterialCategory.OnListChanged += MaterialCategory_OnListChanged;
+
+        playerName = PlayerPrefs.GetString(PLAYER_PREFS_NAME_MULTIPLAYER, "Player_" + UnityEngine.Random.Range(1000, 9999));
     }
 
     public void ChangeCurrentMaterialCategory(MaterialCategory materialCategory)
@@ -92,6 +97,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
             eyesColorId = 11
         });
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
+        SetPlayerNameServerRpc(GetPlayerName());
 
         if (IsServer)
         {
@@ -121,7 +127,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
             return;
         }
 
-        if (NetworkManager.Singleton.ConnectedClientsIds.Count >= MAX_PLAYER_AMOUNT)
+        if (NetworkManager.Singleton.ConnectedClientsIds.Count >= PLAYER_COUNT)
         {
             connectionApprovalResponse.Approved = false;
             connectionApprovalResponse.Reason = "Game is full";
@@ -134,12 +140,31 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     public void StartClient() {
         OnTryingToJoinGame?.Invoke(this, EventArgs.Empty);
 
-        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_Client_OnClientDisconnectCallback;
+        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Client_OnClientConnectedCallback;
         NetworkManager.Singleton.StartClient();
     }
 
-    private void NetworkManager_OnClientDisconnectCallback(ulong clientId) {
+    private void NetworkManager_Client_OnClientDisconnectCallback(ulong clientId) 
+    {
         OnFailedToJoinGame?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void NetworkManager_Client_OnClientConnectedCallback(ulong clientId)
+    {
+        SetPlayerNameServerRpc(GetPlayerName());
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void SetPlayerNameServerRpc(string playerName, ServerRpcParams serverRpcParams=default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.playerName = playerName;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
     }
 
     public bool IsPlayerIndexConnected(int playerIndex)
@@ -225,6 +250,12 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
         return MaterialCategory.Hair;
     }
 
+    public void KickPlayer(ulong clientId)
+    {
+        NetworkManager.Singleton.DisconnectClient(clientId);
+        NetworkManager_Server_OnClientDisconnectCallback(clientId);
+    }
+
     public int GetPlayerCount()
     {
         return playerDataNetworkList.Count;
@@ -233,6 +264,18 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     public ulong GetPlayerClientId()
     {
         return NetworkManager.Singleton.LocalClientId;
+    }
+
+    public string GetPlayerName()
+    {
+        return playerName;
+    }
+
+    public void SetPlayerName(string playerName)
+    {
+        this.playerName = playerName;
+
+        PlayerPrefs.SetString(PLAYER_PREFS_NAME_MULTIPLAYER, playerName);
     }
 
     // public override void OnDestroy()

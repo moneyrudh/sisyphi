@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.UI;
+using TMPro;
 
-public class HostDisconnectUI : NetworkBehaviour
+public class HostDisconnectUI : MonoBehaviour 
 {
     [SerializeField] private Button mainMenuButton;
+    [SerializeField] private TMP_Text disconnectMessage;
 
     private void Start()
     {
@@ -24,12 +26,17 @@ public class HostDisconnectUI : NetworkBehaviour
     {
         Debug.Log("Client " + clientId + " disconnected.");
         Debug.Log(NetworkManager.ServerClientId);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
         {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-            Show();
+            disconnectMessage.text = "Host has disconnected!";
         }
+        else
+        {
+            disconnectMessage.text = "Player has disconnected!";
+        }
+        Show();
     }
 
     private void NetworkManager_OnServerStopped(bool wasAHost)

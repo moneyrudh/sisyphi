@@ -4,12 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 using TMPro;
+using Unity.Services.Lobbies.Models;
 
 public class CharacterSelectUI : MonoBehaviour
 {
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button readyButton;
     [SerializeField] private TMP_Text readyButtonText;
+    [SerializeField] private TextMeshProUGUI lobbyNameText;
+    [SerializeField] private TextMeshProUGUI lobbyCodeText;
     private bool isPlayerReady = false;
     private bool canReady = false;
 
@@ -23,6 +26,14 @@ public class CharacterSelectUI : MonoBehaviour
             UpdateReadyButton(!isPlayerReady);
         });
         readyButton.interactable = false;
+    }
+
+    private void Start()
+    {
+        Lobby lobby = SisyphiGameLobby.Instance.GetLobby();
+
+        lobbyNameText.text = "Lobby Name: " + lobby.Name;
+        lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
     }
 
     private void FixedUpdate()

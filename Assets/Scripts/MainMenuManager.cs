@@ -19,5 +19,10 @@ public class MainMenuManager : MonoBehaviour
         {
             Destroy(SisyphiGameMultiplayer.Instance.gameObject);
         }
+
+        if (SisyphiGameLobby.Instance != null)
+        {
+            Destroy(SisyphiGameLobby.Instance.gameObject);
+        }
     }
 }
