@@ -28,6 +28,30 @@ public class Logs
     public GameObject log;
 }
 
+public class TileSpawnJob
+{
+    public enum SpawnType 
+    {
+        Normal,
+        Checkpoint
+    }
+
+    public int[][] Tiles { get; set; }
+    public float X { get; set; }
+    public float Z { get; set; }
+    public int ParentIndex { get; set; }
+    public SpawnType Type { get; set; }
+
+    public TileSpawnJob(int[][] tiles, float x, float z, int parentIndex, SpawnType type=SpawnType.Normal)
+    {
+        Tiles = tiles;
+        X = x;
+        Z = z;
+        ParentIndex = parentIndex;
+        Type = type;
+    }
+}
+
 public class TileSetter : NetworkBehaviour
 {
     public List<TileGroup> environmentTileGroups;
@@ -58,6 +82,8 @@ public class TileSetter : NetworkBehaviour
     private bool isSetTilesParent = false;
     // Start is called before the first frame update
 
+    private Queue<TileSpawnJob> spawnQueue = new Queue<TileSpawnJob>();
+    private bool isProcessingQueue = false;
 
 
     public APIProvider apiProvider = APIProvider.Groq;
@@ -358,8 +384,11 @@ public class TileSetter : NetworkBehaviour
             }
         }
 
-        StartCoroutine(SetNetworkTiles(initTiles, 0, 0 - width * 9, 0));
-        StartCoroutine(SetCheckpointTiles());
+        // StartCoroutine(SetNetworkTiles(initTiles, 0, 0 - width * 9, 0));
+        // StartCoroutine(SetCheckpointTiles());
+        EnqueueTileSpawn(initTiles, 0, -width*9, 0);
+        float checkPointStartZ = width * 0.91f * 10;
+        EnqueueTileSpawn(null, 0, checkPointStartZ, 0, TileSpawnJob.SpawnType.Checkpoint);
     }
 
     private IEnumerator SetCheckpointTiles()
@@ -381,6 +410,102 @@ public class TileSetter : NetworkBehaviour
                     int count = environmentTileGroups[value].tiles.Count;
                     int index = UnityEngine.Random.Range(0, count-1);
                     SpawnTileServerRpc(value, index, curX, curY, curZ, sizeMultiplier, 0);
+                    curX += width * demultiplier;
+                }
+                curX = 0;
+                curZ += width * demultiplier;
+            }
+            curZ += width * demultiplier * 8;
+            curZ += checkPointOffset * width * demultiplier;
+        }
+    }
+
+    private void EnqueueTileSpawn(int[][] tiles, float x, float z, int parentIndex, TileSpawnJob.SpawnType type = TileSpawnJob.SpawnType.Normal)
+    {
+        var job = new TileSpawnJob(tiles, x, z, parentIndex, type);
+        spawnQueue.Enqueue(job);
+
+        if (!isProcessingQueue)
+        {
+            StartCoroutine(ProcessSpawnQueue());
+        }
+    }
+
+    private IEnumerator ProcessSpawnQueue()
+    {
+        isProcessingQueue = true;
+
+        while (spawnQueue.Count > 0)
+        {
+            var job = spawnQueue.Peek();
+
+            if (job.Type == TileSpawnJob.SpawnType.Normal)
+            {
+                yield return StartCoroutine(SpawnTileSet(job));
+            }
+            else 
+            {
+                yield return StartCoroutine(SpawnCheckpointSet(job));
+            }
+
+            spawnQueue.Dequeue();
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        isProcessingQueue = false;
+    }
+
+    private IEnumerator SpawnTileSet(TileSpawnJob job)
+    {
+        if (job.ParentIndex < 0) yield break;
+
+        Transform parent = tileParents[job.ParentIndex].transform;
+        curX = job.X;
+        curZ = job.Z;
+        float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+        const float demultiplier = 0.91f;
+
+        for (int i = 0; i < job.Tiles.Length; i++)
+        {
+            for (int j = 0; j < job.Tiles[i].Length; j++)
+            {
+                yield return null;
+                int value = job.Tiles[i][j];
+                if (value != 9)
+                {
+                    int count = environmentTileGroups[value].tiles.Count;
+                    int index = UnityEngine.Random.Range(0, count-1);
+                    SpawnTileServerRpc(value, index, curX, curY, curZ, sizeMultiplier, job.ParentIndex);
+                }
+                curX += width * demultiplier;
+            }
+            curX = 0;
+            curZ += width * demultiplier;
+        }
+
+        isIce = false;
+        isTilesSet = true;
+    }
+
+    private IEnumerator SpawnCheckpointSet(TileSpawnJob job)
+    {
+        float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+        const float demultiplier = 0.91f;
+        int checkPointOffset = 2;
+        curX = job.X;
+        curZ = job.Z;
+
+        for (int k = 0; k < 3; k++)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    yield return null;
+                    int value = 0;
+                    int count = environmentTileGroups[value].tiles.Count;
+                    int index = UnityEngine.Random.Range(0, count-1);
+                    SpawnTileServerRpc(value, index, curX, curY, curZ, sizeMultiplier, job.ParentIndex);
                     curX += width * demultiplier;
                 }
                 curX = 0;
@@ -434,14 +559,16 @@ public class TileSetter : NetworkBehaviour
             Debug.Log($"Response from server: {response}");
 
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
-            StartCoroutine(SetNetworkTiles(tiles, x, z, parentIndex));
+            // StartCoroutine(SetNetworkTiles(tiles, x, z, parentIndex));
+            EnqueueTileSpawn(tiles, x, z, parentIndex);
         }
         catch (Exception e)
         {
             Debug.LogError($"Error while calling server: {e}");
             const string fallbackResponse = @"{""tiles"":[[0,0,8,8,8,8,8,8,0,0],[0,8,8,9,9,9,9,8,8,0],[8,8,9,9,9,9,9,9,8,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,9,9,9,9,9,9,9,9,8],[8,8,9,9,9,9,9,9,8,8],[0,8,8,9,9,9,9,8,8,0],[0,0,8,8,8,8,8,8,0,0]]}";
             int[][] tiles = JsonConvert.DeserializeObject<ResponseBody>(fallbackResponse).tiles;
-            StartCoroutine(SetNetworkTiles(tiles, x, z, parentIndex));
+            // StartCoroutine(SetNetworkTiles(tiles, x, z, parentIndex));
+            EnqueueTileSpawn(tiles, x, z, parentIndex);
         }
     }
 

@@ -10,16 +10,12 @@ public class CountdownUI : MonoBehaviour
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private TMP_Text generatingPromptText;
 
-    private void Awake()
+    private void Start()
     {
         SisyphiGameManager.Instance.OnStateChanged += CountdownUI_UpdateState;
 
         countdownText.gameObject.SetActive(false);
         Hide();
-    }
-
-    private void Start()
-    {
         // generatingPromptText.gameObject.SetActive(false);
     }
 
