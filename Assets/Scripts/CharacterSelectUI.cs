@@ -20,6 +20,7 @@ public class CharacterSelectUI : MonoBehaviour
     {
         mainMenuButton.onClick.AddListener(() => {
             NetworkManager.Singleton.Shutdown();
+            SisyphiGameLobby.Instance.LeaveLobby();
             Loader.Load(Loader.Scene.MainMenu); 
         });
         readyButton.onClick.AddListener(() => {

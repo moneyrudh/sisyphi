@@ -17,6 +17,7 @@ public class CharacterSelectPlayer : MonoBehaviour
     {
         kickButton.onClick.AddListener(() => {
             PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(playerIndex);
+            SisyphiGameLobby.Instance.KickPlayer(playerData.playerId.ToString());
             SisyphiGameMultiplayer.Instance.KickPlayer(playerData.clientId);
         });
     }
@@ -27,7 +28,7 @@ public class CharacterSelectPlayer : MonoBehaviour
         CharacterSelectReady.Instance.OnReadyPlayer += CharacterSelectReady_OnReadyChanged;
 
         readyGameObject.SetActive(false);
-        kickButton.gameObject.SetActive(NetworkManager.Singleton.IsServer);
+        kickButton.gameObject.SetActive(NetworkManager.Singleton.IsServer && playerIndex > 0);
 
         UpdatePlayer();
     }

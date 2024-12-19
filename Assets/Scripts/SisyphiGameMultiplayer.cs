@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using UnityEngine.SceneManagement;
+using Unity.Services.Authentication;
 
 public class SisyphiGameMultiplayer : NetworkBehaviour
 {
@@ -98,6 +99,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
         });
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
         SetPlayerNameServerRpc(GetPlayerName());
+        SetPlayerIdServerRpc(AuthenticationService.Instance.PlayerId);
 
         if (IsServer)
         {
@@ -120,7 +122,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
 
     private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest, NetworkManager.ConnectionApprovalResponse connectionApprovalResponse)
     {
-        if (SceneManager.GetActiveScene().name == Loader.Scene.CharacterScene.ToString())
+        if (SceneManager.GetActiveScene().name == Loader.Scene.GameScene.ToString())
         {
             connectionApprovalResponse.Approved = false;
             connectionApprovalResponse.Reason = "Game has already started";
@@ -134,7 +136,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
             return;
         }
 
-        connectionApprovalResponse.Approved = false;
+        connectionApprovalResponse.Approved = true;
     }
 
     public void StartClient() {
@@ -153,6 +155,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     private void NetworkManager_Client_OnClientConnectedCallback(ulong clientId)
     {
         SetPlayerNameServerRpc(GetPlayerName());
+        SetPlayerIdServerRpc(AuthenticationService.Instance.PlayerId);
     }
 
     [ServerRpc(RequireOwnership=false)]
@@ -163,6 +166,18 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
         PlayerData playerData = playerDataNetworkList[playerDataIndex];
 
         playerData.playerName = playerName;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
+
+    [ServerRpc(RequireOwnership=false)]
+    private void SetPlayerIdServerRpc(string playerId, ServerRpcParams serverRpcParams=default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.playerId = playerId;
 
         playerDataNetworkList[playerDataIndex] = playerData;
     }

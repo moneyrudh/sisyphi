@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class HostDisconnectUI : MonoBehaviour 
 {
@@ -31,12 +32,13 @@ public class HostDisconnectUI : MonoBehaviour
         if (!NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
         {
             disconnectMessage.text = "Host has disconnected!";
+            Show();
         }
-        else
+        else if (SceneManager.GetActiveScene().name == Loader.Scene.GameScene.ToString())
         {
             disconnectMessage.text = "Player has disconnected!";
+            Show();
         }
-        Show();
     }
 
     private void NetworkManager_OnServerStopped(bool wasAHost)
