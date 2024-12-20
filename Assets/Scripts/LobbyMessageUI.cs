@@ -84,5 +84,10 @@ public class LobbyMessageUI : MonoBehaviour
     private void OnDestroy()
     {
         SisyphiGameMultiplayer.Instance.OnFailedToJoinGame -= SisyphiGameMultiplayer_OnFailedToJoinGame;
+        SisyphiGameLobby.Instance.OnCreateLobbyStarted -= SisyphiGameLobby_OnCreateLobbyStarted;
+        SisyphiGameLobby.Instance.OnCreateLobbyFailed -= SisyphiGameLobby_OnCreateLobbyFailed;
+        SisyphiGameLobby.Instance.OnJoinStarted -= SisyphiGameLobby_OnJoinStarted;
+        SisyphiGameLobby.Instance.OnJoinFailed -= SisyphiGameLobby_OnJoinFailed;
+        SisyphiGameLobby.Instance.OnQuickJoinFailed -= SisyphiGameLobby_OnQuickJoinFailed;
     }
 }

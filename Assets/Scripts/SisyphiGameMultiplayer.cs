@@ -76,6 +76,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
 
     private void NetworkManager_Server_OnClientDisconnectCallback(ulong clientId)
     {
+        if (playerDataNetworkList == null) return;
         for(int i=0; i<playerDataNetworkList.Count; i++)
         {
             PlayerData playerData = playerDataNetworkList[i];

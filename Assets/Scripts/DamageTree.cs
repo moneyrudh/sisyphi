@@ -6,6 +6,7 @@ using Unity.Netcode;
 public class DamageTree : NetworkBehaviour
 {
     [SerializeField] GameObject onDestroyedParticlesGO;
+    private List<GameObject> spawnedParticlesGO;
     private TileSetter tileSetter;
     private int maxHealth = 4;
     private NetworkVariable<int> health = new NetworkVariable<int>();
@@ -41,9 +42,10 @@ public class DamageTree : NetworkBehaviour
 
     private void OnTreeDestroyed()
     {
-        GameObject gameObject = Instantiate(onDestroyedParticlesGO, new(transform.position.x, transform.position.y + 2.5f, transform.position.z), Quaternion.identity);
+        GameObject particlesGO = Instantiate(onDestroyedParticlesGO, new(transform.position.x, transform.position.y + 2.5f, transform.position.z), Quaternion.identity);
         // transform.Find("Remains").gameObject.SetActive(true);
-        Destroy(gameObject, 5f);
+        spawnedParticlesGO.Add(particlesGO);
+        Destroy(particlesGO, 5f);
         GameObject trees = transform.Find("Trees").gameObject;
         if (trees == null) return;
         foreach (Transform child in trees.transform)
@@ -65,6 +67,18 @@ public class DamageTree : NetworkBehaviour
         if (other.CompareTag("FarmPoint"))
         {
             Debug.Log("FarmPoint in range");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (spawnedParticlesGO == null) return;
+        foreach (GameObject go in spawnedParticlesGO)
+        {
+            if (go != null)
+            {
+                Destroy(go);
+            }
         }
     }
 }

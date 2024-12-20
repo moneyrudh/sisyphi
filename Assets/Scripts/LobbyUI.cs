@@ -72,4 +72,9 @@ public class LobbyUI : MonoBehaviour
             lobbyTransform.GetComponent<LobbyListSingleUI>().SetLobby(lobby);
         }
     }
+
+    private void OnDestroy()
+    {
+        SisyphiGameLobby.Instance.OnLobbyListChanged -= SisyphiGameLobby_OnLobbyListChanged;        
+    }
 }

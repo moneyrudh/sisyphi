@@ -36,16 +36,24 @@ public class BoulderTreeBreak : NetworkBehaviour
 
     private void SpawnParticlesAndDestroy()
     {
-        Destroy(gameObject, 0.5f);
+        // Destroy(gameObject, 0.5f);
+        StartCoroutine(SpawnParticlesCoroutine());
     }
 
-    private void OnDestroy()
+    private IEnumerator SpawnParticlesCoroutine()
     {
+        yield return new WaitForSeconds(0.5f);
+        gameObject.SetActive(false);
         if (particlesPrefab != null)
         {
             Vector3 particlePos = new(transform.position.x, transform.position.y + 2.5f, transform.position.z);
             GameObject particles = Instantiate(particlesPrefab, particlePos, Quaternion.identity);
             Destroy(particles, 2.5f);
         }
+    }
+
+    private void OnDestroy()
+    {
+        
     }
 }
