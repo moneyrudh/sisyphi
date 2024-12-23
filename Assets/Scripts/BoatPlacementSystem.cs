@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
+using System.Linq;
 
 public class BoatPlacementSystem : NetworkBehaviour
 {
@@ -37,7 +38,7 @@ public class BoatPlacementSystem : NetworkBehaviour
     private List<Renderer> previewRenderers = new List<Renderer>();
     private bool isValidPlacement = true;
 
-    private NetworkObject placedBoat;
+    public NetworkObject placedBoat;
     private NetworkVariable<bool> hasPlacedBoat = new NetworkVariable<bool>(false);
     private NetworkVariable<bool> canRemoveBoat = new NetworkVariable<bool>(true);
 
@@ -55,11 +56,12 @@ public class BoatPlacementSystem : NetworkBehaviour
         //         DisablePlacementMode();
         //     }
         // };
-        hasPlacedBoat.OnValueChanged += OnHasPlacedBoatChanged;
+        // hasPlacedBoat.OnValueChanged += OnHasPlacedBoatChanged;
     }
 
     private void EnableInputs()
     {
+        if (!IsOwner) return;
         if (placeBoatToggle != null)
         {
             placeBoatToggle.action.Enable();
@@ -81,6 +83,7 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void DisableInputs()
     {
+        if (!IsOwner) return;
         if (placeBoatToggle != null)
         {
             placeBoatToggle.action.Disable();
@@ -112,9 +115,10 @@ public class BoatPlacementSystem : NetworkBehaviour
     {
         yield return new WaitForEndOfFrame();
         InitializePreview();
+        EnableInputs();
     }
 
-    private void InitializePreview()
+    public void InitializePreview()
     {
         if (!IsOwner) return;
 
@@ -148,7 +152,7 @@ public class BoatPlacementSystem : NetworkBehaviour
         inPlacementMode = false;
     }
 
-    private IEnumerator ReinitializePreview()
+    public IEnumerator ReinitializePreview()
     {
         yield return new WaitForEndOfFrame();
 
@@ -159,6 +163,7 @@ public class BoatPlacementSystem : NetworkBehaviour
             Destroy(boatPreview);
             boatPreview = null;
         }
+        Debug.Log("ReinitializePreview for client " + OwnerClientId);
 
         InitializePreview();
         EnableInputs();
@@ -168,7 +173,7 @@ public class BoatPlacementSystem : NetworkBehaviour
     {
         if (!IsOwner || playerCamera == null || !inPlacementMode) return;
 
-        if (hasPlacedBoat.Value)
+        if (HasPlacedBoat())
         {
             DisablePlacementMode();
             return;
@@ -207,8 +212,8 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void HandleBoatToggle(InputAction.CallbackContext context)
     {
-        Debug.Log(hasPlacedBoat.Value + " Toggling");
-        if (hasPlacedBoat.Value) return;
+        // Debug.Log(hasPlacedBoat.Value + " Toggling");
+        // if (hasPlacedBoat.Value) return;
 
         if (boatPreview == null)
         {
@@ -221,7 +226,7 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void HandleBoatConfirm(InputAction.CallbackContext context)
     {
-        if (!inPlacementMode || !isValidPlacement || hasPlacedBoat.Value) return;
+        if (!inPlacementMode || !isValidPlacement || HasPlacedBoat()) return;
         if (boatPreview == null)
         {
             Debug.LogWarning("Boat preview is null, reinitializing...");
@@ -233,7 +238,10 @@ public class BoatPlacementSystem : NetworkBehaviour
         Vector3 previewPos = boatPreview.transform.position;
         if (Physics.Raycast(previewPos + Vector3.up * 2, Vector3.down, out RaycastHit waterHit, 10f, waterLayer))
         {
-            PlaceBoatServerRpc(previewPos, boatPreview.transform.rotation);
+            Vector3 finalPosition = waterHit.point;
+            // finalPosition.x = previewPos.x;
+            // finalPosition.z = previewPos.z;
+            PlaceBoatServerRpc(finalPosition, boatPreview.transform.rotation);
         }
         else
         {
@@ -245,7 +253,7 @@ public class BoatPlacementSystem : NetworkBehaviour
     private void HandleBoatRemoval(InputAction.CallbackContext context)
     {
         Debug.Log("Attempting to remove boat.");
-        if (!hasPlacedBoat.Value || !canRemoveBoat.Value) return;
+        // if (!hasPlacedBoat.Value || !canRemoveBoat.Value) return;
 
         if (playerCamera == null)
         {
@@ -316,28 +324,58 @@ public class BoatPlacementSystem : NetworkBehaviour
     [ServerRpc(RequireOwnership=false)]
     private void PlaceBoatServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams rpcParams = default)
     {
-        if (hasPlacedBoat.Value) return;
+        // if (hasPlacedBoat.Value) return;
+        ulong clientId = rpcParams.Receive.SenderClientId;
+        Debug.Log($"PlaceBoatServerRpc - Client {clientId} attempting to place boat");
 
-        // Verify position is valid by doing a server-side water check
-        if (Physics.Raycast(position + Vector3.up * 2, Vector3.down, out RaycastHit waterHit, 10f, waterLayer))
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .Values
+            .Any(obj => obj.CompareTag("Boat") && obj.OwnerClientId == clientId))
         {
-            // Use the water hit point to ensure consistent Y position
-            Vector3 finalPosition = waterHit.point;
-            finalPosition.x = position.x;
-            finalPosition.z = position.z;
-
-            GameObject boat = Instantiate(boatPrefab, finalPosition, rotation);
-            NetworkObject networkObject = boat.GetComponent<NetworkObject>();
-            networkObject.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
-
-            hasPlacedBoat.Value = true;
-            UpdateBoatPlacedStateClientRpc(true, networkObject);
+            Debug.Log($"PlaceBoatServerRpc - Client {clientId} already has a boat");
+            return;
         }
-        else
-        {
-            // If water check fails, notify client to retry
-            RetryBoatPlacementClientRpc(rpcParams.Receive.SenderClientId);
-        }
+
+        GameObject boat = Instantiate(boatPrefab, position, rotation);
+        NetworkObject networkObject = boat.GetComponent<NetworkObject>();
+        
+        Debug.Log($"PlaceBoatServerRpc - Spawning boat for client {clientId}");
+        networkObject.SpawnWithOwnership(clientId);
+        // networkObject.ChangeOwnership(clientId);
+        networkObject.gameObject.transform.position = position;
+        Debug.Log($"PlaceBoatServerRpc - Boat spawned with NetworkObjectId: {networkObject.NetworkObjectId}");
+        
+        // hasPlacedBoat.Value = true;
+        UpdateBoatPlacedStateClientRpc(true, new NetworkObjectReference(networkObject));
+        SyncBoatPositionClientRpc(
+            networkObject.NetworkObjectId,
+            position,
+            networkObject.transform.rotation
+        );
+        // // Verify position is valid by doing a server-side water check
+        // if (Physics.Raycast(position + Vector3.up * 2, Vector3.down, out RaycastHit waterHit, 10f, waterLayer))
+        // {
+        //     // Use the water hit point to ensure consistent Y position
+        //     Vector3 finalPosition = waterHit.point;
+        //     finalPosition.x = position.x;
+        //     finalPosition.z = position.z;
+
+        //     GameObject boat = Instantiate(boatPrefab, finalPosition, rotation);
+        //     NetworkObject networkObject = boat.GetComponent<NetworkObject>();
+        //     networkObject.gameObject.transform.position = finalPosition;
+        //     networkObject.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
+        //     hasPlacedBoat.Value = true;
+        //     UpdateBoatPlacedStateClientRpc(true, new NetworkObjectReference(networkObject));
+        //     // StartCoroutine(ConfirmBoatSpawnAfterDelay(networkObject, finalPosition, rpcParams.Receive.SenderClientId));
+        //     if (!networkObject.IsSpawned)
+        //     {
+        //     }
+        // }
+        // else
+        // {
+        //     // If water check fails, notify client to retry
+        //     // RetryBoatPlacementClientRpc(rpcParams.Receive.SenderClientId);
+        // }
     }
 
     [ClientRpc]
@@ -349,56 +387,118 @@ public class BoatPlacementSystem : NetworkBehaviour
         }
     }
 
+    private IEnumerator ConfirmBoatSpawnAfterDelay(NetworkObject networkObject, Vector3 position, ulong clientId)
+    {
+        yield return new WaitForEndOfFrame();
+
+        if (networkObject != null && networkObject.IsSpawned)
+        {
+            hasPlacedBoat.Value = true;
+            UpdateBoatPlacedStateClientRpc(true, new NetworkObjectReference(networkObject));
+
+            SyncBoatPositionClientRpc(
+                networkObject.NetworkObjectId,
+                position,
+                networkObject.transform.rotation
+            );
+        }
+        else
+        {
+            Debug.LogError("Failed to spawn boat properly.");
+            RetryBoatPlacementClientRpc(clientId);
+        }
+    }
+
+    [ClientRpc]
+    private void SyncBoatPositionClientRpc(ulong networkId, Vector3 position, Quaternion rotation)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkId, out NetworkObject boatObj))
+        {
+            boatObj.transform.position = position;
+            boatObj.transform.rotation = rotation;
+        }
+    }
 
     [ClientRpc]
     private void UpdateBoatPlacedStateClientRpc(bool placed, NetworkObjectReference boatRef)
     {
+        Debug.Log($"UpdateBoatPlacedStateClientRpc - Client {OwnerClientId} received update");
+    
         if (boatRef.TryGet(out NetworkObject boatObj))
         {
+            Debug.Log($"UpdateBoatPlacedStateClientRpc - Got boat reference successfully for {OwnerClientId}");
             placedBoat = boatObj;
+            if (IsOwner)
+            {
+                DisablePlacementMode();
+            }
         }
-
-        if (IsOwner)
+        else
         {
-            DisablePlacementMode();
+            Debug.LogError($"UpdateBoatPlacedStateClientRpc - Failed to get boat reference for {OwnerClientId}");
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RemoveBoatServerRpc()
+    private void RemoveBoatServerRpc(ServerRpcParams serverRpcParams = default)
     {
-        if (!hasPlacedBoat.Value || !canRemoveBoat.Value) return;
+        ulong clientId = serverRpcParams.Receive.SenderClientId;
+        // if (!hasPlacedBoat.Value || !canRemoveBoat.Value) return;
+        var boat = NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .Values
+            .Where(obj => obj != null && obj.IsSpawned)
+            .FirstOrDefault(obj => obj.CompareTag("Boat") && obj.OwnerClientId == clientId);
 
-        if (placedBoat != null)
+        Debug.Log("In RemoveBoatServerRpc for clientId: " + clientId);
+        if (boat != null && boat.IsSpawned)
         {
-            if (placedBoat.OwnerClientId != OwnerClientId) return;
+            // if (placedBoat.OwnerClientId != OwnerClientId) return;
+            if (boat.OwnerClientId != clientId)
+            {
+                Debug.LogError($"Ownership mismatch during boat removal. Expected {clientId}, got {boat.OwnerClientId}");
+                return;
+            }
 
             Collider[] obstacles = Physics.OverlapSphere(
-                placedBoat.transform.position,
+                boat.transform.position,
                 removeCheckRadius,
                 removalObstructionLayer
             );
 
             if (obstacles.Length == 0)
             {
-                ulong boatId = placedBoat.NetworkObjectId;
-                placedBoat.Despawn();
-                Destroy(placedBoat.gameObject);
+                ulong boatId = boat.NetworkObjectId;
 
-                hasPlacedBoat.Value = false;
-                UpdatePlacementStateClientRpc(boatId);
+                boat.Despawn();
+                Destroy(boat.gameObject);
+
+                // hasPlacedBoat.Value = false;
+                UpdatePlacementStateClientRpc(boatId, clientId);
             }
         }
     }
 
-    [ClientRpc]
-    private void UpdatePlacementStateClientRpc(ulong boatId)
+    private bool HasPlacedBoat()
     {
-        if (placedBoat != null && placedBoat.NetworkObjectId == boatId && placedBoat.OwnerClientId == OwnerClientId)
+        return NetworkManager.Singleton.SpawnManager.SpawnedObjects
+            .Values
+            .Any(obj => obj.CompareTag("Boat") && obj.OwnerClientId == OwnerClientId);
+    }
+
+    [ClientRpc]
+    private void UpdatePlacementStateClientRpc(ulong boatId, ulong clientId)
+    {
+        if (!IsOwner) return;
+        Debug.Log("UpdatePlacementStateClientRpc for client " + OwnerClientId);
+        if (OwnerClientId == clientId)
         {
-            placedBoat = null;
+            if (placedBoat != null && placedBoat.NetworkObjectId == boatId && placedBoat.OwnerClientId == OwnerClientId)
+            {
+                placedBoat = null;
+            }
+            Debug.Log("Updating Placement State for client " + clientId);
+            StartCoroutine(ReinitializePreview());
         }
-        StartCoroutine(ReinitializePreview());
     }
 
     public void SetBoatRemovable(bool canRemove)
@@ -414,10 +514,10 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void OnDestroy()
     {
-        if (IsSpawned && hasPlacedBoat.Value != null)
-        {
-            hasPlacedBoat.OnValueChanged -= OnHasPlacedBoatChanged;
-        }
+        // if (IsSpawned && hasPlacedBoat.Value != null)
+        // {
+        //     hasPlacedBoat.OnValueChanged -= OnHasPlacedBoatChanged;
+        // }
 
         DisableInputs();
         if (boatPreview != null)

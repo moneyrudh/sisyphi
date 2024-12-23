@@ -32,6 +32,9 @@ public class PlayerSpawnHandler : NetworkBehaviour
     private Material _pantMaterial;
     private Material _eyesMaterial;
 
+    private int playerIndex;
+    private GameObject boulder;
+
     private void Awake()
     {
         SisyphiGameManager.Instance.OnStateChanged += PlayerSpawnHandler_SetPlayerState;
@@ -52,37 +55,61 @@ public class PlayerSpawnHandler : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
-        if (IsOwner)
+        if (IsServer)
         {
-            SetInitialPosition(OwnerClientId);
             NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
-            SpawnBoulderServerRpc();
-            SisyphiGameManager.Instance.SetPlayerJoinedServerRpc();
         }
 
-        SetPlayerColor();
+        if (IsOwner)
+        {
+            playerIndex = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(OwnerClientId);
+            SetInitialPosition();
+            SisyphiGameManager.Instance.SetPlayerJoinedServerRpc();
+            SpawnBoulderServerRpc();
+            SetPlayerColor();
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            SetInitialPosition();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            ResetBoulderPosition();
+            // DespawnBoulderServerRpc();
+            // SpawnBoulderServerRpc();
+        }
     }
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
         if (clientId == OwnerClientId)
         {
-            Destroy(GameObject.Find("Boulder_" + OwnerClientId));
+            Destroy(GameObject.Find("Boulder_" + playerIndex));
         }
     }
 
-    private void SetInitialPosition(ulong clientId)
+    private void SetInitialPosition()
     {
-        int playerIndex = (int) clientId > 0 ? 1 : 0;
+        // int playerIndex = (int) clientId > 0 ? 1 : 0;
         transform.position = spawnPoints[playerIndex];
         // SyncPositionClientRpc(spawnPoints[playerIndex]);
+    }
+
+    private void ResetBoulderPosition()
+    {
+        Vector3 position = spawnPoints[playerIndex] + new Vector3(0, 1f, 4f);
+        boulder.transform.position = position;
     }
 
     [ServerRpc(RequireOwnership = true)]
     private void RequestSpawnPositionServerRpc(ServerRpcParams serverRpcParams = default)
     {
         ulong clientId = serverRpcParams.Receive.SenderClientId;
-        SetInitialPosition(clientId);
+        SetInitialPosition();
     }
 
     [ClientRpc]
@@ -97,12 +124,35 @@ public class PlayerSpawnHandler : NetworkBehaviour
         ulong clientId = serverRpcParams.Receive.SenderClientId;
         NetworkObject playerObject = NetworkManager.ConnectedClients[clientId].PlayerObject;
 
-        int index = OwnerClientId == 0 ? 0 : 1;
+        int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(clientId);
         Vector3 spawnPosition = spawnPoints[index] + new Vector3(0, 1f, 4f);
         GameObject boulder = Instantiate(boulderPrefab, spawnPosition, Quaternion.identity);
-        boulder.name = "Boulder_" + OwnerClientId;
+        boulder.name = "Boulder_" + index;
         NetworkObject networkObject = boulder.GetComponent<NetworkObject>();
         networkObject.Spawn();
+
+        AssignBoulderClientRpc(new NetworkObjectReference(networkObject));
+    }
+
+    [ClientRpc]
+    private void AssignBoulderClientRpc(NetworkObjectReference boulderRef)
+    {
+        if (IsOwner)
+        {
+            if (boulderRef.TryGet(out NetworkObject boulderNetObj))
+            {
+                boulder = boulderNetObj.gameObject;
+            }
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DespawnBoulderServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+        GameObject boulder = GameObject.Find("Boulder_" + index);
+        boulder.GetComponent<NetworkObject>().Despawn();
+        Destroy(boulder);
     }
 
     public void SetPlayerColor()

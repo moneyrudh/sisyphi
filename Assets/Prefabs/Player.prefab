@@ -4024,7 +4024,8 @@ GameObject:
   - component: {fileID: 6505856498458587469}
   - component: {fileID: 5087495146834746033}
   - component: {fileID: 5899198299220735642}
-  m_Layer: 9
+  - component: {fileID: 441397108175300128}
+  m_Layer: 15
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4449,13 +4450,31 @@ MonoBehaviour:
   boatLayer:
     serializedVersion: 2
     m_Bits: 4096
-  removeCheckRadius: 1
+  removeCheckRadius: 2
   removalObstructionLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 32896
   placeBoatToggle: {fileID: 2835967775205859358, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   placeBoatConfirm: {fileID: 7112439953257795887, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   removeBoatAction: {fileID: 4470123054780279601, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
+  placedBoat: {fileID: 0}
+--- !u!114 &441397108175300128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5751469025688621471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 971a29e621157473d9796c427364211e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resetBoatAction: {fileID: -7415950866107471503, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
+  removeCheckRadius: 2
+  removalObstructionLayer:
+    serializedVersion: 2
+    m_Bits: 32896
 --- !u!1 &6075755152283341952
 GameObject:
   m_ObjectHideFlags: 0

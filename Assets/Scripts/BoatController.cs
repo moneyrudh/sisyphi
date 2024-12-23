@@ -23,7 +23,7 @@ public class BoatController : NetworkBehaviour
     public InputActionReference interactAction;
     public InputActionReference movement;
 
-    private NetworkVariable<bool> isMounted = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> isMounted = new NetworkVariable<bool>(false);
     private NetworkVariable<Vector3> targetPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> targetRotation = new NetworkVariable<Quaternion>();
 
@@ -51,6 +51,8 @@ public class BoatController : NetworkBehaviour
 
     private void OnEnable()
     {
+        // if (!IsOwner) return;
+
         if (movement != null)
         {
             movement.action.Enable();
@@ -65,6 +67,8 @@ public class BoatController : NetworkBehaviour
 
     private void OnDisable()
     {
+        // if (!IsOwner) return;
+        
         if (movement != null)
         {
             movement.action.Disable();
@@ -88,17 +92,36 @@ public class BoatController : NetworkBehaviour
         }
 
         rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
 
         if (IsOwner)
         {
+            if (movement != null)
+            {
+                movement.action.Enable();
+                Debug.Log($"Enabling movement on spawn for boat {NetworkObjectId}");
+            }
             StartCoroutine(WaitForCamera());
         }
     }
 
-    // Update is called once per frame
+    private bool CanProcessMovement()
+    {
+        if (!IsSpawned || !IsOwner) return false;
+        if (movement == null || !movement.action.enabled)
+        {
+            Debug.LogWarning($"Movement check failed for boat {NetworkObjectId}. Action enabled: {movement?.action.enabled}");
+            movement?.action.Enable();  // Try to re-enable if disabled
+            return false;
+        }
+        return true;
+    }
+
     void Update()
     {
-        if (!IsSpawned) return;
+        if (!CanProcessMovement()) return;
+
+        // if (!IsSpawned) return;
 
         if (IsOwner && isMounted.Value)
         {
@@ -264,7 +287,15 @@ public class BoatController : NetworkBehaviour
         if (moveDirection.x != 0) HandleRotation();
         if (moveDirection.y != 0) HandleForwardMovement();
 
-        UpdateBoatTransformServerRpc(rb.position, rb.rotation);
+        if (IsServer || IsHost)
+        {
+            targetPosition.Value = rb.position;
+            targetRotation.Value = rb.rotation;
+        }
+        else
+        {
+            UpdateBoatTransformServerRpc(rb.position, rb.rotation);
+        }
     }
 
     private void HandleRotation()
@@ -440,6 +471,18 @@ public class BoatController : NetworkBehaviour
     {
         targetPosition.Value = newPosition;
         targetRotation.Value = newRotation;
+
+        SyncTransformClientRpc(newPosition, newRotation);
+    }
+
+    [ClientRpc]
+    private void SyncTransformClientRpc(Vector3 position, Quaternion rotation)
+    {
+        if (!IsOwner)
+        {
+            rb.MovePosition(position);
+            rb.MoveRotation(rotation);
+        }
     }
 
     private void HandleInteractInput(InputAction.CallbackContext context)
@@ -448,11 +491,11 @@ public class BoatController : NetworkBehaviour
 
         if (isMounted.Value)
         {
-            RequestDismountServerRpc();
+            RequestDismountServerRpc(isMounted.Value);
         }
         else if (IsInRange())
         {
-            RequestMountServerRpc();
+            RequestMountServerRpc(isMounted.Value);
         }
     }
 
@@ -467,9 +510,9 @@ public class BoatController : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void RequestMountServerRpc(ServerRpcParams rpcParams = default)
+    private void RequestMountServerRpc(bool mounted, ServerRpcParams rpcParams = default)
     {
-        if (isMounted.Value) return;
+        if (mounted) return;
 
         ulong clientId = rpcParams.Receive.SenderClientId;
         if (clientId != OwnerClientId)
@@ -482,8 +525,8 @@ public class BoatController : NetworkBehaviour
         if (player != null)
         {
             // mountedPlayer = player;
-            mountedPlayerRef.Value = new NetworkObjectReference(player);
             isMounted.Value = true;
+            mountedPlayerRef.Value = new NetworkObjectReference(player);
             HandleMountClientRpc(new NetworkObjectReference(player));
         }
     }
@@ -491,15 +534,12 @@ public class BoatController : NetworkBehaviour
     [ClientRpc]
     private void HandleMountClientRpc(NetworkObjectReference playerRef)
     {
+        // if (!IsOwner) return;
         if (!playerRef.TryGet(out NetworkObject playerObj)) return;
 
         if (playerObj.IsOwner)
         {
-            playerMovement = playerObj.GetComponent<Movement>();
-            if (playerMovement != null)
-            {
-                playerMovement.enabled = false;
-            }
+            SetValues(playerObj);
         }
 
         if (IsServer)
@@ -509,16 +549,27 @@ public class BoatController : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
-    private void RequestDismountServerRpc(ServerRpcParams rpcParams = default)
+    private void SetValues(NetworkObject playerObj)
     {
-        if (!isMounted.Value) return;
+        playerMovement = playerObj.GetComponent<Movement>();
+        if (playerMovement != null)
+        {
+            playerMovement.enabled = false;
+            // var playerRb = playerObj.GetComponent<Rigidbody>();
+            // if (playerRb) playerRb.isKinematic = true;
+        }
+    }
+
+    [ServerRpc]
+    private void RequestDismountServerRpc(bool mounted, ServerRpcParams rpcParams = default)
+    {
+        if (!mounted) return;
 
         ulong clientId = rpcParams.Receive.SenderClientId;
         if (clientId != OwnerClientId) return;
 
         isMounted.Value = false;
-        HandleDismountClientRpc(new NetworkObjectReference(mountedPlayer));
+        HandleDismountClientRpc(mountedPlayerRef.Value);
         // mountedPlayer = null;
         mountedPlayerRef.Value = default;
     }
@@ -526,15 +577,24 @@ public class BoatController : NetworkBehaviour
     [ClientRpc]
     private void HandleDismountClientRpc(NetworkObjectReference playerRef)
     {
+        // if (!IsOwner) return;
         if (!playerRef.TryGet(out NetworkObject playerObj)) return;
 
         if (playerObj.IsOwner)
         {
-            if (playerMovement != null)
-            {
-                playerMovement.enabled = true;
-                playerMovement = null;
-            }
+            ResetValues();
+        }
+    }
+
+    private void ResetValues()
+    {
+        if (playerMovement != null)
+        {
+            // var playerRb = playerObj.GetComponent<Rigidbody>();
+            // if (playerRb) playerRb.isKinematic = false;
+
+            playerMovement.enabled = true;
+            playerMovement = null;
         }
     }
 

@@ -861,7 +861,7 @@ GameObject:
   - component: {fileID: -4894236017340077371}
   - component: {fileID: -50324828774126566}
   - component: {fileID: -650592744803832138}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: TreesForSand_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

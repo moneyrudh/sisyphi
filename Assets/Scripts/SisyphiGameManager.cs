@@ -14,7 +14,8 @@ public class SisyphiGameManager: NetworkBehaviour
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private Dictionary<ulong, bool> playerReadyDictionary;
     private NetworkVariable<NetworkPromptArray> prompts = new NetworkVariable<NetworkPromptArray>(new NetworkPromptArray(4));
-    private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(5f);
+    private const float timerDuration = 4f;
+    private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(timerDuration);
     private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(600f);
 
     public event EventHandler OnStateChanged;
@@ -100,7 +101,7 @@ public class SisyphiGameManager: NetworkBehaviour
                 countdownTimer.Value -= Time.deltaTime;
                 if (countdownTimer.Value < -3f)
                 {
-                    countdownTimer.Value = 5f;
+                    countdownTimer.Value = timerDuration;
                     state.Value = State.SecondPrompt;
                 }
                 break;

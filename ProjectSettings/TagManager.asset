@@ -11,6 +11,7 @@ TagManager:
   - Boulder
   - Ramp
   - Tree
+  - Boat
   layers:
   - Default
   - TransparentFX
@@ -27,7 +28,7 @@ TagManager:
   - Boat
   - Boat_0
   - Boat_1
-  - 
+  - Player
   - 
   - 
   - 
