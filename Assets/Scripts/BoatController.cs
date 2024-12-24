@@ -93,6 +93,7 @@ public class BoatController : NetworkBehaviour
 
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = true;
+        rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 
         if (IsOwner)
         {
@@ -539,6 +540,8 @@ public class BoatController : NetworkBehaviour
 
         if (playerObj.IsOwner)
         {
+            rb.constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            
             SetValues(playerObj);
         }
 
@@ -582,6 +585,8 @@ public class BoatController : NetworkBehaviour
 
         if (playerObj.IsOwner)
         {
+            rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+
             ResetValues();
         }
     }
