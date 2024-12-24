@@ -32,15 +32,15 @@ public class BoatPlacementSystem : NetworkBehaviour
     public InputActionReference removeBoatAction;
 
     [Header("References")]
-    private GameObject boatPreview;
+    public GameObject boatPreview;
     private Camera playerCamera;
-    private bool inPlacementMode;
+    public bool inPlacementMode;
     private List<Renderer> previewRenderers = new List<Renderer>();
     private bool isValidPlacement = true;
 
     public NetworkObject placedBoat;
-    private NetworkVariable<bool> hasPlacedBoat = new NetworkVariable<bool>(false);
-    private NetworkVariable<bool> canRemoveBoat = new NetworkVariable<bool>(true);
+    public NetworkVariable<bool> hasPlacedBoat = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> canRemoveBoat = new NetworkVariable<bool>(true);
 
     public override void OnNetworkSpawn()
     {
@@ -129,11 +129,7 @@ public class BoatPlacementSystem : NetworkBehaviour
             return;
         }
 
-        if (boatPreview != null)
-        {
-            Destroy(boatPreview);
-            boatPreview = null;
-        }
+        CleanupExistingPreview();
 
         boatPreview = Instantiate(boatGhostPrefab);
         boatPreview.SetActive(false);
@@ -154,19 +150,27 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     public IEnumerator ReinitializePreview()
     {
+        DisableInputs();
+
         yield return new WaitForEndOfFrame();
 
-        playerCamera = GameObject.Find($"PlayerCamera_{OwnerClientId}")?.GetComponent<Camera>();
+        CleanupExistingPreview();
 
+        // playerCamera = GameObject.Find($"PlayerCamera_{OwnerClientId}")?.GetComponent<Camera>();
+
+        Debug.Log("ReinitializePreview for client " + OwnerClientId);
+
+        InitializePreview();
+        EnableInputs();
+    }
+
+    private void CleanupExistingPreview()
+    {
         if (boatPreview != null)
         {
             Destroy(boatPreview);
             boatPreview = null;
         }
-        Debug.Log("ReinitializePreview for client " + OwnerClientId);
-
-        InitializePreview();
-        EnableInputs();
     }
     
     private void Update()
@@ -212,15 +216,22 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     private void HandleBoatToggle(InputAction.CallbackContext context)
     {
-        // Debug.Log(hasPlacedBoat.Value + " Toggling");
-        // if (hasPlacedBoat.Value) return;
+        if (!IsSpawned || !IsOwner)
+        {
+            Debug.LogWarning($"HandleBoatToggle ignored - IsSpawned: {IsSpawned}, IsOwner: {IsOwner}");
+            return;
+        }
+
+        Debug.Log($"Handling boat toggle for client {OwnerClientId}");
 
         if (boatPreview == null)
         {
+            Debug.Log($"Preview null during toggle, reinitializing for client {OwnerClientId}");
             StartCoroutine(ReinitializePreview());
             return;
         }
 
+        Debug.Log($"Toggling placement mode for client {OwnerClientId}. Current mode: {inPlacementMode}");
         TogglePlacementMode();
     }
 
@@ -239,8 +250,8 @@ public class BoatPlacementSystem : NetworkBehaviour
         if (Physics.Raycast(previewPos + Vector3.up * 2, Vector3.down, out RaycastHit waterHit, 10f, waterLayer))
         {
             Vector3 finalPosition = waterHit.point;
-            // finalPosition.x = previewPos.x;
-            // finalPosition.z = previewPos.z;
+            finalPosition.x = previewPos.x;
+            finalPosition.z = previewPos.z;
             PlaceBoatServerRpc(finalPosition, boatPreview.transform.rotation);
         }
         else
@@ -306,6 +317,8 @@ public class BoatPlacementSystem : NetworkBehaviour
     private void TogglePlacementMode()
     {
         inPlacementMode = !inPlacementMode;
+        Debug.Log($"Placement mode toggled to {inPlacementMode} for client {OwnerClientId}");
+        
         if (!inPlacementMode)
         {
             DisablePlacementMode();
@@ -336,19 +349,24 @@ public class BoatPlacementSystem : NetworkBehaviour
             return;
         }
 
+        Debug.Log($"Spawning boat for client {clientId} at position {position}");
         GameObject boat = Instantiate(boatPrefab, position, rotation);
         NetworkObject networkObject = boat.GetComponent<NetworkObject>();
-        
+        // boat.transform.SetPositionAndRotation(position, rotation);
+    
         Debug.Log($"PlaceBoatServerRpc - Spawning boat for client {clientId}");
         networkObject.SpawnWithOwnership(clientId);
         // networkObject.ChangeOwnership(clientId);
-        networkObject.gameObject.transform.position = position;
+        // boat.transform.SetPositionAndRotation(position, rotation);
+        // networkObject.gameObject.transform.position = position;
+        Debug.Log($"Location of boat {networkObject.gameObject.transform.position}");
         Debug.Log($"PlaceBoatServerRpc - Boat spawned with NetworkObjectId: {networkObject.NetworkObjectId}");
         
         // hasPlacedBoat.Value = true;
         UpdateBoatPlacedStateClientRpc(true, new NetworkObjectReference(networkObject));
         SyncBoatPositionClientRpc(
-            networkObject.NetworkObjectId,
+            clientId,
+            new NetworkObjectReference(networkObject),
             position,
             networkObject.transform.rotation
         );
@@ -387,35 +405,39 @@ public class BoatPlacementSystem : NetworkBehaviour
         }
     }
 
-    private IEnumerator ConfirmBoatSpawnAfterDelay(NetworkObject networkObject, Vector3 position, ulong clientId)
-    {
-        yield return new WaitForEndOfFrame();
+    // private IEnumerator ConfirmBoatSpawnAfterDelay(NetworkObject networkObject, Vector3 position, ulong clientId)
+    // {
+    //     yield return new WaitForEndOfFrame();
 
-        if (networkObject != null && networkObject.IsSpawned)
-        {
-            hasPlacedBoat.Value = true;
-            UpdateBoatPlacedStateClientRpc(true, new NetworkObjectReference(networkObject));
+    //     if (networkObject != null && networkObject.IsSpawned)
+    //     {
+    //         hasPlacedBoat.Value = true;
+    //         UpdateBoatPlacedStateClientRpc(true, new NetworkObjectReference(networkObject));
 
-            SyncBoatPositionClientRpc(
-                networkObject.NetworkObjectId,
-                position,
-                networkObject.transform.rotation
-            );
-        }
-        else
-        {
-            Debug.LogError("Failed to spawn boat properly.");
-            RetryBoatPlacementClientRpc(clientId);
-        }
-    }
+    //         SyncBoatPositionClientRpc(
+
+    //             networkObject.NetworkObjectId,
+    //             position,
+    //             networkObject.transform.rotation
+    //         );
+    //     }
+    //     else
+    //     {
+    //         Debug.LogError("Failed to spawn boat properly.");
+    //         RetryBoatPlacementClientRpc(clientId);
+    //     }
+    // }
 
     [ClientRpc]
-    private void SyncBoatPositionClientRpc(ulong networkId, Vector3 position, Quaternion rotation)
+    private void SyncBoatPositionClientRpc(ulong clientId, NetworkObjectReference boatRef, Vector3 position, Quaternion rotation)
     {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkId, out NetworkObject boatObj))
+        // if (clientId != OwnerClientId) return;
+        if (boatRef.TryGet(out NetworkObject boatObj))
         {
-            boatObj.transform.position = position;
-            boatObj.transform.rotation = rotation;
+            Debug.Log($"SyncBoatPositionClientRpc - Syncing boat position for client {clientId} at position {position}");
+            boatObj.gameObject.transform.position = position;
+            boatObj.gameObject.transform.rotation = rotation;
+            // boatObj.transform.SetPositionAndRotation(position, rotation);
         }
     }
 
@@ -519,7 +541,7 @@ public class BoatPlacementSystem : NetworkBehaviour
         //     hasPlacedBoat.OnValueChanged -= OnHasPlacedBoatChanged;
         // }
 
-        DisableInputs();
+        // DisableInputs();
         if (boatPreview != null)
         {
             Destroy(boatPreview);

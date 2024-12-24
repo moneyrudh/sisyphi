@@ -67,8 +67,9 @@ public class Movement : NetworkBehaviour
             base.OnNetworkSpawn();
             Debug.Log("Calling TileSetter");
             FindObjectOfType<TileSetter>().SetInitialGrid();
-            gameObject.name = "Player_" + OwnerClientId;
         }
+        
+        gameObject.name = "Player_" + OwnerClientId;
     }
 
     void Start()

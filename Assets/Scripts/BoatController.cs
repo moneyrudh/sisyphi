@@ -69,16 +69,16 @@ public class BoatController : NetworkBehaviour
     {
         // if (!IsOwner) return;
         
-        if (movement != null)
-        {
-            movement.action.Disable();
-        }
+        // if (movement != null)
+        // {
+        //     movement.action.Disable();
+        // }
 
-        if (interactAction != null)
-        {
-            interactAction.action.Disable();
-            interactAction.action.started -= HandleInteractInput;
-        }
+        // if (interactAction != null)
+        // {
+        //     interactAction.action.Disable();
+        //     interactAction.action.started -= HandleInteractInput;
+        // }
     }
 
     public override void OnNetworkSpawn()
@@ -139,7 +139,7 @@ public class BoatController : NetworkBehaviour
         {
             HandleBoatMovement();
         }
-        else if (!IsOwner)
+        else if (!IsOwner && isMounted.Value)
         {
             // rb.MovePosition(Vector3.SmoothDamp(
             //     rb.position,
