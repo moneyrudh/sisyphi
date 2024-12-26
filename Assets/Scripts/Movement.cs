@@ -12,8 +12,11 @@ public class Movement : NetworkBehaviour
     public GameObject pushingColliders;
     public Transform proximityCheck;
     public Transform groundCheck;
+    public Transform headCheck;
     public LayerMask groundLayer;
     public LayerMask boulderLayer;
+    public LayerMask wallObstacleLayer;
+    public LayerMask groundObstacleLayer;
 
     private GameObject boulder;
 
@@ -25,6 +28,10 @@ public class Movement : NetworkBehaviour
     public float rotationSpeed = 72f;
     public float rotationFromCameraSpeed = 10f;
     public float groundCheckDistance = 0.1f;
+    public float groundCheckRadius = 0.1f;
+    public float wallCheckRadius = 0.5f;
+    public float groundCollisionDistance = 0.75f;
+    public float wallCollisionDistance = 1f;
     public float gravityMultiplier = 2.5f;
     public float fallMultiplier = 2.5f;
     public float rotationSmoothTime = 0.1f;
@@ -35,7 +42,7 @@ public class Movement : NetworkBehaviour
     private CameraController cameraController;
     private Animator animator;
     private bool isJumping;
-    public static bool isGrounded;
+    public bool isGrounded;
     private bool idle;
     private bool pushing;
 
@@ -138,6 +145,129 @@ public class Movement : NetworkBehaviour
         // }
     }
 
+    private bool CanMoveInDirection(Vector3 direction)
+    {
+        if (pushing) return true;
+        if (direction == Vector3.zero) return true;
+
+        direction = direction.normalized;
+
+        RaycastHit hit;
+        bool headBlocked = Physics.Raycast(
+            headCheck.position, 
+            direction, 
+            out hit,
+            wallCollisionDistance, 
+            wallObstacleLayer,
+            QueryTriggerInteraction.Ignore
+        );
+        if (headBlocked)
+        {
+            Debug.Log("HIT! Object: " + hit.collider.name);
+        }
+        // bool headBlocked = Physics.SphereCast(
+        //     headCheck.position, 
+        //     wallCheckRadius, 
+        //     direction,
+        //     out RaycastHit hit1,
+        //     wallCollisionDistance, 
+        //     obstacleLayer
+        // );
+        bool groundBlocked = Physics.Raycast(
+            groundCheck.position, 
+            direction, 
+            out hit,
+            groundCollisionDistance, 
+            groundObstacleLayer,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (groundBlocked)
+        {
+            Debug.Log("HIT! Object: " + hit.collider.name);
+        }
+        DrawSphereCast(
+        headCheck.position,
+        direction,
+        wallCheckRadius,
+        wallCollisionDistance,
+        headBlocked ? Color.red : Color.green
+        );
+        
+        // Standard raycast debug for ground check
+        Debug.DrawRay(
+            groundCheck.position, 
+            direction * 0.2f, 
+            groundBlocked ? Color.red : Color.green,
+            0.5f
+        );
+
+        return !headBlocked && !groundBlocked;
+    }
+
+    private void DrawSphereCast(Vector3 origin, Vector3 direction, float radius, float distance, Color color)
+    {
+        // Draw the starting sphere
+        DrawWireSphere(origin, radius, color);
+        
+        // Draw the ending sphere
+        Vector3 endPosition = origin + direction * distance;
+        DrawWireSphere(endPosition, radius, color);
+        
+        // Draw the connecting lines between spheres
+        Vector3 up = Vector3.up * radius;
+        Vector3 right = Vector3.right * radius;
+        Vector3 forward = Vector3.forward * radius;
+
+        // Draw lines connecting the spheres
+        Debug.DrawLine(origin + up, endPosition + up, color, 0.5f);
+        Debug.DrawLine(origin - up, endPosition - up, color, 0.5f);
+        Debug.DrawLine(origin + right, endPosition + right, color, 0.5f);
+        Debug.DrawLine(origin - right, endPosition - right, color, 0.5f);
+        Debug.DrawLine(origin + forward, endPosition + forward, color, 0.5f);
+        Debug.DrawLine(origin - forward, endPosition - forward, color, 0.5f);
+    }
+
+    private void DrawWireSphere(Vector3 position, float radius, Color color)
+    {
+        float segments = 16;
+        float angleStep = 360f / segments;
+        
+        // Draw three circles for each major axis
+        for (int axis = 0; axis < 3; axis++)
+        {
+            for (float angle = 0; angle < 360; angle += angleStep)
+            {
+                float nextAngle = angle + angleStep;
+                
+                // Convert angles to radians
+                float rad1 = angle * Mathf.Deg2Rad;
+                float rad2 = nextAngle * Mathf.Deg2Rad;
+                
+                Vector3 p1 = position;
+                Vector3 p2 = position;
+                
+                switch (axis)
+                {
+                    case 0: // XY plane
+                        p1 += new Vector3(Mathf.Cos(rad1) * radius, Mathf.Sin(rad1) * radius, 0);
+                        p2 += new Vector3(Mathf.Cos(rad2) * radius, Mathf.Sin(rad2) * radius, 0);
+                        break;
+                    case 1: // XZ plane
+                        p1 += new Vector3(Mathf.Cos(rad1) * radius, 0, Mathf.Sin(rad1) * radius);
+                        p2 += new Vector3(Mathf.Cos(rad2) * radius, 0, Mathf.Sin(rad2) * radius);
+                        break;
+                    case 2: // YZ plane
+                        p1 += new Vector3(0, Mathf.Cos(rad1) * radius, Mathf.Sin(rad1) * radius);
+                        p2 += new Vector3(0, Mathf.Cos(rad2) * radius, Mathf.Sin(rad2) * radius);
+                        break;
+                }
+                
+                Debug.DrawLine(p1, p2, color, 0.5f);
+            }
+        }
+    }
+
     private void MoveRelativeToCamera()
     {
         if (!IsOwner) return;
@@ -148,9 +278,12 @@ public class Movement : NetworkBehaviour
 
         Vector3 movement = (forward * moveDirection.y + right * moveDirection.x).normalized;
 
-        float currentSpeed = pushing ? pushSpeed : (Input.GetKey(KeyCode.LeftShift) ? moveSpeed * sprintMultiplier : moveSpeed);
-        rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
-        // Quaternion targetRotation = Quaternion.LookRotation(movement);
+        if (CanMoveInDirection(movement))
+        {
+            float currentSpeed = pushing ? pushSpeed : (Input.GetKey(KeyCode.LeftShift) ? moveSpeed * sprintMultiplier : moveSpeed);
+            rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
+            // Quaternion targetRotation = Quaternion.LookRotation(movement);
+        }
         if (movement != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(movement);

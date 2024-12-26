@@ -23,7 +23,7 @@ public class PlayerFarm : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (movement.moveDirection.magnitude < 0.1f && Input.GetMouseButton(1) && !isFarming && Movement.isGrounded)
+        if (movement.moveDirection.magnitude < 0.1f && Input.GetMouseButton(1) && !isFarming && movement.isGrounded)
         {
             // StartCoroutine(PerformFarmRoutine());
             isFarming = true;

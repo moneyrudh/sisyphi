@@ -56,7 +56,7 @@ public class SisyphiGameManager: NetworkBehaviour
 
         Debug.Log("ALL PLAYERS JOINED");
         StartGameClientRpc();
-        state.Value = State.FirstPrompt;
+        state.Value = State.Playing;
     }
 
     [ClientRpc]

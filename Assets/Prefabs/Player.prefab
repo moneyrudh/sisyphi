@@ -3206,6 +3206,37 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.6988672, y: 0.11245008, z: 0.000000007450581}
     m_Extent: {x: 0.01559332, y: 0.028514788, z: 0.08320365}
   m_DirtyAABB: 0
+--- !u!1 &4820934540265914605
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2916284041959098695}
+  m_Layer: 9
+  m_Name: HeadCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2916284041959098695
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4820934540265914605}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.828, z: -0.0886}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3742736202113095190}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4916435796843751554
 GameObject:
   m_ObjectHideFlags: 0
@@ -4049,6 +4080,7 @@ Transform:
   - {fileID: 3944974466692329860}
   - {fileID: 872057651799178448}
   - {fileID: 6654591264043039490}
+  - {fileID: 2916284041959098695}
   - {fileID: 8560478710581063736}
   - {fileID: 2817456718215930386}
   - {fileID: 7489287984856098926}
@@ -4113,12 +4145,19 @@ MonoBehaviour:
   pushingColliders: {fileID: 6781943642012271567}
   proximityCheck: {fileID: 2817456718215930386}
   groundCheck: {fileID: 6654591264043039490}
+  headCheck: {fileID: 2916284041959098695}
   groundLayer:
     serializedVersion: 2
     m_Bits: 5065
   boulderLayer:
     serializedVersion: 2
     m_Bits: 128
+  wallObstacleLayer:
+    serializedVersion: 2
+    m_Bits: 769
+  groundObstacleLayer:
+    serializedVersion: 2
+    m_Bits: 28672
   moveSpeed: 5
   sprintMultiplier: 1.5
   pushSpeed: 1.5
@@ -4126,9 +4165,14 @@ MonoBehaviour:
   rotationSpeed: 10
   rotationFromCameraSpeed: 10
   groundCheckDistance: 0.2
+  groundCheckRadius: 0.1
+  wallCheckRadius: 0.5
+  groundCollisionDistance: 0.75
+  wallCollisionDistance: 1
   gravityMultiplier: 3
   fallMultiplier: 3
   rotationSmoothTime: 1
+  isGrounded: 0
 --- !u!114 &6470093790754881284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4457,7 +4501,13 @@ MonoBehaviour:
   placeBoatToggle: {fileID: 2835967775205859358, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   placeBoatConfirm: {fileID: 7112439953257795887, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   removeBoatAction: {fileID: 4470123054780279601, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
+  boatPreview: {fileID: 0}
+  inPlacementMode: 0
   placedBoat: {fileID: 0}
+  hasPlacedBoat:
+    m_InternalValue: 0
+  canRemoveBoat:
+    m_InternalValue: 1
 --- !u!114 &441397108175300128
 MonoBehaviour:
   m_ObjectHideFlags: 0
