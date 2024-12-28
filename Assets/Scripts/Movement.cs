@@ -296,16 +296,6 @@ public class Movement : NetworkBehaviour
             float currentSpeed = pushing ? pushSpeed : (Input.GetKey(KeyCode.LeftShift) ? moveSpeed * sprintMultiplier : moveSpeed);
             rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
 
-            if (pushing && boulderController != null)
-            {
-                // Vector3 newBoulderPos = boulderRb.position + movement * currentSpeed * Time.fixedDeltaTime;
-                // boulderController.RequestMove(movement * currentSpeed * Time.fixedDeltaTime);
-                // boulderController.MoveBoulder(movement * currentSpeed * Time.fixedDeltaTime);
-                // boulderRb.MovePosition(newBoulderPos);
-                // MoveBoulderServerRpc(movement * currentSpeed * Time.fixedDeltaTime);
-
-                // SyncBoulderPositionServerRpc(newBoulderPos);
-            }
             // Quaternion targetRotation = Quaternion.LookRotation(movement);
         }
         if (movement != Vector3.zero)
@@ -424,19 +414,34 @@ public class Movement : NetworkBehaviour
             boulder = hit.collider.gameObject;
             if (!wasPushing)
             {
-                // boulderRb = boulder.GetComponent<Rigidbody>();
                 boulderController = boulder.GetComponent<BoulderController>();
+                // Request boulder ownership when starting to push
+                boulderController.OnPlayerApproach(NetworkObject);
+                
                 if (IsServer)
                 {
                     netPushing.Value = true;
                 }
-                else UpdatePushingStateServerRpc(true);
+                else 
+                {
+                    UpdatePushingStateServerRpc(true);
+                }
             }
         }
         else if (wasPushing)
         {
-            if (IsServer) netPushing.Value = false;
-            else UpdatePushingStateServerRpc(false);
+            // Release boulder ownership when stopping push
+            boulderController?.OnPlayerLeave(NetworkObject);
+            
+            if (IsServer) 
+            {
+                netPushing.Value = false;
+            }
+            else 
+            {
+                UpdatePushingStateServerRpc(false);
+            }
+            boulderController = null;
             boulderRb = null;
         }
     }

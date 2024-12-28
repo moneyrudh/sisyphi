@@ -18,15 +18,17 @@ public class BoulderCollision : NetworkBehaviour
 
     private void Update()
     {
-        if (IsServer)
+        if (IsClient)
         {
             netPosition.Value = transform.position;
             netRotation.Value = transform.rotation;
         }
-        else
+        else if (IsServer)
         {
-            transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.deltaTime);
-            transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.deltaTime);
+            transform.position = netPosition.Value;
+            transform.rotation = netRotation.Value;
+            // transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.deltaTime);
+            // transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.deltaTime);
         }
     }
 

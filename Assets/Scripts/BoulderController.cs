@@ -4,81 +4,46 @@ using Unity.Netcode.Components;
 
 public class BoulderController : NetworkBehaviour
 {
+    private NetworkRigidbody networkRigidbody;
     private Rigidbody rb;
-    private NetworkVariable<Vector3> targetPosition = new NetworkVariable<Vector3>();
-    private NetworkVariable<Vector3> targetVelocity = new NetworkVariable<Vector3>();
-    public float syncThreshold = 0.1f;  // Only sync if position difference is greater than this
-    public float smoothFactor = 10f;    // Higher = faster correction
-    private Vector3 currentVelocity;
-    public float smoothTime = 0.1f;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        // rb.constraints = RigidbodyConstraints.FreezeRotation;
+        networkRigidbody = GetComponent<NetworkRigidbody>();
     }
 
-    public override void OnNetworkSpawn()
+    // Call this when a player's collider enters the boulder's trigger zone
+    public void OnPlayerApproach(NetworkObject playerObject)
     {
-        if (IsServer)
-        {
-            targetPosition.Value = transform.position;
-        }
-    }
-
-    private void Update()
-    {
-        if (IsServer)
-        {
-            // Server updates network position if boulder has moved significantly
-            if (Vector3.Distance(targetPosition.Value, rb.position) > syncThreshold)
-            {
-                targetPosition.Value = rb.position;
-                targetVelocity.Value = rb.velocity;
-            }
-        }
-        else
-        {
-            // Clients smoothly correct any desync while maintaining physics simulation
-            Vector3 positionError = targetPosition.Value - rb.position;
-            if (positionError.magnitude > syncThreshold)
-            {
-                rb.velocity = Vector3.Lerp(rb.velocity, targetVelocity.Value, Time.deltaTime * smoothFactor);
-                rb.MovePosition(Vector3.Lerp(rb.position, targetPosition.Value, Time.deltaTime * smoothFactor));
-            }
-        }
-    }
-
-    public void MoveBoulder(Vector3 movement)
-    {
-        // Client and Host both just request the move
-        RequestMoveServerRpc(movement);
+        if (!playerObject.IsOwner) return;
+        
+        // Request ownership of the boulder
+        RequestBoulderOwnershipServerRpc(playerObject.OwnerClientId);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestMoveServerRpc(Vector3 movement)
+    private void RequestBoulderOwnershipServerRpc(ulong requestingPlayerId)
     {
-        // Server applies the movement
-        Vector3 newPosition = transform.position + movement;
-        transform.position = newPosition;
-        targetPosition.Value = newPosition;
-        
-        // Tell clients to update their positions
-        UpdatePositionClientRpc(newPosition);
+        // Transfer ownership to the requesting player
+        NetworkObject.ChangeOwnership(requestingPlayerId);
     }
 
-    [ClientRpc]
-    private void UpdatePositionClientRpc(Vector3 newPosition)
+    // Optional: Release ownership when player moves away
+    public void OnPlayerLeave(NetworkObject playerObject)
     {
-        // Only non-host clients need to update
-        if (!IsServer)
+        if (!playerObject.IsOwner) return;
+        
+        if (NetworkObject.OwnerClientId == playerObject.OwnerClientId)
         {
-            transform.position = Vector3.SmoothDamp(
-                transform.position,
-                newPosition,
-                ref currentVelocity,
-                smoothTime
-            );
+            ReleaseBoulderOwnershipServerRpc();
         }
+    }
+
+    [ServerRpc]
+    private void ReleaseBoulderOwnershipServerRpc()
+    {
+        // Transfer ownership back to the server
+        NetworkObject.ChangeOwnership(NetworkManager.ServerClientId);
     }
 }

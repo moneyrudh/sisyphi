@@ -15,6 +15,7 @@ public class DamageTree : NetworkBehaviour
     public void Start()
     {
         tileSetter = FindObjectOfType<TileSetter>();
+        spawnedParticlesGO = new List<GameObject>();
     }
 
     public override void OnNetworkSpawn()
