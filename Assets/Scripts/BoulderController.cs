@@ -6,6 +6,8 @@ public class BoulderController : NetworkBehaviour
 {
     private NetworkRigidbody networkRigidbody;
     private Rigidbody rb;
+    public int restingMass = 20;
+    public int pushingMass = 7;
 
     private void Awake()
     {
@@ -17,7 +19,7 @@ public class BoulderController : NetworkBehaviour
     public void OnPlayerApproach(NetworkObject playerObject)
     {
         if (!playerObject.IsOwner) return;
-        
+        rb.mass = pushingMass;
         // Request ownership of the boulder
         // RequestBoulderOwnershipServerRpc(playerObject.OwnerClientId);
     }
@@ -33,7 +35,7 @@ public class BoulderController : NetworkBehaviour
     public void OnPlayerLeave(NetworkObject playerObject)
     {
         if (!playerObject.IsOwner) return;
-        
+        rb.mass = restingMass;
         // if (NetworkObject.OwnerClientId == playerObject.OwnerClientId)
         // {
         //     ReleaseBoulderOwnershipServerRpc();

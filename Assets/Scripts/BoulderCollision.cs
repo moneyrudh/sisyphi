@@ -16,22 +16,6 @@ public class BoulderCollision : NetworkBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    private void Update()
-    {
-        if (IsClient)
-        {
-            netPosition.Value = transform.position;
-            netRotation.Value = transform.rotation;
-        }
-        else if (IsServer)
-        {
-            transform.position = netPosition.Value;
-            transform.rotation = netRotation.Value;
-            // transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.deltaTime);
-            // transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.deltaTime);
-        }
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsServer) return;

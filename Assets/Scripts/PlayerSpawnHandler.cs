@@ -126,18 +126,18 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
         int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(clientId);
         Vector3 spawnPosition = spawnPoints[index] + new Vector3(0, 1f, 4f);
-        GameObject boulder = Instantiate(boulderPrefab, spawnPosition, Quaternion.identity);
-        boulder.name = "Boulder_" + index;
-        NetworkObject networkObject = boulder.GetComponent<NetworkObject>();
+        GameObject _boulder = Instantiate(boulderPrefab, spawnPosition, Quaternion.identity);
+        _boulder.name = "Boulder_" + index;
+        NetworkObject networkObject = _boulder.GetComponent<NetworkObject>();
         networkObject.SpawnWithOwnership(clientId);
 
-        AssignBoulderClientRpc(new NetworkObjectReference(networkObject));
+        AssignBoulderClientRpc(clientId, new NetworkObjectReference(networkObject));
     }
 
     [ClientRpc]
-    private void AssignBoulderClientRpc(NetworkObjectReference boulderRef)
+    private void AssignBoulderClientRpc(ulong clientId, NetworkObjectReference boulderRef)
     {
-        if (IsOwner)
+        if (OwnerClientId == clientId)
         {
             if (boulderRef.TryGet(out NetworkObject boulderNetObj))
             {
