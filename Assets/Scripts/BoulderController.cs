@@ -19,7 +19,7 @@ public class BoulderController : NetworkBehaviour
         if (!playerObject.IsOwner) return;
         
         // Request ownership of the boulder
-        RequestBoulderOwnershipServerRpc(playerObject.OwnerClientId);
+        // RequestBoulderOwnershipServerRpc(playerObject.OwnerClientId);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -34,10 +34,10 @@ public class BoulderController : NetworkBehaviour
     {
         if (!playerObject.IsOwner) return;
         
-        if (NetworkObject.OwnerClientId == playerObject.OwnerClientId)
-        {
-            ReleaseBoulderOwnershipServerRpc();
-        }
+        // if (NetworkObject.OwnerClientId == playerObject.OwnerClientId)
+        // {
+        //     ReleaseBoulderOwnershipServerRpc();
+        // }
     }
 
     [ServerRpc]

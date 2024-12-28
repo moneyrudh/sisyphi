@@ -129,7 +129,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
         GameObject boulder = Instantiate(boulderPrefab, spawnPosition, Quaternion.identity);
         boulder.name = "Boulder_" + index;
         NetworkObject networkObject = boulder.GetComponent<NetworkObject>();
-        networkObject.Spawn();
+        networkObject.SpawnWithOwnership(clientId);
 
         AssignBoulderClientRpc(new NetworkObjectReference(networkObject));
     }
