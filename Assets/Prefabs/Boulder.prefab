@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6634942402420577885}
   - component: {fileID: 1752648284258405585}
   - component: {fileID: 6660538233823883936}
+  - component: {fileID: 8664722534287285459}
   m_Layer: 7
   m_Name: Boulder
   m_TagString: Boulder
@@ -134,7 +135,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &1752648284258405585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1580327592
+  GlobalObjectIdHash: 1599261419
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -169,3 +170,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   breakVelocityThreshold: 0.25
+--- !u!114 &8664722534287285459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6887029233247754709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18a0461a5d593435f92934c97bdd0d5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncThreshold: 5
+  smoothFactor: 20
+  smoothTime: 0

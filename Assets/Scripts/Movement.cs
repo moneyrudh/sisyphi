@@ -48,6 +48,10 @@ public class Movement : NetworkBehaviour
 
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
+    private NetworkVariable<bool> netPushing = new NetworkVariable<bool>();
+    private NetworkVariable<Vector3> netBoulderPosition = new NetworkVariable<Vector3>();
+    private Rigidbody boulderRb;
+    private BoulderController boulderController;
 
     public void OnEnable()
     {
@@ -122,7 +126,16 @@ public class Movement : NetworkBehaviour
             // Rotate();
             ApplyGravity();
             CheckPushing();
+            UpdateBoulderPosition();
             // UpdateNetworkPositionServerRpc(transform.position, transform.rotation);
+        }
+    }
+
+    private void UpdateBoulderPosition()
+    {
+        if (!IsOwner && boulder != null)
+        {
+            boulder.transform.position = Vector3.Lerp(boulder.transform.position, netBoulderPosition.Value, Time.fixedDeltaTime * 10f);
         }
     }
 
@@ -282,6 +295,17 @@ public class Movement : NetworkBehaviour
         {
             float currentSpeed = pushing ? pushSpeed : (Input.GetKey(KeyCode.LeftShift) ? moveSpeed * sprintMultiplier : moveSpeed);
             rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
+
+            if (pushing && boulderController != null)
+            {
+                // Vector3 newBoulderPos = boulderRb.position + movement * currentSpeed * Time.fixedDeltaTime;
+                // boulderController.RequestMove(movement * currentSpeed * Time.fixedDeltaTime);
+                // boulderController.MoveBoulder(movement * currentSpeed * Time.fixedDeltaTime);
+                // boulderRb.MovePosition(newBoulderPos);
+                // MoveBoulderServerRpc(movement * currentSpeed * Time.fixedDeltaTime);
+
+                // SyncBoulderPositionServerRpc(newBoulderPos);
+            }
             // Quaternion targetRotation = Quaternion.LookRotation(movement);
         }
         if (movement != Vector3.zero)
@@ -289,6 +313,23 @@ public class Movement : NetworkBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(movement);
             rb.MoveRotation(Quaternion.Lerp(rb.rotation, targetRotation, rotationFromCameraSpeed * Time.fixedDeltaTime));
         }
+    }
+
+    [ServerRpc]
+    private void MoveBoulderServerRpc(Vector3 movement)
+    {
+        if (!netPushing.Value) return;
+        if (boulder != null)
+        {
+            Rigidbody rb = boulder.GetComponent<Rigidbody>();
+            rb.MovePosition(rb.position + movement);
+        }
+    }
+
+    [ServerRpc]
+    private void SyncBoulderPositionServerRpc(Vector3 position)
+    {
+        netBoulderPosition.Value = position;
     }
 
     private void CheckPushing()
@@ -374,12 +415,36 @@ public class Movement : NetworkBehaviour
     private void CheckRockProximity()
     {
         RaycastHit hit;
+        bool wasPushing = pushing;
         pushing = Physics.Raycast(proximityCheck.position, transform.TransformDirection(Vector3.forward), out hit, 0.75f, boulderLayer);
         pushingColliders.SetActive(pushing);
+
         if (pushing)
         {
             boulder = hit.collider.gameObject;
+            if (!wasPushing)
+            {
+                // boulderRb = boulder.GetComponent<Rigidbody>();
+                boulderController = boulder.GetComponent<BoulderController>();
+                if (IsServer)
+                {
+                    netPushing.Value = true;
+                }
+                else UpdatePushingStateServerRpc(true);
+            }
         }
+        else if (wasPushing)
+        {
+            if (IsServer) netPushing.Value = false;
+            else UpdatePushingStateServerRpc(false);
+            boulderRb = null;
+        }
+    }
+
+    [ServerRpc]
+    private void UpdatePushingStateServerRpc(bool isPushing)
+    {
+        netPushing.Value = isPushing;
     }
 
     private void ApplyGravity()
