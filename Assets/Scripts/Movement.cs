@@ -24,6 +24,7 @@ public class Movement : NetworkBehaviour
     public float moveSpeed = 5f;
     public float sprintMultiplier = 1.5f;
     public float pushSpeed = 1.5f;
+    public float fallingVelocity = -2f;
     public float jumpForce = 5f;
     public float rotationSpeed = 72f;
     public float rotationFromCameraSpeed = 10f;
@@ -45,6 +46,8 @@ public class Movement : NetworkBehaviour
     public bool isGrounded;
     private bool idle;
     private bool pushing;
+    private bool isFalling;
+    private float jumpYPosition;
 
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
@@ -89,6 +92,8 @@ public class Movement : NetworkBehaviour
         animator = GetComponent<Animator>();
         cameraController = GetComponent<CameraController>();
         boulder = GameObject.FindWithTag("Boulder");
+        isFalling = false;
+        pushing = false;
         if (IsOwner)
         {
             StartCoroutine(WaitForCamera());
@@ -381,12 +386,15 @@ public class Movement : NetworkBehaviour
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z); // Reset Y velocity
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isJumping = true;
+            isFalling = false;
+            jumpYPosition = transform.position.y;
             animator.SetTrigger("jump");
         }
     }
 
     private void CheckGrounded()
     {
+        bool wasGrounded = isGrounded;
         isGrounded = Physics.SphereCast(
             groundCheck.position + Vector3.up * 0.2f, // Start slightly above to avoid false negatives
             0.2f, // Radius of sphere
@@ -395,6 +403,14 @@ public class Movement : NetworkBehaviour
             groundCheckDistance + 0.1f,
             groundLayer
         );
+
+        if (isGrounded && !wasGrounded)
+        {
+            Debug.Log("Landed");
+            animator.SetTrigger("landed");
+            animator.SetBool("falling", false);
+            isFalling = false;
+        }
 
         if (isGrounded && rb.velocity.y < 0.1f)
         {
@@ -468,7 +484,13 @@ public class Movement : NetworkBehaviour
     {
         bool isMoving = moveDirection.magnitude > 0;
 
-        if (pushing && isGrounded)
+        if (!isGrounded && rb.velocity.y < 0f && !isFalling && transform.position.y < jumpYPosition)
+        {
+            jumpYPosition = -999f;
+            animator.SetBool("falling", true);
+            isFalling = true;
+        }
+        else if (pushing && isGrounded)
         {
             animator.SetBool("pushing", true);
             animator.SetBool("fast-push", Input.GetKey(KeyCode.LeftShift));

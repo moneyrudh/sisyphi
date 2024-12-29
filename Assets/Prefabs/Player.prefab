@@ -4161,6 +4161,7 @@ MonoBehaviour:
   moveSpeed: 5
   sprintMultiplier: 1.5
   pushSpeed: 1.5
+  fallingVelocity: -2
   jumpForce: 7
   rotationSpeed: 10
   rotationFromCameraSpeed: 10
@@ -4320,7 +4321,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b4f7f154736e484ba4d8f71a44c0800, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1906797511
+    DestinationState: 2081823275
+    TransitionDuration: 0.1
+    TriggerNameHash: -1395332848
+    TransitionIndex: 0
   m_Animator: {fileID: 3743273975912292817}
 --- !u!114 &3629608946139005133
 MonoBehaviour:
