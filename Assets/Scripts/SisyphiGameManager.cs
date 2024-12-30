@@ -38,6 +38,29 @@ public class SisyphiGameManager: NetworkBehaviour
         state.OnValueChanged += State_OnValueChanged;
     }
 
+    private void Start()
+    {
+        SkyboxMaterial skyboxMaterial = SisyphiGameMultiplayer.Instance.GetSkyboxData();
+        RenderSettings.skybox = skyboxMaterial.material;
+        RenderSettings.fog = true;
+        RenderSettings.fogColor = skyboxMaterial.fogColor;
+        RenderSettings.fogMode = skyboxMaterial.fogMode;
+        switch (skyboxMaterial.fogMode)
+        {
+            case FogMode.Linear:
+            {
+                RenderSettings.fogStartDistance = skyboxMaterial.startDistance;
+                RenderSettings.fogEndDistance = skyboxMaterial.endDistance;
+            }
+            break;
+            case FogMode.Exponential:
+            {
+                RenderSettings.fogDensity = skyboxMaterial.density;
+            }
+            break;
+        }
+    }
+
     [ServerRpc(RequireOwnership=false)]
     public void SetPlayerJoinedServerRpc(ServerRpcParams serverRpcParams=default)
     {

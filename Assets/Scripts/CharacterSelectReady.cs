@@ -17,6 +17,29 @@ public class CharacterSelectReady : NetworkBehaviour
         playerReadyDictionary = new Dictionary<ulong, bool>();
     }
 
+    private void Start()
+    {
+        SkyboxMaterial skyboxMaterial = SisyphiGameMultiplayer.Instance.GetSkyboxData();
+        RenderSettings.skybox = skyboxMaterial.material;
+        RenderSettings.fog = true;
+        RenderSettings.fogColor = skyboxMaterial.fogColor;
+        RenderSettings.fogMode = skyboxMaterial.fogMode;
+        switch (skyboxMaterial.fogMode)
+        {
+            case FogMode.Linear:
+            {
+                RenderSettings.fogStartDistance = skyboxMaterial.startDistance;
+                RenderSettings.fogEndDistance = skyboxMaterial.endDistance;
+            }
+            break;
+            case FogMode.Exponential:
+            {
+                RenderSettings.fogDensity = skyboxMaterial.density;
+            }
+            break;
+        }
+    }
+
     public void SetPlayerReady(bool ready)
     {
         SetPlayerReadyServerRpc(ready);

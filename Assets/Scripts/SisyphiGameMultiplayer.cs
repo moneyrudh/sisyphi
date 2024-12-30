@@ -6,13 +6,24 @@ using System;
 using UnityEngine.SceneManagement;
 using Unity.Services.Authentication;
 
+[System.Serializable]
+public class SkyboxMaterial {
+    public Material material;
+    public Color fogColor;
+    public FogMode fogMode;
+    public int startDistance;
+    public int endDistance;
+    public float density;
+}
+
 public class SisyphiGameMultiplayer : NetworkBehaviour
 {
     public const int PLAYER_COUNT = 2;
     private const string PLAYER_PREFS_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
-
+    private int skyboxIndex;
     private NetworkList<PlayerData> playerDataNetworkList;
     [SerializeField] private List<Color> playerColors;
+    [SerializeField] private List<SkyboxMaterial> skyboxMaterialList;
     private NetworkList<NetworkedMaterialCategory> currentMaterialCategory;
     public static SisyphiGameMultiplayer Instance { get; private set; }
 
@@ -34,6 +45,17 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
         currentMaterialCategory.OnListChanged += MaterialCategory_OnListChanged;
 
         playerName = PlayerPrefs.GetString(PLAYER_PREFS_NAME_MULTIPLAYER, "Player_" + UnityEngine.Random.Range(1000, 9999));
+    }
+
+    private void SetSkyboxData()
+    {
+        skyboxIndex = UnityEngine.Random.Range(0, 3);
+        SkyboxMaterial skyboxMaterial = skyboxMaterialList[skyboxIndex];
+    }
+
+    public SkyboxMaterial GetSkyboxData()
+    {
+        return skyboxMaterialList[skyboxIndex];
     }
 
     public void ChangeCurrentMaterialCategory(MaterialCategory materialCategory)

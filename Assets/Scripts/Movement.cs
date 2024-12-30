@@ -52,6 +52,7 @@ public class Movement : NetworkBehaviour
     private float jumpYPosition;
     private float fallYPosition;
 
+    private NetworkVariable<float> animationSpeed = new NetworkVariable<float>(1f);
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
     private NetworkVariable<bool> netPushing = new NetworkVariable<bool>();
@@ -139,8 +140,6 @@ public class Movement : NetworkBehaviour
             UpdateBoulderPosition();
             // UpdateNetworkPositionServerRpc(transform.position, transform.rotation);
         }
-
-        Debug.Log("VELOCITY: " + rb.velocity.y + " FREE FALLING: " + isFreeFalling + " LANDED: " + animator.GetBool("landed") + " IMPACT: " + animator.GetBool("impact"));
     }
 
     private void UpdateBoulderPosition()
@@ -551,16 +550,32 @@ public class Movement : NetworkBehaviour
         {
             animator.SetBool("pushing", true);
             animator.SetBool("fast-push", Input.GetKey(KeyCode.LeftShift));
-            animator.speed = isMoving ? 1f : 0.1f;
+            // animator.speed = isMoving ? 1f : 0.1f;
+            SetAnimatorSpeedServerRpc(isMoving ? 1f : 0.1f);
         }
         else if (canMove)
         {
-            animator.speed = 1f;
+            // animator.speed = 1f;
+            SetAnimatorSpeedServerRpc(1f);
             animator.SetBool("pushing", false);
             animator.SetBool("sprint", isMoving && isGrounded && Input.GetKey(KeyCode.LeftShift));
             animator.SetBool("run", isMoving && isGrounded && !Input.GetKey(KeyCode.LeftShift));
             animator.SetBool("idle", !isMoving && isGrounded);
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetAnimatorSpeedServerRpc(float speed, ServerRpcParams serverRpcParams = default)
+    {
+        animationSpeed.Value = speed;
+        UpdateAnimatorSpeedClientRpc(serverRpcParams.Receive.SenderClientId);
+    }
+
+    [ClientRpc]
+    private void UpdateAnimatorSpeedClientRpc(ulong clientId)
+    {
+        if (OwnerClientId != clientId) return;
+        animator.speed = animationSpeed.Value;
     }
 
     public void AllowMovement()
