@@ -42,12 +42,15 @@ public class Movement : NetworkBehaviour
     private Camera playerCamera;
     private CameraController cameraController;
     private Animator animator;
+    private bool canMove;
     private bool isJumping;
     public bool isGrounded;
     private bool idle;
     private bool pushing;
     private bool isFalling;
+    private bool isFreeFalling;
     private float jumpYPosition;
+    private float fallYPosition;
 
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
@@ -92,8 +95,10 @@ public class Movement : NetworkBehaviour
         animator = GetComponent<Animator>();
         cameraController = GetComponent<CameraController>();
         boulder = GameObject.FindWithTag("Boulder");
+        canMove = true;
         isFalling = false;
         pushing = false;
+        isFreeFalling = false;
         if (IsOwner)
         {
             StartCoroutine(WaitForCamera());
@@ -127,13 +132,15 @@ public class Movement : NetworkBehaviour
         if (IsOwner) 
         {
             // Move();
-            MoveRelativeToCamera();
+            if (canMove) MoveRelativeToCamera();
             // Rotate();
             ApplyGravity();
-            CheckPushing();
+            if (canMove) CheckPushing();
             UpdateBoulderPosition();
             // UpdateNetworkPositionServerRpc(transform.position, transform.rotation);
         }
+
+        Debug.Log("VELOCITY: " + rb.velocity.y + " FREE FALLING: " + isFreeFalling + " LANDED: " + animator.GetBool("landed") + " IMPACT: " + animator.GetBool("impact"));
     }
 
     private void UpdateBoulderPosition()
@@ -388,6 +395,7 @@ public class Movement : NetworkBehaviour
             isJumping = true;
             isFalling = false;
             jumpYPosition = transform.position.y;
+            animator.SetBool("impact", false);
             animator.SetTrigger("jump");
         }
     }
@@ -404,17 +412,61 @@ public class Movement : NetworkBehaviour
             groundLayer
         );
 
+        if (!isGrounded && !wasGrounded && !isJumping && rb.velocity.y < -0.5f && !isFreeFalling)
+        {
+            isFreeFalling = true;
+            fallYPosition = transform.position.y;
+            Debug.Log("Playing should be falling at position " + fallYPosition);
+        }
+
         if (isGrounded && !wasGrounded)
         {
             Debug.Log("Landed");
             animator.SetTrigger("landed");
+            if (isFalling)
+            {
+                if (jumpYPosition - transform.position.y > 15)
+                {
+                    // Set fall flat animation
+                    animator.SetBool("impact", true);
+                    animator.SetBool("landed", false);
+                    SetMovement(false);
+                }
+                else if (jumpYPosition - transform.position.y > 5)
+                {
+                    // Set minor impact animation
+                    animator.SetBool("impact", false);
+                    animator.SetBool("landed", false);
+                    SetMovement(false);
+                }
+                else if (fallYPosition - transform.position.y > 15)
+                {
+                    animator.SetBool("impact", true);
+                    animator.SetBool("landed", false);
+                    SetMovement(false);
+                }
+                else if (fallYPosition - transform.position.y > 5)
+                {
+                    animator.SetBool("impact", false);
+                    animator.SetBool("landed", false);
+                    SetMovement(false);
+                }
+                else
+                {
+                    animator.SetBool("landed", true);
+                    SetMovement(true);
+                }
+                isFalling = false;
+            }
             animator.SetBool("falling", false);
-            isFalling = false;
         }
 
-        if (isGrounded && rb.velocity.y < 0.1f)
+        if (isGrounded && wasGrounded && rb.velocity.y < 0.1f)
         {
             isJumping = false;
+            isFalling = false;
+            isFreeFalling = false;
+            fallYPosition = -999f;
         }
     }
 
@@ -486,17 +538,22 @@ public class Movement : NetworkBehaviour
 
         if (!isGrounded && rb.velocity.y < 0f && !isFalling && transform.position.y < jumpYPosition)
         {
-            jumpYPosition = -999f;
             animator.SetBool("falling", true);
             isFalling = true;
         }
-        else if (pushing && isGrounded)
+        else if (!isGrounded && !isJumping && !isFalling && (fallYPosition - transform.position.y) > 1.5f)
+        {
+            Debug.Log("SETTING ANIMATION");
+            animator.SetBool("falling", true);
+            isFalling = true;
+        }
+        else if (pushing && isGrounded && canMove)
         {
             animator.SetBool("pushing", true);
             animator.SetBool("fast-push", Input.GetKey(KeyCode.LeftShift));
             animator.speed = isMoving ? 1f : 0.1f;
         }
-        else
+        else if (canMove)
         {
             animator.speed = 1f;
             animator.SetBool("pushing", false);
@@ -504,5 +561,18 @@ public class Movement : NetworkBehaviour
             animator.SetBool("run", isMoving && isGrounded && !Input.GetKey(KeyCode.LeftShift));
             animator.SetBool("idle", !isMoving && isGrounded);
         }
+    }
+
+    public void AllowMovement()
+    {
+        canMove = true;
+        animator.SetBool("impact", false);
+        animator.SetBool("landed", true);
+        jumpYPosition = -999f;
+    }
+
+    public void SetMovement(bool move)
+    {
+        canMove = move;
     }
 }
