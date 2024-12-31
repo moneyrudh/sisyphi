@@ -67,6 +67,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
             SisyphiGameManager.Instance.SetPlayerJoinedServerRpc();
             SpawnBoulderServerRpc();
             SetPlayerColor();
+            GetComponent<BoulderSkillSystem>().InitializeBoulderSkillSystemServerRpc();
         }
     }
 
@@ -127,21 +128,21 @@ public class PlayerSpawnHandler : NetworkBehaviour
         int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(clientId);
         Vector3 spawnPosition = spawnPoints[index] + new Vector3(0, 1f, 4f);
         GameObject _boulder = Instantiate(boulderPrefab, spawnPosition, Quaternion.identity);
-        _boulder.name = "Boulder_" + index;
         NetworkObject networkObject = _boulder.GetComponent<NetworkObject>();
         networkObject.SpawnWithOwnership(clientId);
 
-        AssignBoulderClientRpc(clientId, new NetworkObjectReference(networkObject));
+        AssignBoulderClientRpc(clientId, new NetworkObjectReference(networkObject), index);
     }
 
     [ClientRpc]
-    private void AssignBoulderClientRpc(ulong clientId, NetworkObjectReference boulderRef)
+    private void AssignBoulderClientRpc(ulong clientId, NetworkObjectReference boulderRef, int index)
     {
         if (OwnerClientId == clientId)
         {
             if (boulderRef.TryGet(out NetworkObject boulderNetObj))
             {
                 boulder = boulderNetObj.gameObject;
+                boulderNetObj.gameObject.name = "Boulder_" + index;
             }
         }
     }

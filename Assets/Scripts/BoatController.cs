@@ -8,20 +8,33 @@ public class BoatController : NetworkBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 2f;
-    public float rotationSpeed = 180f;
-    public float rotationSmoothTime = 0.1f;
-    public float smoothTime = 0.1f;
+    public float rotationSpeed = 10f; //180f;
+    public float rotationSmoothTime = 2f; //0.1f;
+    public float smoothTime = 0; //0.1f;
 
     [Header("References")]
     public Transform mountPoint;
+    public LayerMask boulderLayer;
     public BoxCollider interactionTrigger;
     public LayerMask waterLayer;
     public LayerMask obstructionLayer;
     public Transform obstructionTransform;
+    public Transform boulderDetectionPoint;
 
     [Header("Input")]
     public InputActionReference interactAction;
     public InputActionReference movement;
+
+    [Header("Speed Settings")]
+    public float baseSpeed = 5f;
+    public float noBoulderSpeedMultiplier = 2f;
+    public float smallBoulderSpeedMultiplier = 1.5f;
+    public float mediumBoulderSpeedMultiplier = 1f;
+    public float largeBoulderSpeedMultiplier = 0f;
+
+    private NetworkVariable<bool> hasBoulder = new NetworkVariable<bool>(false);
+    private BoulderController currentBoulderController;
+    private NetworkVariable<BoulderSize> currentBoulderSize = new NetworkVariable<BoulderSize>(BoulderSize.Medium);
 
     public NetworkVariable<bool> isMounted = new NetworkVariable<bool>(false);
     private NetworkVariable<Vector3> targetPosition = new NetworkVariable<Vector3>();
@@ -38,9 +51,12 @@ public class BoatController : NetworkBehaviour
     private Camera playerCamera;
     private Vector2 moveDirection;
     private Rigidbody rb;
+    private BoulderProperties currentBoulderProperties;
 
     private void Start()
     {
+        moveSpeed = 5f;
+        currentBoulderProperties = null;
     }
 
     private System.Collections.IEnumerator WaitForCamera()
@@ -129,6 +145,11 @@ public class BoatController : NetworkBehaviour
             // HandleBoatMovement();
             UpdateMountedPlayerPosition();
             moveDirection = movement.action.ReadValue<Vector2>();
+        }
+
+        if (IsOwner)
+        {
+            UpdateBoulderProperties();
         }
     }
 
@@ -285,8 +306,12 @@ public class BoatController : NetworkBehaviour
     {
         if (playerCamera == null) return;
 
+        float currentSpeedMultiplier = GetCurrentSpeedMultiplier();
+
+        if (currentSpeedMultiplier <= 0) return;
+
         if (moveDirection.x != 0) HandleRotation();
-        if (moveDirection.y != 0) HandleForwardMovement();
+        if (moveDirection.y != 0) HandleForwardMovement(currentSpeedMultiplier);
 
         if (IsServer || IsHost)
         {
@@ -323,10 +348,10 @@ public class BoatController : NetworkBehaviour
         return hits.Length == 0;
     }
 
-    private void HandleForwardMovement()
+    private void HandleForwardMovement(float currentSpeedMultiplier)
     {
         Vector3 moveDir = transform.forward * moveDirection.y;
-        Vector3 desiredPosition = CalculateDesiredPosition(moveDir);
+        Vector3 desiredPosition = CalculateDesiredPosition(moveDir, currentSpeedMultiplier);
 
         if (CanMoveToPosition(moveDir))
         {
@@ -338,9 +363,9 @@ public class BoatController : NetworkBehaviour
         }
     }
 
-    private Vector3 CalculateDesiredPosition(Vector3 moveDir)
+    private Vector3 CalculateDesiredPosition(Vector3 moveDir, float speedMultiplier)
     {
-        return rb.position + moveDir * moveSpeed * Time.fixedDeltaTime;
+        return rb.position + moveDir * moveSpeed * speedMultiplier * Time.fixedDeltaTime;
     }
 
     private bool CanMoveToPosition(Vector3 moveDir)
@@ -639,6 +664,64 @@ public class BoatController : NetworkBehaviour
         {
             mountedPlayer.transform.position = position;
             mountedPlayer.transform.rotation = rotation;
+        }
+    }
+
+    // UPDATING BOULDER PROPERTIES
+
+    private void UpdateBoulderProperties()
+    {
+        
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!IsServer) return;
+
+        if (other.CompareTag("Boulder"))
+        {
+            hasBoulder.Value = true;
+            BoulderController boulder = other.GetComponent<BoulderController>();
+            if (boulder != null)
+            {
+                currentBoulderController = boulder;
+                UpdateBoulderSizeClientRpc(boulder.GetBoulderProperties().boulderSize);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (!IsServer) return;
+
+        if (other.CompareTag("Boulder"))
+        {
+            hasBoulder.Value = false;
+            currentBoulderController = null;
+            UpdateBoulderSizeClientRpc(BoulderSize.Medium);
+        }
+    }
+
+    [ClientRpc]
+    private void UpdateBoulderSizeClientRpc(BoulderSize size)
+    {
+        currentBoulderSize.Value = size;
+    }
+
+    private float GetCurrentSpeedMultiplier()
+    {
+        if (!hasBoulder.Value) return noBoulderSpeedMultiplier;
+
+        switch (currentBoulderSize.Value)
+        {
+            case BoulderSize.Small:
+                return smallBoulderSpeedMultiplier;
+            case BoulderSize.Medium:
+                return mediumBoulderSpeedMultiplier;
+            case BoulderSize.Large:
+                return largeBoulderSpeedMultiplier;
+            default:
+                return mediumBoulderSpeedMultiplier;
         }
     }
 }
