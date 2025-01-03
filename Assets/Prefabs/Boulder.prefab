@@ -120,8 +120,8 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6887029233247754709}
   serializedVersion: 4
-  m_Mass: 20
-  m_Drag: 2
+  m_Mass: 10
+  m_Drag: 0.1
   m_AngularDrag: 2
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -136,7 +136,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
 --- !u!114 &1752648284258405585
@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1599261419
+  GlobalObjectIdHash: 1580327592
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37ea5947c4717435f955552886145cfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  breakVelocityThreshold: 5
+  breakVelocityThreshold: 0.5
 --- !u!114 &8664722534287285459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,6 +185,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18a0461a5d593435f92934c97bdd0d5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  restingMass: 2
+  pushingMass: 7
+  boulderPropertiesList:
+  - pushingMass: 1
+    boulderSize: 0
+    localScale: 3
+  - pushingMass: 7
+    boulderSize: 1
+    localScale: 3.5
+  - pushingMass: 20
+    boulderSize: 2
+    localScale: 4
 --- !u!75 &5661731483997284219
 ConstantForce:
   m_ObjectHideFlags: 0
@@ -193,7 +205,7 @@ ConstantForce:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6887029233247754709}
   m_Enabled: 0
-  m_Force: {x: 0, y: -10, z: 0}
+  m_Force: {x: 0, y: -20, z: 0}
   m_RelativeForce: {x: 0, y: 0, z: 0}
   m_Torque: {x: 0, y: 0, z: 0}
   m_RelativeTorque: {x: 0, y: 0, z: 0}

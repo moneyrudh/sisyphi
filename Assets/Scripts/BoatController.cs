@@ -25,14 +25,21 @@ public class BoatController : NetworkBehaviour
     public InputActionReference interactAction;
     public InputActionReference movement;
 
-    [Header("Speed Settings")]
-    public float baseSpeed = 5f;
+    [Header("Movement Speed Settings")]
     public float noBoulderSpeedMultiplier = 2f;
     public float smallBoulderSpeedMultiplier = 1.5f;
     public float mediumBoulderSpeedMultiplier = 1f;
     public float largeBoulderSpeedMultiplier = 0f;
 
+    [Header("Rotation Speed Settings")]
+    public float noBoulderRotationMultiplier = 2f;
+    public float smallBoulderRotationMultiplier = 1.5f;
+    public float mediumBoulderRotationMultiplier = 1f;
+    public float largeBoulderRotationMultiplier = 0f;
+
     private NetworkVariable<bool> hasBoulder = new NetworkVariable<bool>(false);
+    private NetworkVariable<NetworkObjectReference> currentBoulderRef = new NetworkVariable<NetworkObjectReference>();
+    private NetworkObject currentBoulderNetObj;
     private BoulderController currentBoulderController;
     private NetworkVariable<BoulderSize> currentBoulderSize = new NetworkVariable<BoulderSize>(BoulderSize.Medium);
 
@@ -55,7 +62,6 @@ public class BoatController : NetworkBehaviour
 
     private void Start()
     {
-        moveSpeed = 5f;
         currentBoulderProperties = null;
     }
 
@@ -109,7 +115,8 @@ public class BoatController : NetworkBehaviour
 
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = true;
-        rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+        // rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
 
         if (IsOwner)
         {
@@ -307,10 +314,11 @@ public class BoatController : NetworkBehaviour
         if (playerCamera == null) return;
 
         float currentSpeedMultiplier = GetCurrentSpeedMultiplier();
+        float currentRotationMultiplier = GetCurrentRotationMultiplier();
 
         if (currentSpeedMultiplier <= 0) return;
 
-        if (moveDirection.x != 0) HandleRotation();
+        if (moveDirection.x != 0) HandleRotation(currentRotationMultiplier);
         if (moveDirection.y != 0) HandleForwardMovement(currentSpeedMultiplier);
 
         if (IsServer || IsHost)
@@ -324,9 +332,9 @@ public class BoatController : NetworkBehaviour
         }
     }
 
-    private void HandleRotation()
+    private void HandleRotation(float rotationMultiplier)
     {
-        Quaternion targetRotation = transform.rotation * Quaternion.Euler(0f, moveDirection.x * rotationSpeed * Time.fixedDeltaTime, 0f);
+        Quaternion targetRotation = transform.rotation * Quaternion.Euler(0f, moveDirection.x * rotationSpeed * rotationMultiplier * Time.fixedDeltaTime, 0f);
         if (CanRotate())
         {
             rb.MoveRotation(targetRotation);
@@ -525,6 +533,16 @@ public class BoatController : NetworkBehaviour
         }
     }
 
+    // private bool IsBoulderInRange()
+    // {
+    //     if (!IsOwner || boulderDetectionPoint == null) return false;
+
+    //     int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(OwnerClientId);
+    //     var boulder = GameObject.Find("Boulder_" + index);
+
+    //     return Physics.OverlapSphere()
+    // }
+
     private bool IsInRange()
     {
         if (!IsOwner || interactionTrigger == null) return false;
@@ -566,7 +584,7 @@ public class BoatController : NetworkBehaviour
         if (playerObj.IsOwner)
         {
             rb.constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-            
+            playerObj.GetComponent<Animator>().SetTrigger("mount");
             SetValues(playerObj);
         }
 
@@ -610,9 +628,18 @@ public class BoatController : NetworkBehaviour
 
         if (playerObj.IsOwner)
         {
-            rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-
+            // rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+            playerObj.GetComponent<Animator>().SetTrigger("unmount");
             ResetValues();
+        }
+
+        if (IsServer)
+        {
+            hasBoulder.Value = false;
+            currentBoulderRef.Value = default;
+            currentBoulderController = null;
+            currentBoulderSize.Value = BoulderSize.Medium;
         }
     }
 
@@ -651,6 +678,45 @@ public class BoatController : NetworkBehaviour
             {
                 playerObj.transform.position = mountPoint.position;
                 playerObj.transform.rotation = mountPoint.rotation;
+                if (hasBoulder.Value && boulderDetectionPoint != null)
+                {
+                    if (currentBoulderRef.Value.TryGet(out NetworkObject boulderObj))
+                    {
+                        boulderObj.transform.position = boulderDetectionPoint.position;
+                        // if (boulderObj.TryGetComponent<Rigidbody>(out Rigidbody boulderRb))
+                        // {
+                        //     Vector3 targetPos = boulderDetectionPoint.position;
+                        //     targetPos.y = boulderRb.position.y;
+                        //     boulderRb.MovePosition(targetPos);
+
+                        //     SyncBoulderPositionServerRpc(targetPos);
+                        // }
+                    }
+                }
+            }
+        }
+    }
+
+    [ServerRpc]
+    private void SyncBoulderPositionServerRpc(Vector3 position)
+    {
+        if (currentBoulderRef.Value.TryGet(out NetworkObject boulderObj))
+        {
+            SyncBoulderPositionClientRpc(position, boulderObj.NetworkObjectId);
+        }
+    }
+
+    [ClientRpc]
+    private void SyncBoulderPositionClientRpc(Vector3 position, ulong boulderNetId)
+    {
+        if (!IsOwner)
+        {
+            if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(boulderNetId, out NetworkObject boulderObj))
+            {
+                if (boulderObj.TryGetComponent<Rigidbody>(out Rigidbody boulderRb))
+                {
+                    boulderRb.MovePosition(position);
+                }
             }
         }
     }
@@ -671,7 +737,30 @@ public class BoatController : NetworkBehaviour
 
     private void UpdateBoulderProperties()
     {
-        
+        if (!hasBoulder.Value || currentBoulderRef.Value.TryGet(out NetworkObject boulderObj) == false) return;
+
+        BoulderController boulderController = boulderObj.GetComponent<BoulderController>();
+        if (boulderController != null)
+        {
+            BoulderSize newSize = boulderController.GetBoulderProperties().boulderSize;
+            if (currentBoulderSize.Value != newSize)
+            {
+                if (IsServer)
+                {
+                    currentBoulderSize.Value = newSize;
+                }
+                else
+                {
+                    UpdateBoulderSizeServerRpc(newSize);
+                }
+            }
+        }
+    }
+
+    [ServerRpc]
+    private void UpdateBoulderSizeServerRpc(BoulderSize newSize)
+    {
+        currentBoulderSize.Value = newSize;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -680,12 +769,14 @@ public class BoatController : NetworkBehaviour
 
         if (other.CompareTag("Boulder"))
         {
+            Debug.Log("TRIGGER ENTERED: " + other.name);
             hasBoulder.Value = true;
-            BoulderController boulder = other.GetComponent<BoulderController>();
-            if (boulder != null)
+            NetworkObject boulderNetObj = other.GetComponent<NetworkObject>();
+            if (boulderNetObj != null)
             {
-                currentBoulderController = boulder;
-                UpdateBoulderSizeClientRpc(boulder.GetBoulderProperties().boulderSize);
+                currentBoulderRef.Value = new NetworkObjectReference(boulderNetObj);
+                currentBoulderController = other.GetComponent<BoulderController>();
+                UpdateBoulderSizeClientRpc(currentBoulderController.GetBoulderProperties().boulderSize);
             }
         }
     }
@@ -696,16 +787,19 @@ public class BoatController : NetworkBehaviour
 
         if (other.CompareTag("Boulder"))
         {
-            hasBoulder.Value = false;
-            currentBoulderController = null;
-            UpdateBoulderSizeClientRpc(BoulderSize.Medium);
+            // Debug.Log("TRIGGER EXITED: " + other.name);
+            // hasBoulder.Value = false;
+            // currentBoulderRef.Value = default;
+            // currentBoulderController = null;
+            // currentBoulderNetObj = null;
+            // UpdateBoulderSizeClientRpc(BoulderSize.Medium);
         }
     }
 
     [ClientRpc]
     private void UpdateBoulderSizeClientRpc(BoulderSize size)
     {
-        currentBoulderSize.Value = size;
+        if (IsServer) currentBoulderSize.Value = size;
     }
 
     private float GetCurrentSpeedMultiplier()
@@ -722,6 +816,23 @@ public class BoatController : NetworkBehaviour
                 return largeBoulderSpeedMultiplier;
             default:
                 return mediumBoulderSpeedMultiplier;
+        }
+    }
+
+    private float GetCurrentRotationMultiplier()
+    {
+        if (!hasBoulder.Value) return noBoulderRotationMultiplier;
+
+        switch (currentBoulderSize.Value)
+        {
+            case BoulderSize.Small:
+                return smallBoulderRotationMultiplier;
+            case BoulderSize.Medium:
+                return mediumBoulderRotationMultiplier;
+            case BoulderSize.Large:
+                return largeBoulderRotationMultiplier;
+            default:
+                return mediumBoulderRotationMultiplier;
         }
     }
 }

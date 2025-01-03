@@ -33,6 +33,41 @@ public class CharacterSelectPlayer : MonoBehaviour
         UpdatePlayer();
     }
 
+    private void OnEnable()
+    {
+        SetSkybox();
+    }
+
+    public void SetSkybox()
+    {
+        SkyboxMaterial skyboxMaterial = SisyphiGameMultiplayer.Instance.GetSkyboxData();
+        string log = @"Inside SetSkyboxClientRpc with skybox settings:
+            Skybox: " + skyboxMaterial.material + @"
+            Fog Color: " + skyboxMaterial.fogColor + @"
+            Fog Mode: " + skyboxMaterial.fogMode.ToString();
+        Debug.Log(log);
+        RenderSettings.skybox = skyboxMaterial.material;
+        RenderSettings.fog = true;
+        RenderSettings.fogColor = skyboxMaterial.fogColor;
+        RenderSettings.fogMode = skyboxMaterial.fogMode;
+        switch (skyboxMaterial.fogMode)
+        {
+            case FogMode.Linear:
+            {
+                RenderSettings.fogStartDistance = skyboxMaterial.startDistance;
+                RenderSettings.fogEndDistance = skyboxMaterial.endDistance;
+            }
+            break;
+            case FogMode.Exponential:
+            {
+                RenderSettings.fogDensity = skyboxMaterial.density;
+            }
+            break;
+        }
+
+        DynamicGI.UpdateEnvironment();
+    }
+
     private void CharacterSelectReady_OnReadyChanged(object sender, System.EventArgs e)
     {
         UpdatePlayer();

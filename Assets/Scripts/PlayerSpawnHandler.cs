@@ -96,6 +96,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
     private void SetInitialPosition()
     {
         // int playerIndex = (int) clientId > 0 ? 1 : 0;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
         transform.position = spawnPoints[playerIndex];
         // SyncPositionClientRpc(spawnPoints[playerIndex]);
     }
@@ -104,6 +105,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
     {
         Vector3 position = spawnPoints[playerIndex] + new Vector3(0, 1f, 4f);
         boulder.transform.position = position;
+        boulder.GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
 
     [ServerRpc(RequireOwnership = true)]

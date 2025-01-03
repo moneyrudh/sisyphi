@@ -40,6 +40,17 @@ public class SisyphiGameManager: NetworkBehaviour
 
     private void Start()
     {
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SetSkyboxServerRpc()
+    {
+        SetSkyboxClientRpc();
+    }
+
+    [ClientRpc]
+    public void SetSkyboxClientRpc()
+    {
         SkyboxMaterial skyboxMaterial = SisyphiGameMultiplayer.Instance.GetSkyboxData();
         RenderSettings.skybox = skyboxMaterial.material;
         RenderSettings.fog = true;
@@ -93,6 +104,7 @@ public class SisyphiGameManager: NetworkBehaviour
         if (NetworkManager.Singleton.IsServer)
         {
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
+            SetSkyboxServerRpc();
         }
 
     }

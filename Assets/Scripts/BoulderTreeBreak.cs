@@ -7,7 +7,6 @@ public class BoulderTreeBreak : NetworkBehaviour
 {
     [SerializeField]
     private GameObject particlesPrefab;
-
     private NetworkVariable<bool> isBroken = new NetworkVariable<bool>();
 
     public override void OnNetworkSpawn()
@@ -19,30 +18,30 @@ public class BoulderTreeBreak : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void BreakTreeServerRpc()
+    public void BreakTreeServerRpc(float waitForSeconds)
     {
         if (isBroken.Value) return;
 
         isBroken.Value = true;
-        BreakTreeClientRpc();
+        BreakTreeClientRpc(waitForSeconds);
         // gameObject.SetActive(false);
     }
 
     [ClientRpc]
-    private void BreakTreeClientRpc()
+    private void BreakTreeClientRpc(float waitForSeconds)
     {
-        SpawnParticlesAndDestroy();
+        SpawnParticlesAndDestroy(waitForSeconds);
     }
 
-    private void SpawnParticlesAndDestroy()
+    private void SpawnParticlesAndDestroy(float waitForSeconds)
     {
         // Destroy(gameObject, 0.5f);
-        StartCoroutine(SpawnParticlesCoroutine());
+        StartCoroutine(SpawnParticlesCoroutine(waitForSeconds));
     }
 
-    private IEnumerator SpawnParticlesCoroutine()
+    private IEnumerator SpawnParticlesCoroutine(float waitForSeconds)
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(waitForSeconds);
         gameObject.SetActive(false);
         if (particlesPrefab != null)
         {

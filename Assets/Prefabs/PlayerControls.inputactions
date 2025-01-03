@@ -94,6 +94,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "BoulderGrow",
+                    "type": "Button",
+                    "id": "d5fa8c2b-9c15-49c5-bcaa-09f98fa5a92a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "BoulderShrink",
+                    "type": "Button",
+                    "id": "4521bc8b-870e-4e75-94ad-a6172bc4d01d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -512,6 +530,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "ResetBoat",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "826d284b-5ce1-4f6b-bc85-6af9a3f5f617",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BoulderGrow",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6015de6a-5d5d-44ac-a0a5-19fd29582731",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BoulderShrink",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

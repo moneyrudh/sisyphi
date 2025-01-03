@@ -20,7 +20,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
 {
     public const int PLAYER_COUNT = 2;
     private const string PLAYER_PREFS_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
-    private int skyboxIndex;
+    private NetworkVariable<int> skyboxIndex = new NetworkVariable<int>(0);
     private NetworkList<PlayerData> playerDataNetworkList;
     [SerializeField] private List<Color> playerColors;
     [SerializeField] private List<SkyboxMaterial> skyboxMaterialList;
@@ -45,17 +45,18 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
         currentMaterialCategory.OnListChanged += MaterialCategory_OnListChanged;
 
         playerName = PlayerPrefs.GetString(PLAYER_PREFS_NAME_MULTIPLAYER, "Player_" + UnityEngine.Random.Range(1000, 9999));
+        RandomizeSkyboxIndex();
     }
 
-    private void SetSkyboxData()
+    private void RandomizeSkyboxIndex()
     {
-        skyboxIndex = UnityEngine.Random.Range(0, 3);
-        SkyboxMaterial skyboxMaterial = skyboxMaterialList[skyboxIndex];
+        if (!NetworkManager.Singleton.IsServer) return;
+        skyboxIndex.Value = UnityEngine.Random.Range(0, 3);
     }
 
     public SkyboxMaterial GetSkyboxData()
     {
-        return skyboxMaterialList[skyboxIndex];
+        return skyboxMaterialList[skyboxIndex.Value];
     }
 
     public void ChangeCurrentMaterialCategory(MaterialCategory materialCategory)

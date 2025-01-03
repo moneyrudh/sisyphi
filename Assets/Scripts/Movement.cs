@@ -120,12 +120,16 @@ public class Movement : NetworkBehaviour
             CheckGrounded();
             UpdateAnimator();
             CheckRockProximity();
+
+            if (pushing && Input.GetKey(KeyCode.LeftShift))
+            {
+                rb.mass = 3;
+            }
+            else
+            {
+                rb.mass = 1;
+            }
         }
-        // else
-        // {
-        //     transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.deltaTime * 10f);
-        //     transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.deltaTime * 10f);
-        // }
     }
 
     private void FixedUpdate()
@@ -176,13 +180,17 @@ public class Movement : NetworkBehaviour
 
         direction = direction.normalized;
 
+        LayerMask currentWallObstacleLayer = isJumping ?
+            wallObstacleLayer | (1 << 7) :
+            wallObstacleLayer;
+
         RaycastHit hit;
         bool headBlocked = Physics.Raycast(
             headCheck.position, 
             direction, 
             out hit,
             wallCollisionDistance, 
-            wallObstacleLayer,
+            currentWallObstacleLayer,
             QueryTriggerInteraction.Ignore
         );
         if (headBlocked)
@@ -387,6 +395,7 @@ public class Movement : NetworkBehaviour
     private void Jump(InputAction.CallbackContext context)
     {
         if (!IsOwner) return;
+        if (pushing) return;
         if (isGrounded && !isJumping)
         {
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z); // Reset Y velocity
@@ -466,6 +475,7 @@ public class Movement : NetworkBehaviour
             isFalling = false;
             isFreeFalling = false;
             fallYPosition = -999f;
+            jumpYPosition = -999f;
         }
     }
 
@@ -568,14 +578,15 @@ public class Movement : NetworkBehaviour
     private void SetAnimatorSpeedServerRpc(float speed, ServerRpcParams serverRpcParams = default)
     {
         animationSpeed.Value = speed;
-        UpdateAnimatorSpeedClientRpc(serverRpcParams.Receive.SenderClientId);
+        UpdateAnimatorSpeedClientRpc(serverRpcParams.Receive.SenderClientId, speed);
     }
 
     [ClientRpc]
-    private void UpdateAnimatorSpeedClientRpc(ulong clientId)
+    private void UpdateAnimatorSpeedClientRpc(ulong clientId, float speed)
     {
         if (OwnerClientId != clientId) return;
-        animator.speed = animationSpeed.Value;
+        if (animator == null) return;
+        animator.speed = speed;
     }
 
     public void AllowMovement()

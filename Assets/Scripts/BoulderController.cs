@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using System;
+using System.Collections.Generic;
 
 [System.Serializable]
 public enum BoulderSize {
@@ -12,7 +13,7 @@ public enum BoulderSize {
 
 [System.Serializable]
 public class BoulderProperties : INetworkSerializable, IEquatable<BoulderProperties> {
-    public int pushingMass;
+    public float pushingMass;
     public BoulderSize boulderSize;
     public float localScale;
 
@@ -38,20 +39,16 @@ public class BoulderController : NetworkBehaviour
     private Rigidbody rb;
     public int restingMass = 20;
     public int pushingMass = 7;
-    private NetworkVariable<BoulderProperties> netBoulderProperties = new NetworkVariable<BoulderProperties>(
-        new BoulderProperties
-        {
-            pushingMass = 4,
-            boulderSize = BoulderSize.Medium,
-            localScale = 3.5f
-        }
-    );
+    public List<BoulderProperties> boulderPropertiesList;
+    private NetworkVariable<BoulderProperties> netBoulderProperties = new NetworkVariable<BoulderProperties>();
     public BoulderProperties currentBoulderProperties => netBoulderProperties.Value;
+    private NetworkVariable<bool> isPlayerPushing = new NetworkVariable<bool>(false);
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         networkRigidbody = GetComponent<NetworkRigidbody>();
+        
     }
 
     public override void OnNetworkSpawn()
@@ -60,6 +57,7 @@ public class BoulderController : NetworkBehaviour
         if (IsServer)
         {
             SetBoulderProperties(BoulderSize.Medium);
+            netBoulderProperties.Value = boulderPropertiesList[1];
         }
     }
 
@@ -68,8 +66,15 @@ public class BoulderController : NetworkBehaviour
     {
         if (!playerObject.IsOwner) return;
         rb.mass = currentBoulderProperties.pushingMass;
+        SetPlayerPushingServerRpc(true);
         // Request ownership of the boulder
         // RequestBoulderOwnershipServerRpc(playerObject.OwnerClientId);
+    }
+
+    [ServerRpc]
+    private void SetPlayerPushingServerRpc(bool pushing)
+    {
+        isPlayerPushing.Value = pushing;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -84,6 +89,7 @@ public class BoulderController : NetworkBehaviour
     {
         if (!playerObject.IsOwner) return;
         rb.mass = restingMass;
+        SetPlayerPushingServerRpc(false);
         // if (NetworkObject.OwnerClientId == playerObject.OwnerClientId)
         // {
         //     ReleaseBoulderOwnershipServerRpc();
@@ -113,29 +119,17 @@ public class BoulderController : NetworkBehaviour
         {
             case BoulderSize.Small:
             {
-                boulderProperties = new BoulderProperties {
-                    pushingMass = 1,
-                    boulderSize = BoulderSize.Small,
-                    localScale = 2.5f
-                };
+                boulderProperties = boulderPropertiesList[0];
             }
             break;
             case BoulderSize.Medium:
             {
-                boulderProperties = new BoulderProperties {
-                    pushingMass = 4,
-                    boulderSize = BoulderSize.Medium,
-                    localScale = 3.5f
-                };
+                boulderProperties = boulderPropertiesList[1];
             }
             break;
             case BoulderSize.Large:
             {
-                boulderProperties = new BoulderProperties {
-                    pushingMass = 7,
-                    boulderSize = BoulderSize.Large,
-                    localScale = 4.5f
-                };
+                boulderProperties = boulderPropertiesList[2];
             }
             break;
         }
@@ -159,6 +153,7 @@ public class BoulderController : NetworkBehaviour
         float scale = properties.localScale;
         float localScale = scale;
         transform.localScale = new (scale, scale, scale);
+        if (isPlayerPushing.Value) rb.mass = properties.pushingMass;
         Debug.Log($"[{gameObject.name}] Scale applied, new scale: {transform.localScale}");
     }
 

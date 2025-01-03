@@ -17,9 +17,26 @@ public class CharacterSelectReady : NetworkBehaviour
         playerReadyDictionary = new Dictionary<ulong, bool>();
     }
 
-    private void Start()
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SetSkyboxServerRpc()
+    {
+        SetSkyboxClientRpc();
+    }
+
+    [ClientRpc]
+    public void SetSkyboxClientRpc()
     {
         SkyboxMaterial skyboxMaterial = SisyphiGameMultiplayer.Instance.GetSkyboxData();
+        string log = @"Inside SetSkyboxClientRpc with skybox settings:
+            Skybox: " + skyboxMaterial.material + @"
+            Fog Color: " + skyboxMaterial.fogColor + @"
+            Fog Mode: " + skyboxMaterial.fogMode.ToString();
+        Debug.Log(log);
         RenderSettings.skybox = skyboxMaterial.material;
         RenderSettings.fog = true;
         RenderSettings.fogColor = skyboxMaterial.fogColor;
@@ -38,6 +55,8 @@ public class CharacterSelectReady : NetworkBehaviour
             }
             break;
         }
+
+        DynamicGI.UpdateEnvironment();
     }
 
     public void SetPlayerReady(bool ready)
