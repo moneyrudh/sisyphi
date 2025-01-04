@@ -28,6 +28,16 @@ public class BoulderSkillSystem : NetworkBehaviour
         // }
     }
 
+    private void Start()
+    {
+        SisyphiGameManager.Instance.GameFinishedEvent += BoulderSkillSystem_OnGameFinished;
+    }
+
+    private void BoulderSkillSystem_OnGameFinished(object sender, System.EventArgs e)
+    {
+        DisableInputs();
+    }
+
     [ServerRpc(RequireOwnership = false)]
     public void InitializeBoulderSkillSystemServerRpc(ServerRpcParams serverRpcParams = default)
     {
@@ -57,7 +67,7 @@ public class BoulderSkillSystem : NetworkBehaviour
         }
     }
 
-    private void OnDisable()
+    public override void OnDestroy()
     {
         DisableInputs();
         if (IsOwner)

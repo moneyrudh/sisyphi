@@ -63,6 +63,7 @@ public class TileSetter : NetworkBehaviour
     public GameObject WaterPrefab;
     public Material WaterMaterial;
     public GameObject IcePrefab;
+    public GameObject EndTile;
     public TMP_InputField inputField;
     public float sizeMultiplier;
     private APIManager apiManager;
@@ -172,6 +173,15 @@ public class TileSetter : NetworkBehaviour
             networkObject.Spawn();
             networkObject.transform.parent = GameObject.Find($"TilesParent_{parentIndex}").transform;
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnEndTilesServerRpc(float x, float y, float z, int parentIndex)
+    {
+        GameObject gameObject = Instantiate(EndTile, new Vector3(x, y, z), Quaternion.identity);
+        NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
+        networkObject.Spawn();
+        networkObject.transform.parent = GameObject.Find($"TilesParent_{parentIndex}").transform;
     }
 
     void HandleResponse(bool success, string response)
@@ -475,7 +485,14 @@ public class TileSetter : NetworkBehaviour
                 {
                     int count = environmentTileGroups[value].tiles.Count;
                     int index = UnityEngine.Random.Range(0, count-1);
-                    SpawnTileServerRpc(value, index, curX, curY, curZ, sizeMultiplier, job.ParentIndex);
+                    if (
+                        job.ParentIndex == 0 &&
+                        i >= 8 && 
+                        (j <= 1 || j >= job.Tiles.Length - 2)
+                    ) {
+                    } else {
+                        SpawnTileServerRpc(value, index, curX, curY, curZ, sizeMultiplier, job.ParentIndex);
+                    }
                 }
                 curX += width * demultiplier;
             }
@@ -495,7 +512,7 @@ public class TileSetter : NetworkBehaviour
         curX = job.X;
         curZ = job.Z;
 
-        for (int k = 0; k < 3; k++)
+        for (int k = 0; k < 4; k++)
         {
             for (int i = 0; i < 2; i++)
             {
@@ -505,7 +522,15 @@ public class TileSetter : NetworkBehaviour
                     int value = 0;
                     int count = environmentTileGroups[value].tiles.Count;
                     int index = UnityEngine.Random.Range(0, count-1);
-                    SpawnTileServerRpc(value, index, curX, curY, curZ, sizeMultiplier, job.ParentIndex);
+                    if (
+                        job.ParentIndex == 0 &&
+                        k < 3 &&
+                        (j <= 1 || j >= 8)
+                    ) {
+                    } else {
+                        SpawnTileServerRpc(value, index, curX, curY, curZ, sizeMultiplier, job.ParentIndex);
+                    }
+                    // SpawnTileServerRpc(value, index, curX, curY, curZ, sizeMultiplier, job.ParentIndex);
                     curX += width * demultiplier;
                 }
                 curX = 0;
@@ -514,6 +539,20 @@ public class TileSetter : NetworkBehaviour
             curZ += width * demultiplier * 8;
             curZ += checkPointOffset * width * demultiplier;
         }
+        
+        // curZ -= checkPointOffset * width * demultiplier;
+        // curZ -= width * demultiplier * 8;
+        // for (int i = 0; i < 10; i++)
+        // {
+        //     for (int j = 0; j < 10; j++)
+        //     {
+        //         yield return null;
+        //         SpawnEndTilesServerRpc(curX, curY, curZ, job.ParentIndex);
+        //         curX += width * demultiplier;
+        //     }
+        //     curX = 0;
+        //     curZ += width * demultiplier;
+        // }
     }
 
     public void GenerateMap() {

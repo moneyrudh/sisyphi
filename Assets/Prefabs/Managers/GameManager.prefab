@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1232429135
+  GlobalObjectIdHash: 775408939
   InScenePlacedSourceGlobalObjectIdHash: 3953791312
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -162,9 +162,10 @@ MonoBehaviour:
   WaterPrefab: {fileID: 6674482388860770485, guid: 15a8d397f1e594199a1dd6a369caa7b1, type: 3}
   WaterMaterial: {fileID: 2100000, guid: 541d89427b42b4040b80b215bdd9a767, type: 2}
   IcePrefab: {fileID: 3190443546418774298, guid: 56a7219ca2bbb4733af80485ce1df096, type: 3}
+  EndTile: {fileID: 4667580252543552619, guid: a106808afc9964908a1131b8fecd2892, type: 3}
   inputField: {fileID: 0}
   sizeMultiplier: 2
-  tilesParent: {fileID: 2266380574268447392, guid: 1fca94afb14724d2f8a7c2d3b2bc8c25, type: 3}
+  initParent: {fileID: 0}
   anthropicResponse: 
   openAIResponse: 
   grocResponse: 

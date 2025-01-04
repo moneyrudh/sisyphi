@@ -45,7 +45,7 @@ public class BuildingSystem : NetworkBehaviour
     private BuildableObject targetBuildableObject;
     private ulong targetBuildableObjectId;
     private BuildableObject ghostBuildableObject;
-    private bool inBuildMode = false;
+    public bool inBuildMode = false;
     private Movement movement;
     private PlayerInventory inventory;
 
@@ -53,6 +53,8 @@ public class BuildingSystem : NetworkBehaviour
     public bool isValidPlacement = true;
     private List<Renderer> previewRenderers = new List<Renderer>();
     private HashSet<Collider> overlappingColliders = new HashSet<Collider>();
+
+    public event System.Action<bool> OnBuildModeChanged;
 
     public override void OnNetworkSpawn()
     {
@@ -958,6 +960,7 @@ public class BuildingSystem : NetworkBehaviour
         }
 
         inBuildMode = !inBuildMode;
+        OnBuildModeChanged?.Invoke(inBuildMode);
 
         if (!inBuildMode)
         {

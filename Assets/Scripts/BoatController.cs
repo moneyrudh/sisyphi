@@ -63,6 +63,21 @@ public class BoatController : NetworkBehaviour
     private void Start()
     {
         currentBoulderProperties = null;
+        SisyphiGameManager.Instance.GameFinishedEvent += BoatController_OnGameFinished;
+    }
+
+    private void BoatController_OnGameFinished(object sender, System.EventArgs e)
+    {
+        if (movement != null)
+        {
+            movement.action.Disable();
+        }
+
+        if (interactAction != null)
+        {
+            interactAction.action.Disable();
+            interactAction.action.started -= HandleInteractInput;
+        }
     }
 
     private System.Collections.IEnumerator WaitForCamera()
@@ -89,18 +104,6 @@ public class BoatController : NetworkBehaviour
 
     private void OnDisable()
     {
-        // if (!IsOwner) return;
-        
-        // if (movement != null)
-        // {
-        //     movement.action.Disable();
-        // }
-
-        // if (interactAction != null)
-        // {
-        //     interactAction.action.Disable();
-        //     interactAction.action.started -= HandleInteractInput;
-        // }
     }
 
     public override void OnNetworkSpawn()

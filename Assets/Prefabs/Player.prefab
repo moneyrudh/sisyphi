@@ -4057,9 +4057,10 @@ GameObject:
   - component: {fileID: 5899198299220735642}
   - component: {fileID: 441397108175300128}
   - component: {fileID: 4922146404306663281}
+  - component: {fileID: 6983722217644549642}
   m_Layer: 15
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4322,7 +4323,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b4f7f154736e484ba4d8f71a44c0800, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -1157782965
+    DestinationState: 2081823275
+    TransitionDuration: 0.25
+    TriggerNameHash: -318159930
+    TransitionIndex: 0
   m_Animator: {fileID: 3743273975912292817}
 --- !u!114 &3629608946139005133
 MonoBehaviour:
@@ -4392,6 +4400,7 @@ MonoBehaviour:
     m_Bits: 512
   buildToggle: {fileID: 6339385412579230819, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   buildConfirm: {fileID: 7112439953257795887, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
+  inBuildMode: 0
   isValidPlacement: 1
 --- !u!114 &-2442251563675163270
 MonoBehaviour:
@@ -4542,6 +4551,18 @@ MonoBehaviour:
   shrinkAction: {fileID: -8329900430759677456, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   growAction: {fileID: -8155648545818374368, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   boulder: {fileID: 0}
+--- !u!114 &6983722217644549642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5751469025688621471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfe64f66252244236957c72e8a8e3395, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6075755152283341952
 GameObject:
   m_ObjectHideFlags: 0

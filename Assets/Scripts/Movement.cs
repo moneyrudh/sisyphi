@@ -64,18 +64,12 @@ public class Movement : NetworkBehaviour
     {
         movement.action.Enable();
         jump.action.started += Jump;
-        if (IsOwner)
-        {
-        }
     }
 
-    public void OnDisable()
+    public void Movement_OnGameFinished(object sender, System.EventArgs e)
     {
         movement.action.Disable();
         jump.action.started -= Jump;
-        if (IsOwner)
-        {
-        }
     }
 
     public override void OnNetworkSpawn()
@@ -100,6 +94,8 @@ public class Movement : NetworkBehaviour
         isFalling = false;
         pushing = false;
         isFreeFalling = false;
+        SisyphiGameManager.Instance.GameFinishedEvent += Movement_OnGameFinished;
+
         if (IsOwner)
         {
             StartCoroutine(WaitForCamera());
@@ -114,6 +110,8 @@ public class Movement : NetworkBehaviour
 
     void Update()
     {
+        if (SisyphiGameManager.Instance.IsGameOver()) return;
+        
         if (IsOwner)
         {
             moveDirection = movement.action.ReadValue<Vector2>();
@@ -134,6 +132,8 @@ public class Movement : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (SisyphiGameManager.Instance.IsGameOver()) return;
+       
         if (IsOwner) 
         {
             // Move();

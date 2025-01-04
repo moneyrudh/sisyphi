@@ -22,6 +22,7 @@ public class BoatResetSystem : NetworkBehaviour
         if (!IsOwner) return;
 
         placementSystem = GetComponent<BoatPlacementSystem>();
+        SisyphiGameManager.Instance.GameFinishedEvent += BoatResetSystem_OnGameFinished;
         StartCoroutine(InitializeWithDelay());
         EnableInputs();
     }
@@ -36,6 +37,15 @@ public class BoatResetSystem : NetworkBehaviour
     }
 
     private void DisableInputs()
+    {
+        if (resetBoatAction != null)
+        {
+            resetBoatAction.action.Disable();
+            resetBoatAction.action.started -= HandleBoatReset;
+        }
+    }
+
+    private void BoatResetSystem_OnGameFinished(object sender, System.EventArgs e)
     {
         if (resetBoatAction != null)
         {

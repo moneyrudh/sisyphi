@@ -18,6 +18,9 @@ public class SisyphiGameManager: NetworkBehaviour
     private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(timerDuration);
     private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(600f);
 
+    public event EventHandler GameFinishedEvent;
+    public NetworkVariable<bool> gameOver = new NetworkVariable<bool>(false);
+
     public event EventHandler OnStateChanged;
 
     public enum State 
@@ -88,7 +91,6 @@ public class SisyphiGameManager: NetworkBehaviour
             }
         }
 
-        Debug.Log("ALL PLAYERS JOINED");
         StartGameClientRpc();
         state.Value = State.Playing;
     }
@@ -111,7 +113,6 @@ public class SisyphiGameManager: NetworkBehaviour
 
     public void State_OnValueChanged(State previous, State current)
     {
-        Debug.Log("Current state: " + state.Value.ToString());
         OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -127,6 +128,7 @@ public class SisyphiGameManager: NetworkBehaviour
     private void Update()
     {
         if (!IsServer) return;
+        if (gameOver.Value) return;
 
         switch (state.Value)
         {
@@ -163,10 +165,11 @@ public class SisyphiGameManager: NetworkBehaviour
                 if (gameplayTimer.Value < 0)
                 {
                     gameplayTimer.Value = -Mathf.Infinity;
-                    state.Value = State.Finished; 
+                    SetGameFinishedServerRpc();
                 }
                 break;
             case State.Finished:
+                GameFinishedEvent?.Invoke(this, EventArgs.Empty);
                 break;
         }
     }
@@ -177,6 +180,13 @@ public class SisyphiGameManager: NetworkBehaviour
         NetworkPromptArray current = prompts.Value;
         current.StringArray[index] = value;
         prompts.Value = current;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SetGameFinishedServerRpc()
+    {
+        state.Value = State.Finished;
+        gameOver.Value = true;
     }
 
     public bool IsPlayerWaiting()

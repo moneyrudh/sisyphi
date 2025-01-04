@@ -42,6 +42,8 @@ public class BoatPlacementSystem : NetworkBehaviour
     public NetworkVariable<bool> hasPlacedBoat = new NetworkVariable<bool>(false);
     public NetworkVariable<bool> canRemoveBoat = new NetworkVariable<bool>(true);
 
+    public event System.Action<bool> OnPlacementModeChanged;
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -57,6 +59,33 @@ public class BoatPlacementSystem : NetworkBehaviour
         //     }
         // };
         // hasPlacedBoat.OnValueChanged += OnHasPlacedBoatChanged;
+    }
+
+    private void Start()
+    {
+        SisyphiGameManager.Instance.GameFinishedEvent += BoatPlacementSystem_OnGameFinished;
+    }
+
+    private void BoatPlacementSystem_OnGameFinished(object sender, System.EventArgs e)
+    {
+        if (!IsOwner) return;
+        if (placeBoatToggle != null)
+        {
+            placeBoatToggle.action.Disable();
+            placeBoatToggle.action.started -= HandleBoatToggle;
+        }
+
+        if (placeBoatConfirm != null)
+        {
+            placeBoatConfirm.action.Disable();
+            placeBoatConfirm.action.started -= HandleBoatConfirm;
+        }
+
+        if (removeBoatAction != null)
+        {
+            removeBoatAction.action.Disable();
+            removeBoatAction.action.started -= HandleBoatRemoval;
+        }
     }
 
     private void EnableInputs()
@@ -314,10 +343,11 @@ public class BoatPlacementSystem : NetworkBehaviour
         }
     }
 
-    private void TogglePlacementMode()
+    public void TogglePlacementMode()
     {
         inPlacementMode = !inPlacementMode;
         Debug.Log($"Placement mode toggled to {inPlacementMode} for client {OwnerClientId}");
+        OnPlacementModeChanged?.Invoke(inPlacementMode);
         
         if (!inPlacementMode)
         {
@@ -328,6 +358,7 @@ public class BoatPlacementSystem : NetworkBehaviour
     private void DisablePlacementMode()
     {
         inPlacementMode = false;
+        OnPlacementModeChanged?.Invoke(false);
         if (boatPreview != null)
         {
             boatPreview.SetActive(false);

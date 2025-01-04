@@ -34,6 +34,9 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
     private int playerIndex;
     private GameObject boulder;
+    private int currentCheckpoint = -1;
+    private CheckpointAction currentCheckpointAction;
+    private Vector3 checkpointPosition;
 
     private void Awake()
     {
@@ -73,13 +76,14 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
     private void Update()
     {
+        if (!IsOwner) return;
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
-            SetInitialPosition();
+            SetInitialPositionServerRpc();
         }
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
-            ResetBoulderPosition();
+            ResetBoulderPositionServerRpc();
             // DespawnBoulderServerRpc();
             // SpawnBoulderServerRpc();
         }
@@ -93,19 +97,67 @@ public class PlayerSpawnHandler : NetworkBehaviour
         }
     }
 
+    public void SetCheckpoint(CheckpointAction checkpointAction, int checkpointIndex, Vector3 position)
+    {
+        if (checkpointIndex == currentCheckpoint) return;
+        if (currentCheckpointAction != null) currentCheckpointAction.StopFireParticles();
+        currentCheckpoint = checkpointIndex;
+        checkpointPosition = position;
+        currentCheckpointAction = checkpointAction;
+    }
+
+    public int GetCurrentCheckpoint()
+    {
+        return currentCheckpoint;
+    }
+
     private void SetInitialPosition()
     {
         // int playerIndex = (int) clientId > 0 ? 1 : 0;
-        GetComponent<Rigidbody>().velocity = Vector3.zero;
-        transform.position = spawnPoints[playerIndex];
+        // GetComponent<Rigidbody>().velocity = Vector3.zero;
+        if (currentCheckpoint == -1)
+        {
+            transform.position = spawnPoints[playerIndex];
+        }
+        else transform.position = checkpointPosition + new Vector3(0, 1.5f, 0);
         // SyncPositionClientRpc(spawnPoints[playerIndex]);
+    }
+
+    [ServerRpc]
+    private void SetInitialPositionServerRpc()
+    {
+        SetInitialPositionClientRpc();
+    }
+
+    [ClientRpc]
+    private void SetInitialPositionClientRpc()
+    {
+        SetInitialPosition();
     }
 
     private void ResetBoulderPosition()
     {
-        Vector3 position = spawnPoints[playerIndex] + new Vector3(0, 1f, 4f);
-        boulder.transform.position = position;
-        boulder.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        Rigidbody rb = boulder.GetComponent<Rigidbody>();
+        rb.useGravity = false;
+        rb.velocity = Vector3.zero;
+        rb.isKinematic = true;
+        if (currentCheckpoint == -1) boulder.transform.position = spawnPoints[playerIndex] + new Vector3(0, 1f, 4f);
+        else boulder.transform.position = checkpointPosition + new Vector3(0, 3f, 0);
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        rb.velocity = Vector3.zero;
+    }
+
+    [ServerRpc]
+    private void ResetBoulderPositionServerRpc()
+    {
+        ResetBoulderPositionClientRpc();
+    }
+
+    [ClientRpc]
+    private void ResetBoulderPositionClientRpc()
+    {
+        ResetBoulderPosition();
     }
 
     [ServerRpc(RequireOwnership = true)]
