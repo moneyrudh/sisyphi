@@ -38,6 +38,11 @@ public class PlayerSpawnHandler : NetworkBehaviour
     private CheckpointAction currentCheckpointAction;
     private Vector3 checkpointPosition;
 
+    private NetworkVariable<bool> isRespawnCooldown = new NetworkVariable<bool>(false);
+    private float respawnCooldownTime = 3f;
+    private float minYPosition = -10f;
+    private Coroutine respawnCooldownCoroutine;
+
     private void Awake()
     {
         SisyphiGameManager.Instance.OnStateChanged += PlayerSpawnHandler_SetPlayerState;
@@ -77,16 +82,57 @@ public class PlayerSpawnHandler : NetworkBehaviour
     private void Update()
     {
         if (!IsOwner) return;
+
+        if (transform.position.y < minYPosition)
+        {
+            TryRespawnPlayer();
+        }
+
+        if (boulder != null && boulder.transform.position.y < minYPosition)
+        {
+            TryRespawnBoulder();
+        }
+
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
-            SetInitialPositionServerRpc();
+            TryRespawnPlayer();
         }
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
-            ResetBoulderPositionServerRpc();
-            // DespawnBoulderServerRpc();
-            // SpawnBoulderServerRpc();
+            TryRespawnBoulder();
         }
+    }
+
+    private void TryRespawnPlayer()
+    {
+        if (!isRespawnCooldown.Value)
+        {
+            SetInitialPositionServerRpc();
+            StartRespawnCooldownServerRpc();
+        }
+    }
+
+    private void TryRespawnBoulder()
+    {
+        if (!isRespawnCooldown.Value)
+        {
+            ResetBoulderPositionServerRpc();
+            StartRespawnCooldownServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    private void StartRespawnCooldownServerRpc()
+    {
+        isRespawnCooldown.Value = true;
+        if (respawnCooldownCoroutine != null) StopCoroutine(respawnCooldownCoroutine);
+        respawnCooldownCoroutine = StartCoroutine(RespawnCooldown());
+    }
+
+    private IEnumerator RespawnCooldown()
+    {
+        yield return new WaitForSeconds(respawnCooldownTime);
+        isRespawnCooldown.Value = false;
     }
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
@@ -137,15 +183,33 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
     private void ResetBoulderPosition()
     {
+        if (boulder == null) return;
+
         Rigidbody rb = boulder.GetComponent<Rigidbody>();
-        rb.useGravity = false;
+        if (rb == null) return;
+
         rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
-        if (currentCheckpoint == -1) boulder.transform.position = spawnPoints[playerIndex] + new Vector3(0, 1f, 4f);
-        else boulder.transform.position = checkpointPosition + new Vector3(0, 3f, 0);
+        rb.useGravity = false;
+
+        Vector3 resetPosition = currentCheckpoint == -1 ? 
+            spawnPoints[playerIndex] + new Vector3(0, 1f, 4f) :
+            checkpointPosition + new Vector3(0, 3f, 0);
+    
+        boulder.transform.position = resetPosition;
+        boulder.transform.rotation = Quaternion.identity;
+
+        StartCoroutine(ReenablePhysics(rb));
+    }
+
+    private IEnumerator ReenablePhysics(Rigidbody rb)
+    {
+        yield return new WaitForFixedUpdate();
         rb.isKinematic = false;
         rb.useGravity = true;
         rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
     }
 
     [ServerRpc]

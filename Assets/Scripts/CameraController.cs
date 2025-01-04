@@ -29,6 +29,7 @@ public class CameraController : NetworkBehaviour
     private float currentVerticalAngle;
     private float currentHorizontalAngle;
     private float targetCameraDistance;
+    private const float minCameraY = 2f;
 
     private void OnEnable()
     {
@@ -76,25 +77,8 @@ public class CameraController : NetworkBehaviour
 
         Vector3 targetPosition = transform.position + offset;
         Quaternion targetRotation = Quaternion.Euler(currentVerticalAngle, currentHorizontalAngle, 0f);
-
-        // Vector3 targetPosition = transform.position + offset;
-        // Vector3 directionFromTarget = targetRotation * Vector3.back;
-        // Vector3 targetCameraPosition = targetPosition + directionFromTarget * distance;
-
-        // playerCamera.transform.position = Vector3.SmoothDamp(
-        //     playerCamera.transform.position,
-        //     targetCameraPosition,
-        //     ref currentVelocity,
-        //     positionSmoothTime
-        // );
-
-        // playerCamera.transform.rotation = Quaternion.Slerp(
-        //     playerCamera.transform.rotation,
-        //     targetRotation,
-        //     1f - Mathf.Exp(-rotationSmoothTime * Time.deltaTime)
-        // );
-
         Vector3 directionToCamera = targetRotation * Vector3.back;
+
         RaycastHit hit;
         if (Physics.SphereCast(targetPosition, collisionRadius, directionToCamera, out hit, distance, collisionLayers))
         {
@@ -106,9 +90,13 @@ public class CameraController : NetworkBehaviour
         }
 
         Vector3 finalPosition = targetPosition + directionToCamera * targetCameraDistance;
-        finalPosition = new (finalPosition.x, Mathf.Max(2, finalPosition.y), finalPosition.z);
+        finalPosition.y = Mathf.Max(minCameraY, finalPosition.y);
+        
         playerCamera.transform.position = finalPosition;
-        playerCamera.transform.rotation = targetRotation;
+
+        Vector3 lookTarget = transform.position + offset;
+        // playerCamera.transform.rotation = targetRotation;
+        playerCamera.transform.rotation = Quaternion.LookRotation(lookTarget - finalPosition);
     }
 
     public Quaternion GetCameraRotation()
