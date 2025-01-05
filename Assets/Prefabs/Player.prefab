@@ -4029,6 +4029,37 @@ Transform:
   - {fileID: 7733523360005728837}
   m_Father: {fileID: 2696403498175504818}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5739937355612811787
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8437203155145460504}
+  m_Layer: 9
+  m_Name: BoulderCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8437203155145460504
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5739937355612811787}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.261, z: -0.022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3742736202113095190}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5751469025688621471
 GameObject:
   m_ObjectHideFlags: 0
@@ -4083,6 +4114,7 @@ Transform:
   - {fileID: 872057651799178448}
   - {fileID: 6654591264043039490}
   - {fileID: 2916284041959098695}
+  - {fileID: 8437203155145460504}
   - {fileID: 8560478710581063736}
   - {fileID: 2817456718215930386}
   - {fileID: 7489287984856098926}
@@ -4148,6 +4180,7 @@ MonoBehaviour:
   proximityCheck: {fileID: 2817456718215930386}
   groundCheck: {fileID: 6654591264043039490}
   headCheck: {fileID: 2916284041959098695}
+  boulderCheck: {fileID: 8437203155145460504}
   groundLayer:
     serializedVersion: 2
     m_Bits: 5065
@@ -4170,8 +4203,10 @@ MonoBehaviour:
   groundCheckDistance: 0.2
   groundCheckRadius: 0.1
   wallCheckRadius: 0.5
+  boulderCheckRadius: 0.75
   groundCollisionDistance: 0.75
   wallCollisionDistance: 1
+  boulderCollisionDistance: 1
   gravityMultiplier: 3
   fallMultiplier: 3
   rotationSmoothTime: 1
@@ -4427,6 +4462,8 @@ MonoBehaviour:
   collisionLayers:
     serializedVersion: 2
     m_Bits: 0
+  cinematicPointA: {fileID: 1350877456511926387, guid: 0fb4247f6784b445e9ccbe13bd4b4977, type: 3}
+  cinematicPointB: {fileID: 5453240074845519814, guid: a08bf96c6aae841698cec48f7d01f4b3, type: 3}
 --- !u!114 &6505856498458587469
 MonoBehaviour:
   m_ObjectHideFlags: 0

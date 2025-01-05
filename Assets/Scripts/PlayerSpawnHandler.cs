@@ -40,7 +40,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
     private NetworkVariable<bool> isRespawnCooldown = new NetworkVariable<bool>(false);
     private float respawnCooldownTime = 3f;
-    private float minYPosition = -10f;
+    private float minYPosition = -20f;
     private Coroutine respawnCooldownCoroutine;
 
     private void Awake()
@@ -56,6 +56,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
         {
             Cursor.lockState = CursorLockMode.Locked;
             ToggleScripts(true);
+            boulder.GetComponent<Rigidbody>().isKinematic = false;
         }
     }
 
@@ -81,6 +82,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
     private void Update()
     {
+        if (!SisyphiGameManager.Instance.IsGamePlaying()) return;
         if (!IsOwner) return;
 
         if (transform.position.y < minYPosition)
@@ -200,7 +202,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
         boulder.transform.position = resetPosition;
         boulder.transform.rotation = Quaternion.identity;
 
-        StartCoroutine(ReenablePhysics(rb));
+        if (SisyphiGameManager.Instance.IsGamePlaying()) StartCoroutine(ReenablePhysics(rb));
     }
 
     private IEnumerator ReenablePhysics(Rigidbody rb)
@@ -244,7 +246,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
         NetworkObject playerObject = NetworkManager.ConnectedClients[clientId].PlayerObject;
 
         int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(clientId);
-        Vector3 spawnPosition = spawnPoints[index] + new Vector3(0, 1f, 4f);
+        Vector3 spawnPosition = spawnPoints[index] + new Vector3(0, -1f, 4f);
         GameObject _boulder = Instantiate(boulderPrefab, spawnPosition, Quaternion.identity);
         NetworkObject networkObject = _boulder.GetComponent<NetworkObject>();
         networkObject.SpawnWithOwnership(clientId);
@@ -260,6 +262,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
             if (boulderRef.TryGet(out NetworkObject boulderNetObj))
             {
                 boulder = boulderNetObj.gameObject;
+                boulder.GetComponent<Rigidbody>().isKinematic = true;
                 boulderNetObj.gameObject.name = "Boulder_" + index;
             }
         }

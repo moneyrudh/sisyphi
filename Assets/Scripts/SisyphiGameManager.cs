@@ -15,6 +15,7 @@ public class SisyphiGameManager: NetworkBehaviour
     private Dictionary<ulong, bool> playerReadyDictionary;
     private NetworkVariable<NetworkPromptArray> prompts = new NetworkVariable<NetworkPromptArray>(new NetworkPromptArray(4));
     private const float timerDuration = 4f;
+    private NetworkVariable<int> cinematicCompletionCount = new NetworkVariable<int>(0);
     private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(timerDuration);
     private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(600f);
 
@@ -29,6 +30,7 @@ public class SisyphiGameManager: NetworkBehaviour
         FirstPrompt,
         SecondPrompt,
         PromptGeneration,
+        Cinematic,
         Countdown,
         Playing,
         Finished
@@ -92,7 +94,8 @@ public class SisyphiGameManager: NetworkBehaviour
         }
 
         StartGameClientRpc();
-        state.Value = State.Playing;
+        state.Value = State.Cinematic;
+        StartCinematicClientRpc();
     }
 
     [ClientRpc]
@@ -152,6 +155,13 @@ public class SisyphiGameManager: NetworkBehaviour
                 break;
             case State.PromptGeneration:
                 break;
+            case State.Cinematic:
+                if (cinematicCompletionCount.Value == SisyphiGameMultiplayer.PLAYER_COUNT)
+                {
+                    state.Value = State.Countdown;
+                    cinematicCompletionCount.Value = 0;
+                }
+                break;
             case State.Countdown:
                 countdownTimer.Value -= Time.deltaTime;
                 if (countdownTimer.Value < 0)
@@ -187,6 +197,29 @@ public class SisyphiGameManager: NetworkBehaviour
     {
         state.Value = State.Finished;
         gameOver.Value = true;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CinematicCompleteServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        cinematicCompletionCount.Value++;
+    }
+
+    [ServerRpc]
+    public void StartCinematicServerRpc()
+    {
+        StartCinematicClientRpc();
+    }
+
+    [ClientRpc]
+    private void StartCinematicClientRpc()
+    {
+        NetworkObject localPlayerObj = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+        if (localPlayerObj != null)
+        {
+            CameraController cameraController = localPlayerObj.GetComponent<CameraController>();
+            cameraController?.StartCinematic();
+        }
     }
 
     public bool IsPlayerWaiting()

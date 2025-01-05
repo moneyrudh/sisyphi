@@ -24,6 +24,14 @@ public class CameraController : NetworkBehaviour
     [Header("Camera Collision")]
     public float collisionRadius = 0.2f;
     public LayerMask collisionLayers;
+
+    [Header("Cinematic Points")]
+    public Transform cinematicPointA;
+    public Transform cinematicPointB;
+    private bool isCinematicActive = false;
+    private Vector3 initialOffset;
+    private float cinematicLerpSpeed = 0.1f;
+
     private Camera playerCamera;
     // private Vector3 currentVelocity;
     private float currentVerticalAngle;
@@ -60,12 +68,68 @@ public class CameraController : NetworkBehaviour
 
         if (Camera.main != null) Camera.main.gameObject.SetActive(false);
 
+        playerCamera.transform.position = cinematicPointA.position;
+        playerCamera.transform.rotation = cinematicPointA.rotation;
+        Debug.Log("ALREADY SET BRUH");
         targetCameraDistance = distance;
+    }
+
+    public void StartCinematic()
+    {
+        if (!IsOwner) return;
+        isCinematicActive = true;
+        initialOffset = offset;
+        StartCoroutine(PlayCinematicSequence());
+    }
+
+    private IEnumerator PlayCinematicSequence()
+    {
+        mouseLook.action.Disable();
+
+        playerCamera.transform.position = cinematicPointA.position;
+        playerCamera.transform.rotation = cinematicPointA.rotation;
+        yield return new WaitForSeconds(2f);
+        Debug.Log("POINT A TO B START");
+        float elapsedTime = 0f;
+        while (elapsedTime < 1f)
+        {
+            elapsedTime += Time.deltaTime * cinematicLerpSpeed;
+            playerCamera.transform.position = Vector3.Lerp(cinematicPointA.position, cinematicPointB.position, elapsedTime);
+            playerCamera.transform.rotation = Quaternion.Lerp(cinematicPointA.rotation, cinematicPointB.rotation, elapsedTime);
+            yield return null;
+        }
+
+        Debug.Log("POINT A TO B END");
+        yield return new WaitForSeconds(2f);
+        Debug.Log("POINT B TO PLAYER START");
+
+        Vector3 playerPosition = transform.position + initialOffset;
+        Vector3 initialCameraPosition = playerPosition + (Quaternion.Euler(currentVerticalAngle, currentHorizontalAngle, 0f) * Vector3.back * distance);
+        initialCameraPosition.y = Mathf.Max(minCameraY, initialCameraPosition.y);
+        Quaternion initialCameraRotation = Quaternion.LookRotation(playerPosition - initialCameraPosition);
+
+        elapsedTime = 0f;
+        while (elapsedTime < 1f)
+        {
+            elapsedTime += Time.deltaTime * cinematicLerpSpeed * 6f;
+            playerCamera.transform.position = Vector3.Lerp(cinematicPointB.position, initialCameraPosition, elapsedTime);
+            playerCamera.transform.rotation = Quaternion.Lerp(cinematicPointB.rotation, initialCameraRotation, elapsedTime);
+            yield return null;
+        }
+
+        Debug.Log("POINT B TO PLAYER END");
+        yield return new WaitForSeconds(1f);
+
+        isCinematicActive = false;
+        mouseLook.action.Enable();
+
+        SisyphiGameManager.Instance.CinematicCompleteServerRpc();
     }
 
     private void LateUpdate()
     {
-        if (!IsOwner || playerCamera == null) return;
+        if (!SisyphiGameManager.Instance.IsGamePlaying()) return;
+        if (!IsOwner || playerCamera == null || isCinematicActive) return;
 
         Vector2 mouseInput = mouseLook.action.ReadValue<Vector2>();
         // float mouseX = mouseInput.x * rotationSpeed;

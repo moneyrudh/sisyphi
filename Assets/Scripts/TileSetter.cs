@@ -127,7 +127,8 @@ public class TileSetter : NetworkBehaviour
             //     z += width * demultiplier * 10;
             //     z += checkPointOffset * width * demultiplier;
             // }
-            SisyphiGameManager.Instance.SetCountdownState();
+            // SisyphiGameManager.Instance.SetCountdownState();
+            SisyphiGameManager.Instance.CinematicCompleteServerRpc();
         }
     }
 

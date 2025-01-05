@@ -13,6 +13,7 @@ public class Movement : NetworkBehaviour
     public Transform proximityCheck;
     public Transform groundCheck;
     public Transform headCheck;
+    public Transform boulderCheck;
     public LayerMask groundLayer;
     public LayerMask boulderLayer;
     public LayerMask wallObstacleLayer;
@@ -31,8 +32,10 @@ public class Movement : NetworkBehaviour
     public float groundCheckDistance = 0.1f;
     public float groundCheckRadius = 0.1f;
     public float wallCheckRadius = 0.5f;
+    public float boulderCheckRadius = 0.75f;
     public float groundCollisionDistance = 0.75f;
     public float wallCollisionDistance = 1f;
+    public float boulderCollisionDistance = 0f;
     public float gravityMultiplier = 2.5f;
     public float fallMultiplier = 2.5f;
     public float rotationSmoothTime = 0.1f;
@@ -111,6 +114,7 @@ public class Movement : NetworkBehaviour
     void Update()
     {
         if (SisyphiGameManager.Instance.IsGameOver()) return;
+        if (!SisyphiGameManager.Instance.IsGamePlaying()) return;
         
         if (IsOwner)
         {
@@ -133,6 +137,7 @@ public class Movement : NetworkBehaviour
     private void FixedUpdate()
     {
         if (SisyphiGameManager.Instance.IsGameOver()) return;
+        if (!SisyphiGameManager.Instance.IsGamePlaying()) return;
        
         if (IsOwner) 
         {
@@ -193,18 +198,12 @@ public class Movement : NetworkBehaviour
             currentWallObstacleLayer,
             QueryTriggerInteraction.Ignore
         );
+
         if (headBlocked)
         {
             Debug.Log("HIT! Object: " + hit.collider.name);
         }
-        // bool headBlocked = Physics.SphereCast(
-        //     headCheck.position, 
-        //     wallCheckRadius, 
-        //     direction,
-        //     out RaycastHit hit1,
-        //     wallCollisionDistance, 
-        //     obstacleLayer
-        // );
+        
         bool groundBlocked = Physics.Raycast(
             groundCheck.position, 
             direction, 
@@ -218,12 +217,35 @@ public class Movement : NetworkBehaviour
         {
             Debug.Log("HIT! Object: " + hit.collider.name);
         }
+
+        bool boulderBlocked = Physics.Raycast(
+            boulderCheck.position,
+            direction,
+            out hit,
+            boulderCollisionDistance,
+            boulderLayer,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (boulderBlocked)
+        {
+            Debug.Log("BOULDER HIT");
+        }
+        
         DrawSphereCast(
-        headCheck.position,
-        direction,
-        wallCheckRadius,
-        wallCollisionDistance,
-        headBlocked ? Color.red : Color.green
+            boulderCheck.position,
+            direction,
+            boulderCheckRadius,
+            boulderCollisionDistance,
+            boulderBlocked ? Color.red : Color.green
+        );
+        
+        DrawSphereCast(
+            headCheck.position,
+            direction,
+            wallCheckRadius,
+            wallCollisionDistance,
+            headBlocked ? Color.red : Color.green
         );
         
         // Standard raycast debug for ground check
@@ -234,7 +256,40 @@ public class Movement : NetworkBehaviour
             0.5f
         );
 
-        return !headBlocked && !groundBlocked;
+        return !headBlocked && !groundBlocked && !boulderBlocked;
+    }
+
+    private bool CanRotateInDirection(Vector3 direction)
+    {
+        if (pushing) return true;
+        if (direction == Vector3.zero) return true;
+
+        direction = direction.normalized;
+
+        RaycastHit hit;
+        bool boulderBlocked = Physics.Raycast(
+            boulderCheck.position,
+            direction,
+            out hit,
+            boulderCollisionDistance,
+            boulderLayer,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (boulderBlocked)
+        {
+            Debug.Log("BOULDER HIT");
+        }
+        
+        DrawSphereCast(
+            boulderCheck.position,
+            direction,
+            boulderCheckRadius,
+            boulderCollisionDistance,
+            boulderBlocked ? Color.red : Color.green
+        );
+
+        return !boulderBlocked;
     }
 
     private void DrawSphereCast(Vector3 origin, Vector3 direction, float radius, float distance, Color color)
