@@ -4479,7 +4479,7 @@ MonoBehaviour:
   spawnPoints:
   - {x: 10, y: 5, z: -40}
   - {x: 25, y: 5, z: -40}
-  boulderPrefab: {fileID: 6887029233247754709, guid: 3c760d0d83d3345ffa478b380743fa3b, type: 3}
+  boulderPrefab: {fileID: 2956089421339744865, guid: be0dbaa3db5ca4f549576097c5adf5a0, type: 3}
   movement: {fileID: 1875555350583945303}
   playerFarm: {fileID: 3629608946139005133}
   buildingSystem: {fileID: -895039447018581072}

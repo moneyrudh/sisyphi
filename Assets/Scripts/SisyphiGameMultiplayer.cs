@@ -5,6 +5,7 @@ using Unity.Netcode;
 using System;
 using UnityEngine.SceneManagement;
 using Unity.Services.Authentication;
+using Newtonsoft.Json.Serialization;
 
 [System.Serializable]
 public class SkyboxMaterial {
@@ -23,6 +24,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     private NetworkVariable<int> skyboxIndex = new NetworkVariable<int>(0);
     private NetworkList<PlayerData> playerDataNetworkList;
     [SerializeField] private List<Color> playerColors;
+    [SerializeField] private List<Material> boulderMaterials;
     [SerializeField] private List<SkyboxMaterial> skyboxMaterialList;
     private NetworkList<NetworkedMaterialCategory> currentMaterialCategory;
     public static SisyphiGameMultiplayer Instance { get; private set; }
@@ -119,7 +121,8 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
             hairColorId = 1,
             skinColorId = 10,
             pantColorId = 12,
-            eyesColorId = 11
+            eyesColorId = 11,
+            boulderMaterialId = 0
         });
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
         SetPlayerNameServerRpc(GetPlayerName());
@@ -249,6 +252,11 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
         return playerColors[colorId];
     }
 
+    public Material GetBoulderMaterial(int materialId)
+    {
+        return boulderMaterials[materialId];
+    }
+
     public void ChangePlayerColor(int colorId)
     {
         ChangePlayerColorServerRpc(colorId);
@@ -287,6 +295,20 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
             return currentMaterialCategory[playerIndex];
         }
         return MaterialCategory.Hair;
+    }
+
+    public void ChangeBoulderMaterial(int materialId)
+    {
+        ChangeBoulderMaterialServerRpc(materialId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ChangeBoulderMaterialServerRpc(int materialId, ServerRpcParams serverRpcParams = default)
+    {
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+        playerData.boulderMaterialId = materialId;
+        playerDataNetworkList[playerDataIndex] = playerData;
     }
 
     public void KickPlayer(ulong clientId)

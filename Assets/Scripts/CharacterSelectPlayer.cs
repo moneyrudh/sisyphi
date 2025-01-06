@@ -10,6 +10,7 @@ public class CharacterSelectPlayer : MonoBehaviour
     [SerializeField] private int playerIndex;
     [SerializeField] private GameObject readyGameObject;
     [SerializeField] private PlayerVisual playerVisual;
+    [SerializeField] private GameObject boulder;
     [SerializeField] private Button kickButton;
     [SerializeField] private TextMeshPro playerNameText;
     
@@ -108,6 +109,9 @@ public class CharacterSelectPlayer : MonoBehaviour
             playerNameText.text = playerData.playerName.ToString();
             
             playerVisual.SetPlayerColor(materialCategory, color);
+
+            Material material = SisyphiGameMultiplayer.Instance.GetBoulderMaterial(playerData.boulderMaterialId);
+            boulder.GetComponent<Renderer>().material = material;
         }
         else
         {
@@ -118,11 +122,13 @@ public class CharacterSelectPlayer : MonoBehaviour
     private void Show()
     {
         gameObject.SetActive(true);
+        boulder.SetActive(true);
     }
 
     private void Hide()
     {
         gameObject.SetActive(false);
+        boulder.SetActive(false);
     }
 
     private void OnDestroy()

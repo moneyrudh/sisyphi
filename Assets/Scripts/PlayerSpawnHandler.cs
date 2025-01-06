@@ -302,6 +302,12 @@ public class PlayerSpawnHandler : NetworkBehaviour
         _eyesMaterial.color = SisyphiGameMultiplayer.Instance.GetPlayerColor(playerData.eyesColorId);
     }
 
+    public void SetBoulderMaterial()
+    {
+        PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        boulder.GetComponent<Renderer>().material = SisyphiGameMultiplayer.Instance.GetBoulderMaterial(playerData.boulderMaterialId);
+    }
+
     private void ToggleScripts(bool active)
     {
         movement.enabled = active;

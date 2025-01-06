@@ -277,4 +277,21 @@ public class SisyphiGameLobby : MonoBehaviour
     {
         return joinedLobby;
     }
+
+    public void OnDestroy()
+    {
+        if (LobbyService.Instance != null)
+        {
+            if (joinedLobby != null)
+            {
+                try {
+                    LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, AuthenticationService.Instance.PlayerId);
+                    // if (IsLobbyHost()) DeleteLobby();
+                    joinedLobby = null;
+                } catch (LobbyServiceException e) {
+                    Debug.Log(e); 
+                }
+            }
+        }
+    }
 }

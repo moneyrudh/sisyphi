@@ -14,6 +14,7 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
     public int skinColorId;
     public int pantColorId;
     public int eyesColorId;
+    public int boulderMaterialId;
 
     public bool Equals(PlayerData other)
     {
@@ -23,7 +24,8 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
             playerId == other.playerId &&
             hairColorId == other.hairColorId && 
             skinColorId == other.skinColorId &&
-            eyesColorId == other.eyesColorId;
+            eyesColorId == other.eyesColorId &&
+            boulderMaterialId == other.boulderMaterialId;
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -35,5 +37,6 @@ public struct PlayerData: IEquatable<PlayerData>, INetworkSerializable
         serializer.SerializeValue(ref skinColorId);
         serializer.SerializeValue(ref pantColorId);
         serializer.SerializeValue(ref eyesColorId);
+        serializer.SerializeValue(ref boulderMaterialId);
     }
 }
