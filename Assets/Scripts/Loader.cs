@@ -11,7 +11,8 @@ public static class Loader
         LobbyScene,
         LoadingScene,
         CharacterScene,
-        GameScene
+        GameScene,
+        EndScene
     }
 
     private static Scene targetScene;

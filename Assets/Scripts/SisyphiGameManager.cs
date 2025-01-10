@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using UnityEngine.SceneManagement;
 
 public class SisyphiGameManager: NetworkBehaviour 
 {
@@ -94,8 +95,9 @@ public class SisyphiGameManager: NetworkBehaviour
         }
 
         StartGameClientRpc();
-        state.Value = State.Cinematic;
-        StartCinematicClientRpc();
+        // state.Value = State.Playing;
+        state.Value = State.FirstPrompt;
+        // StartCinematicClientRpc();
     }
 
     [ClientRpc]
@@ -121,6 +123,7 @@ public class SisyphiGameManager: NetworkBehaviour
 
     private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
+        if (SceneManager.GetActiveScene().name == Loader.Scene.EndScene.ToString()) return;
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             Transform playerTransform = Instantiate(playerPrefab);
@@ -208,6 +211,7 @@ public class SisyphiGameManager: NetworkBehaviour
     [ServerRpc]
     public void StartCinematicServerRpc()
     {
+        state.Value = State.Cinematic;
         StartCinematicClientRpc();
     }
 
@@ -240,6 +244,11 @@ public class SisyphiGameManager: NetworkBehaviour
     public bool IsPromptGenerationState()
     {
         return state.Value == State.PromptGeneration;
+    }
+
+    public bool IsCinematicState()
+    {
+        return state.Value == State.Cinematic;
     }
 
     public bool IsCountdown()
@@ -289,5 +298,13 @@ public class SisyphiGameManager: NetworkBehaviour
             promptsData.Add(s);
         }
         return promptsData;
+    }
+
+    private void OnDestroy()
+    {
+        if (NetworkManager.Singleton && NetworkManager.Singleton.SceneManager != null)
+        {
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SceneManager_OnLoadEventCompleted;
+        }
     }
 }

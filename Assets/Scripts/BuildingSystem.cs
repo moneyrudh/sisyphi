@@ -833,6 +833,7 @@ public class BuildingSystem : NetworkBehaviour
         networkObject.Spawn();
         inventory.RemoveWood(2);
 
+        PlaySoundClientRpc("PlaceBuildable", (edgeStart + edgeEnd) / 2f);
         UpdateEdgeStateClientRpc(edgeStart, edgeEnd, direction);
         // Update inventory
     }
@@ -871,6 +872,7 @@ public class BuildingSystem : NetworkBehaviour
         NetworkObject targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
         BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
 
+        PlaySoundClientRpc("PlaceBuildable", position);
         UpdateBuildableEdgeStateClientRpc(targetObjectId, targetEdgeLocalPos);
     }
 
@@ -917,6 +919,7 @@ public class BuildingSystem : NetworkBehaviour
 
         NetworkObject targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
         BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
+        PlaySoundClientRpc("PlaceBuildable", position);
 
         UpdateBuildableEdgeStateClientRpc(targetObjectId, targetEdgeLocalPos);
     }
@@ -931,6 +934,7 @@ public class BuildingSystem : NetworkBehaviour
 
         NetworkObject targetNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetObjectId];
         BuildableObject targetBuildable = targetNetObj.GetComponent<BuildableObject>();
+        PlaySoundClientRpc("PlaceBuildable", position);
 
         UpdateBuildableEdgeStateClientRpc(targetObjectId, targetEdgeLocalPos);
     }
@@ -965,6 +969,11 @@ public class BuildingSystem : NetworkBehaviour
         if (!inBuildMode)
         {
             HideBuildPreview();
+            SoundManager.Instance.PlayOneShot("TurnOffSystem");
+        }
+        else
+        {
+            SoundManager.Instance.PlayOneShot("ToggleBuildable");
         }
     }
 
@@ -1015,5 +1024,11 @@ public class BuildingSystem : NetworkBehaviour
         {
             renderer.material = materialToUse;
         }
+    }
+
+    [ClientRpc]
+    private void PlaySoundClientRpc(string name, Vector3 position)
+    {
+        SoundManager.Instance.PlayAtPosition(name, position);
     }
 }

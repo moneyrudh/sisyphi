@@ -45,6 +45,8 @@ public class DamageTree : NetworkBehaviour
     {
         GameObject particlesGO = Instantiate(onDestroyedParticlesGO, new(transform.position.x, transform.position.y + 2.5f, transform.position.z), Quaternion.identity);
         // transform.Find("Remains").gameObject.SetActive(true);
+        SoundManager.Instance.PlayAtPosition("TreeBreak", transform.position);
+        SoundManager.Instance.PlayAtPosition("Explosion", transform.position);
         spawnedParticlesGO.Add(particlesGO);
         Destroy(particlesGO, 5f);
         GameObject trees = transform.Find("Trees").gameObject;

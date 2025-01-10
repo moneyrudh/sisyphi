@@ -345,6 +345,8 @@ public class BoatPlacementSystem : NetworkBehaviour
 
     public void TogglePlacementMode()
     {
+        if (!IsOwner) return;
+        
         inPlacementMode = !inPlacementMode;
         Debug.Log($"Placement mode toggled to {inPlacementMode} for client {OwnerClientId}");
         OnPlacementModeChanged?.Invoke(inPlacementMode);
@@ -352,6 +354,11 @@ public class BoatPlacementSystem : NetworkBehaviour
         if (!inPlacementMode)
         {
             DisablePlacementMode();
+            SoundManager.Instance.PlayOneShot("TurnOffSystem");
+        }
+        else
+        {
+            SoundManager.Instance.PlayOneShot("ToggleBuildable");
         }
     }
 
@@ -485,6 +492,7 @@ public class BoatPlacementSystem : NetworkBehaviour
             {
                 DisablePlacementMode();
             }
+            SoundManager.Instance.PlayAtPosition("BoatOn", placedBoat.transform.position);
         }
         else
         {

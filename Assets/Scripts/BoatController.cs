@@ -536,15 +536,19 @@ public class BoatController : NetworkBehaviour
         }
     }
 
-    // private bool IsBoulderInRange()
-    // {
-    //     if (!IsOwner || boulderDetectionPoint == null) return false;
+    private bool IsBoulderInRange(ulong clientId)
+    {
+        if (boulderDetectionPoint == null) return false;
 
-    //     int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(OwnerClientId);
-    //     var boulder = GameObject.Find("Boulder_" + index);
+        int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(clientId);
+        var boulder = GameObject.Find($"Boulder_{index}");
+        if (boulder == null) return false;
 
-    //     return Physics.OverlapSphere()
-    // }
+        BoxCollider detectionCollider = boulderDetectionPoint.GetComponent<BoxCollider>();
+        if (detectionCollider == null) return false;
+
+        return detectionCollider.bounds.Contains(boulder.transform.position);
+    }
 
     private bool IsInRange()
     {
@@ -574,6 +578,24 @@ public class BoatController : NetworkBehaviour
             // mountedPlayer = player;
             isMounted.Value = true;
             mountedPlayerRef.Value = new NetworkObjectReference(player);
+            
+            int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(clientId);
+            var boulder = GameObject.Find($"Boulder_{index}");
+            if (boulder != null && IsBoulderInRange(clientId))
+            {
+                NetworkObject boulderNetObj = boulder.GetComponent<NetworkObject>();
+                if (boulderNetObj != null)
+                {
+                    hasBoulder.Value = true;
+                    currentBoulderRef.Value = new NetworkObjectReference(boulderNetObj);
+                    currentBoulderController = boulder.GetComponent<BoulderController>();
+                    if (currentBoulderController != null)
+                    {
+                        currentBoulderController.SetMountedState(true);
+                    }
+                    UpdateBoulderSizeClientRpc(currentBoulderController.GetBoulderProperties().boulderSize);
+                }
+            }
             HandleMountClientRpc(new NetworkObjectReference(player));
         }
     }
@@ -618,7 +640,12 @@ public class BoatController : NetworkBehaviour
         if (clientId != OwnerClientId) return;
 
         isMounted.Value = false;
+        if (currentBoulderController != null)
+        {
+            currentBoulderController.SetMountedState(false);
+        }
         HandleDismountClientRpc(mountedPlayerRef.Value);
+
         // mountedPlayer = null;
         mountedPlayerRef.Value = default;
     }
@@ -686,14 +713,7 @@ public class BoatController : NetworkBehaviour
                     if (currentBoulderRef.Value.TryGet(out NetworkObject boulderObj))
                     {
                         boulderObj.transform.position = boulderDetectionPoint.position;
-                        // if (boulderObj.TryGetComponent<Rigidbody>(out Rigidbody boulderRb))
-                        // {
-                        //     Vector3 targetPos = boulderDetectionPoint.position;
-                        //     targetPos.y = boulderRb.position.y;
-                        //     boulderRb.MovePosition(targetPos);
-
-                        //     SyncBoulderPositionServerRpc(targetPos);
-                        // }
+                        // SyncBoulderPositionServerRpc(boulderObj.transform.position);
                     }
                 }
             }
@@ -716,10 +736,7 @@ public class BoatController : NetworkBehaviour
         {
             if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(boulderNetId, out NetworkObject boulderObj))
             {
-                if (boulderObj.TryGetComponent<Rigidbody>(out Rigidbody boulderRb))
-                {
-                    boulderRb.MovePosition(position);
-                }
+                boulderObj.transform.position = position;
             }
         }
     }
@@ -788,14 +805,14 @@ public class BoatController : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        if (other.CompareTag("Boulder"))
+        if (!isMounted.Value && other.CompareTag("Boulder"))
         {
             // Debug.Log("TRIGGER EXITED: " + other.name);
-            // hasBoulder.Value = false;
-            // currentBoulderRef.Value = default;
-            // currentBoulderController = null;
-            // currentBoulderNetObj = null;
-            // UpdateBoulderSizeClientRpc(BoulderSize.Medium);
+            hasBoulder.Value = false;
+            currentBoulderRef.Value = default;
+            currentBoulderController = null;
+            currentBoulderNetObj = null;
+            UpdateBoulderSizeClientRpc(BoulderSize.Medium);
         }
     }
 

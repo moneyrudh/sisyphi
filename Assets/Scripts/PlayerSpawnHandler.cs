@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using TMPro;
 
 public class PlayerSpawnHandler : NetworkBehaviour
 {
@@ -26,6 +27,12 @@ public class PlayerSpawnHandler : NetworkBehaviour
     [SerializeField] private Material skinMaterial;
     [SerializeField] private Material pantMaterial;
     [SerializeField] private Material eyesMaterial;
+
+    [Header("Name Display")]
+    [SerializeField] private Transform nameTextTransform;
+
+    private Transform otherPlayerTransform;
+    private Camera playerCamera;
 
     private Material _hairMaterial;
     private Material _skinMaterial;
@@ -52,7 +59,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
 
     private void PlayerSpawnHandler_SetPlayerState(object sender, System.EventArgs e)
     {
-        if (SisyphiGameManager.Instance.IsGamePlaying())
+        if (IsOwner && SisyphiGameManager.Instance.IsGamePlaying())
         {
             Cursor.lockState = CursorLockMode.Locked;
             ToggleScripts(true);
@@ -77,6 +84,30 @@ public class PlayerSpawnHandler : NetworkBehaviour
             SpawnBoulderServerRpc();
             SetPlayerColor();
             GetComponent<BoulderSkillSystem>().InitializeBoulderSkillSystemServerRpc();
+
+            StartCoroutine(WaitForOtherPlayerCoroutine());
+        }
+    }
+
+    private IEnumerator WaitForOtherPlayerCoroutine()
+    {
+        yield return new WaitForSeconds(1f);
+        FindOtherPlayer();
+        playerCamera = GameObject.Find($"PlayerCamera_{OwnerClientId}")?.GetComponent<Camera>();
+    }
+
+    private void FindOtherPlayer()
+    {
+        if (!IsOwner) return;
+
+        PlayerSpawnHandler[] players = FindObjectsOfType<PlayerSpawnHandler>();
+        foreach (PlayerSpawnHandler player in players)
+        {
+            if (player != this)
+            {
+                otherPlayerTransform = player.transform;
+                break;
+            }
         }
     }
 
@@ -102,6 +133,29 @@ public class PlayerSpawnHandler : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
             TryRespawnBoulder();
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (!IsOwner) return;
+        if (nameTextTransform == null) return;
+        if (!SisyphiGameManager.Instance.IsGamePlaying()) return;
+        if (playerCamera == null) return;
+
+        PlayerSpawnHandler[] allPlayers = FindObjectsOfType<PlayerSpawnHandler>();
+        foreach (PlayerSpawnHandler player in allPlayers)
+        {
+            if (player.nameTextTransform == null) continue;
+
+            // Get the direction from each name text to the current player's camera
+            Vector3 directionToCamera = (playerCamera.transform.position - player.nameTextTransform.position).normalized;
+            
+            // Calculate the rotation that would make the text face the camera
+            Quaternion targetRotation = Quaternion.LookRotation(-directionToCamera, Vector3.up);
+            
+            // Only apply the Y-axis rotation to keep text upright
+            player.nameTextTransform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
         }
     }
 
@@ -300,6 +354,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
         _skinMaterial.color = SisyphiGameMultiplayer.Instance.GetPlayerColor(playerData.skinColorId);
         _pantMaterial.color = SisyphiGameMultiplayer.Instance.GetPlayerColor(playerData.pantColorId);
         _eyesMaterial.color = SisyphiGameMultiplayer.Instance.GetPlayerColor(playerData.eyesColorId);
+        nameTextTransform.GetComponent<TMP_Text>().text = playerData.playerName.ToString();
     }
 
     public void SetBoulderMaterial()

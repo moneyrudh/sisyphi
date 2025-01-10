@@ -47,6 +47,8 @@ public class BoulderTreeBreak : NetworkBehaviour
         {
             Vector3 particlePos = new(transform.position.x, transform.position.y + 2.5f, transform.position.z);
             GameObject particles = Instantiate(particlesPrefab, particlePos, Quaternion.identity);
+            SoundManager.Instance.PlayAtPosition("TreeBreak", transform.position);
+            SoundManager.Instance.PlayAtPosition("Explosion", transform.position);
             Destroy(particles, 2.5f);
         }
     }

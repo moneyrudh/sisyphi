@@ -10,6 +10,10 @@ public class BoulderSkillSystem : NetworkBehaviour
     public InputActionReference shrinkAction;
     public InputActionReference growAction;
 
+    [Header("Cooldown Settings")]
+    public float skillCooldownDuration = 60f;
+    public float abnormalStateDuration = 30f;
+
     [Header("References")]
     public GameObject boulder;
     private BoulderController boulderController;
@@ -17,10 +21,20 @@ public class BoulderSkillSystem : NetworkBehaviour
     private NetworkVariable<BoulderSize> currentSize = new NetworkVariable<BoulderSize>(BoulderSize.Medium);
     private NetworkVariable<ulong> lastModifiedClientId = new NetworkVariable<ulong>();
 
+    private NetworkVariable<float> skillCooldownEndTime = new NetworkVariable<float>(0f);
+    private NetworkVariable<float> stateResetTime = new NetworkVariable<float>(0f);
+    private NetworkVariable<bool> skillEnabled = new NetworkVariable<bool>(true);
+    private Coroutine stateResetCoroutine;
+
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
+        if (IsServer)
+        {
+            currentSize.OnValueChanged += OnSizeChanged;
+        }
         // boulderController = boulder.GetComponent<BoulderController>();
         // if (IsOwner)
         // {
@@ -28,9 +42,87 @@ public class BoulderSkillSystem : NetworkBehaviour
         // }
     }
 
+    private void OnSizeChanged(BoulderSize previousValue, BoulderSize newValue)
+    {
+        if (IsOwner)
+        {
+            if (previousValue == BoulderSize.Small && newValue == BoulderSize.Medium)
+            {
+                PlaySound("BoulderLarge");
+            }
+            if (previousValue == BoulderSize.Medium && newValue == BoulderSize.Large)
+            {
+                PlaySound("BoulderLarge");
+            }
+            if (previousValue == BoulderSize.Large && newValue == BoulderSize.Medium)
+            {
+                PlaySound("BoulderSmall");
+            }
+            if (previousValue == BoulderSize.Medium && newValue == BoulderSize.Small)
+            {
+                PlaySound("BoulderSmall");
+            }
+        }
+
+        if (!IsServer) return;
+
+        if (stateResetCoroutine != null)
+        {
+            StopCoroutine(stateResetCoroutine);
+        }
+
+        if (newValue != BoulderSize.Medium)
+        {
+            stateResetTime.Value = Time.time + abnormalStateDuration;
+            stateResetCoroutine = StartCoroutine(StateResetTimer());
+        }
+    }
+
+    private IEnumerator StateResetTimer()
+    {
+        yield return new WaitForSeconds(abnormalStateDuration);
+
+        if (currentSize.Value != BoulderSize.Medium)
+        {
+            // RequestSizeChangeServerRpc(BoulderSize.Medium);
+            ResetSizeServerRpc();
+        }
+    }
+
     private void Start()
     {
         SisyphiGameManager.Instance.GameFinishedEvent += BoulderSkillSystem_OnGameFinished;
+    }
+
+    private void Update()
+    {
+        if (IsOwner)
+        {
+            if (!skillEnabled.Value && Time.time >= skillCooldownEndTime.Value)
+            {
+                SetSkillEnabledServerRpc(true);
+            }
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetSkillEnabledServerRpc(bool enabled)
+    {
+        skillEnabled.Value = enabled;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ResetSizeServerRpc()
+    {
+        currentSize.Value = BoulderSize.Medium;
+        if (boulderRef.Value.TryGet(out NetworkObject boulderNetObj))
+        {
+            BoulderController boulderController = boulderNetObj.GetComponent<BoulderController>();
+            if (boulderController != null)
+            {
+                boulderController.SetBoulderProperties(BoulderSize.Medium);
+            }
+        }
     }
 
     private void BoulderSkillSystem_OnGameFinished(object sender, System.EventArgs e)
@@ -72,6 +164,7 @@ public class BoulderSkillSystem : NetworkBehaviour
         DisableInputs();
         if (IsOwner)
         {
+            currentSize.OnValueChanged -= OnSizeChanged;
         }
     }
 
@@ -105,10 +198,26 @@ public class BoulderSkillSystem : NetworkBehaviour
         }
     }
 
-    private void OnShrinkPerformed(InputAction.CallbackContext context)
+    private void StartSkillCooldown()
     {
         if (!IsOwner) return;
 
+        SetSkillCooldownServerRpc(Time.time + skillCooldownDuration);
+        SetSkillEnabledServerRpc(false);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetSkillCooldownServerRpc(float endTime)
+    {
+        skillCooldownEndTime.Value = endTime;
+    }
+
+    private void OnShrinkPerformed(InputAction.CallbackContext context)
+    {
+        if (!IsOwner) return;
+        if (!skillEnabled.Value) return;
+
+        StartSkillCooldown();
         if (lastModifiedClientId.Value != OwnerClientId && currentSize.Value == BoulderSize.Large)
         {
             RequestSizeChangeServerRpc(BoulderSize.Medium);
@@ -124,7 +233,10 @@ public class BoulderSkillSystem : NetworkBehaviour
     private void OnGrowPerformed(InputAction.CallbackContext context)
     {
         if (!IsOwner) return;
+        if (!skillEnabled.Value) return;
 
+        StartSkillCooldown();
+        PlaySound("Boulder-E");
         int index = SisyphiGameMultiplayer.Instance.GetPlayerDataIndexFromClientId(OwnerClientId);
         index = (index + 1) % SisyphiGameMultiplayer.PLAYER_COUNT;
 
@@ -186,5 +298,10 @@ public class BoulderSkillSystem : NetworkBehaviour
     public BoulderSize GetCurrentSize()
     {
         return currentSize.Value;
+    }
+
+    private void PlaySound(string name)
+    {
+        if (IsOwner) SoundManager.Instance.PlayOneShot(name);
     }
 }

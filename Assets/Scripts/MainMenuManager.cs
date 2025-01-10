@@ -25,4 +25,9 @@ public class MainMenuManager : MonoBehaviour
             Destroy(SisyphiGameLobby.Instance.gameObject);
         }
     }
+
+    private void Start()
+    {
+        // SoundManager.Instance.Play("Theme");
+    }
 }

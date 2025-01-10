@@ -1,0 +1,308 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &9031895624547426250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6324985224033806702}
+  - component: {fileID: 1179811542488544790}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6324985224033806702
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9031895624547426250}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1179811542488544790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9031895624547426250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e66c7fe232e7d49bfb540c4a2d563923, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioMixer: {fileID: 24100000, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+  sounds:
+  - name: Boulder
+    clip: {fileID: 8300000, guid: bc7b9fb2cfb524cdb9248b6a7ff8cd42, type: 3}
+    volume: 1
+    pitch: 0.75
+    loop: 1
+    is3D: 1
+    maxDistance: 30
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Theme
+    clip: {fileID: 8300000, guid: c8c0780d0340b497e889b5a126a4b561, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: 1198073000552039611, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Footstep
+    clip: {fileID: 8300000, guid: c17e6d655911249449497123310b613e, type: 3}
+    volume: 0.75
+    pitch: 1.75
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: BoulderContact
+    clip: {fileID: 8300000, guid: c1ad0764b9fb344229e2c66d6eb823fc, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: BoulderSplash
+    clip: {fileID: 8300000, guid: 2e1dda1d4de4c466c96987fa25b00404, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: FallFlat
+    clip: {fileID: 8300000, guid: 8c9c0eb88d99b4ff696fca6c4af687dc, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Jump
+    clip: {fileID: 8300000, guid: a8a400106b6514746bb505d542c4ffcb, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: PlayerLand
+    clip: {fileID: 8300000, guid: 7389923bd19734f499f6b3031d6cb67b, type: 3}
+    volume: 0.75
+    pitch: 1.75
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: PlayerSplash
+    clip: {fileID: 8300000, guid: a5769be7dfd534ee4837ed7fb441c47c, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Explosion
+    clip: {fileID: 8300000, guid: ee284753f7be14a8ab07ab0eaee345c3, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: TreeBreak
+    clip: {fileID: 8300000, guid: bbf075b4db56a4c768774884e8397984, type: 3}
+    volume: 0.75
+    pitch: 0.5
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: GettingUp
+    clip: {fileID: 8300000, guid: be2ee04f7bbeb429a9019100d5d270f3, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: TreeChop
+    clip: {fileID: 8300000, guid: 06e78d9b5259e433892d9dbdc2d5967a, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Select
+    clip: {fileID: 8300000, guid: d161f8b7561094f55b2fe262d9f03a53, type: 3}
+    volume: 0.8
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Hover
+    clip: {fileID: 8300000, guid: a94c4b442c42d418cbb9486761662bb3, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: PlaceBuildable
+    clip: {fileID: 8300000, guid: 6d78cbcccb3eb45628d1163c6b27b01d, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: BoatOn
+    clip: {fileID: 8300000, guid: 607d6bec0e33c4e98bab55d02b615783, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: ToggleBuildable
+    clip: {fileID: 8300000, guid: 139de1e03c8c84e57a42fad8d9bfac7e, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: PickUpBoat
+    clip: {fileID: 8300000, guid: 8abec631ea72b4da6887cba10edaa023, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: TurnOffSystem
+    clip: {fileID: 8300000, guid: 240b7fd4b7fb64510803712105a23364, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Victory
+    clip: {fileID: 8300000, guid: 5a10c5a1901e54434a01fa9d36eeb5dd, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: BoulderLarge
+    clip: {fileID: 8300000, guid: 5d7a7d6571e87480095e4d7a0ea5009b, type: 3}
+    volume: 0.7
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: BoulderSmall
+    clip: {fileID: 8300000, guid: 5985d82676e544274b7b9e6d6859e772, type: 3}
+    volume: 0.7
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: BoulderNormal
+    clip: {fileID: 8300000, guid: e0392e95525d74c32b2e8653cf0f111c, type: 3}
+    volume: 0.7
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Boulder-E
+    clip: {fileID: 8300000, guid: 711aad3918b6e4b648c92d4b08a1f34a, type: 3}
+    volume: 0.7
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Bell
+    clip: {fileID: 8300000, guid: 99cb17eabcadc4be5a756b86d31b5cfa, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}

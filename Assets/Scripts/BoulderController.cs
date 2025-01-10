@@ -3,6 +3,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [System.Serializable]
 public enum BoulderSize {
@@ -44,11 +45,18 @@ public class BoulderController : NetworkBehaviour
     public BoulderProperties currentBoulderProperties => netBoulderProperties.Value;
     private NetworkVariable<bool> isPlayerPushing = new NetworkVariable<bool>(false);
 
+    private NetworkVariable<bool> isKinematic = new NetworkVariable<bool>(false);
+    private NetworkVariable<Vector3> networkPosition = new NetworkVariable<Vector3>();
+    private NetworkVariable<Quaternion> networkRotation = new NetworkVariable<Quaternion>();
+
+    private float positionSmoothSpeed = 20f;
+    private float rotationSmoothSpeed = 20f;
+    private bool isMounted = false;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         networkRigidbody = GetComponent<NetworkRigidbody>();
-        
     }
 
     public override void OnNetworkSpawn()
@@ -58,7 +66,43 @@ public class BoulderController : NetworkBehaviour
         {
             SetBoulderProperties(BoulderSize.Medium);
             netBoulderProperties.Value = boulderPropertiesList[1];
+            networkPosition.Value = transform.position;
+            networkRotation.Value = transform.rotation;
         }
+
+        if (IsOwner) isKinematic.OnValueChanged += OnKinematicStateChanged;
+
+        rb.isKinematic = isKinematic.Value;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+    }
+
+    private void FixedUpdate()
+    {
+        if (IsOwner)
+        {
+            if (!isMounted)
+            {
+                UpdateNetworkPositionServerRpc(transform.position, transform.rotation);
+            }
+        }
+        else if (!rb.isKinematic)
+        {
+            transform.position = Vector3.Lerp(transform.position, networkPosition.Value, Time.fixedDeltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, networkRotation.Value, Time.fixedDeltaTime);
+        }
+    }
+
+    private void OnKinematicStateChanged(bool previousValue, bool newValue)
+    {
+        rb.isKinematic = newValue;
+        rb.interpolation = newValue ? RigidbodyInterpolation.None : RigidbodyInterpolation.Interpolate;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdateNetworkPositionServerRpc(Vector3 newPosition, Quaternion newRotation)
+    {
+        networkPosition.Value = newPosition;
+        networkRotation.Value = newRotation;
     }
 
     // Call this when a player's collider enters the boulder's trigger zone
@@ -160,5 +204,31 @@ public class BoulderController : NetworkBehaviour
     public BoulderProperties GetBoulderProperties()
     {
         return netBoulderProperties.Value;
+    }
+
+    public void SetMountedState(bool mounted)
+    {
+        Debug.Log("SetMountedState called");
+        SetKinematicStateServerRpc(mounted);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetKinematicStateServerRpc(bool kinematic)
+    {
+        Debug.Log($"SetKinematicStateServerRpc called");
+        isKinematic.Value = kinematic;
+        SetMountedStateClientRpc(kinematic);
+    }
+
+    [ClientRpc]
+    private void SetMountedStateClientRpc(bool mounted)
+    {
+        Debug.Log("Clients received SetMountedStateClientRpc call");
+        isMounted = mounted;
+        // if (IsOwner)
+        // {
+        //     rb.isKinematic = mounted;
+        //     rb.interpolation = mounted ? RigidbodyInterpolation.None : RigidbodyInterpolation.Interpolate;    
+        // }
     }
 }

@@ -26,26 +26,31 @@ public class CountdownUI : MonoBehaviour
             Show();
             generatingPromptText.gameObject.SetActive(true);
         }
-        if (SisyphiGameManager.Instance.IsCountdown())
+        if (SisyphiGameManager.Instance.IsCinematicState())
         {
-            Debug.Log("XD");
             backgroundImage.gameObject.SetActive(false);
             generatingPromptText.gameObject.SetActive(false);
+        }
+        if (SisyphiGameManager.Instance.IsCountdown())
+        {
             countdownText.gameObject.SetActive(true);
         }
         if (SisyphiGameManager.Instance.IsGamePlaying())
         {
-            Debug.Log("Lol");
+            countdownText.gameObject.SetActive(false);
             Hide();
         }
     }
 
     private void Update()
     {
-        float seconds = SisyphiGameManager.Instance.GetCountdownTimer();
-        seconds = Mathf.Max(seconds, 0);
-        int rounded = (int) Mathf.Ceil(seconds);
-        countdownText.text = rounded.ToString();
+        if (SisyphiGameManager.Instance.IsCountdown())
+        {
+            float seconds = SisyphiGameManager.Instance.GetCountdownTimer();
+            seconds = Mathf.Max(seconds, 0);
+            int rounded = (int) Mathf.Ceil(seconds);
+            countdownText.text = rounded.ToString();
+        }
     }
 
     private void Show()

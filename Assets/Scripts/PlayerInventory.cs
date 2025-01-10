@@ -12,7 +12,7 @@ public class PlayerInventory : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        wood = 100;
+        wood = 0;
         collecting = false;
         processedWood = new HashSet<GameObject>();
         lastCollectionTime = -collectionCooldown;

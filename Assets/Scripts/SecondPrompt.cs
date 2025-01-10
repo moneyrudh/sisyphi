@@ -36,11 +36,11 @@ public class SecondPrompt : MonoBehaviour
     {
         if (SisyphiGameManager.Instance.IsSecondPrompt())
         {
-            // Show();
+            Show();
         }
         if (SisyphiGameManager.Instance.IsPromptGenerationState())
         {
-            // Hide();
+            Hide();
         }
     }
 

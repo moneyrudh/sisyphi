@@ -70,6 +70,7 @@ public class CameraController : NetworkBehaviour
 
         playerCamera.transform.position = cinematicPointA.position;
         playerCamera.transform.rotation = cinematicPointA.rotation;
+        cam.AddComponent<AudioListener>();
         Debug.Log("ALREADY SET BRUH");
         targetCameraDistance = distance;
     }

@@ -35,6 +35,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     public event EventHandler OnMaterialCategoryNetworkListChanged;
 
     private string playerName;
+    private int winnerPlayerIndex = -1;
 
     private void Awake() {
         Instance = this;
@@ -364,4 +365,26 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     //         currentMaterialCategory = null;
     //     }
     // }
+
+    public void SetWinnerIndex(int index)
+    {
+        winnerPlayerIndex = index;
+    }
+
+    private int GetNonWinnerIndex()
+    {
+        return winnerPlayerIndex == 0 ? 1 : 0;
+    }
+
+    public int GetWinnerIndexFromPlayerIndex(int index)
+    {
+        return index == 0 ? winnerPlayerIndex : GetNonWinnerIndex();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void LoadEndSceneServerRpc()
+    {
+        if (!IsServer) return;
+        Loader.LoadNetwork(Loader.Scene.EndScene);
+    }
 }

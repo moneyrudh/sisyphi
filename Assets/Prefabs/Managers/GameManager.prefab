@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1725177277120663444}
   - component: {fileID: 6005151276248685005}
   - component: {fileID: 8996924889675245924}
-  - component: {fileID: 5567809711432325165}
   - component: {fileID: 273178401555190492}
   m_Layer: 0
   m_Name: GameManager
@@ -48,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 775408939
+  GlobalObjectIdHash: 1232429135
   InScenePlacedSourceGlobalObjectIdHash: 3953791312
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -147,17 +146,10 @@ MonoBehaviour:
   - wood: 3
     log: {fileID: 1254620803359304976, guid: eace3d34761a74092a05fcec7b178507, type: 3}
   tileParents:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 8637653473909232511, guid: 9d707324e63ad4570903a13d8289a1b1, type: 3}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 2266380574268447392, guid: 5a43845c02b90467b9c8190dfa159ac0, type: 3}
+  - {fileID: 2266380574268447392, guid: 36652b68da46b40c68c76c0e045cf595, type: 3}
+  - {fileID: 2266380574268447392, guid: e84782f7ba6e6414aa0fc21e25dd7103, type: 3}
+  - {fileID: 2266380574268447392, guid: a29fc5fd7342045788f33714f4a92ace, type: 3}
   networkPrefab: {fileID: 1576746246073761970, guid: 02f1d52b91f7b4167bc2ec91c9756c99, type: 3}
   WaterPrefab: {fileID: 6674482388860770485, guid: 15a8d397f1e594199a1dd6a369caa7b1, type: 3}
   WaterMaterial: {fileID: 2100000, guid: 541d89427b42b4040b80b215bdd9a767, type: 2}
@@ -182,21 +174,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8d9ac8c788a4c96ac5b1f3b29f2f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5567809711432325165
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3841992414128498506}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f386bcd2709c247ef9ccf03e3e06ded5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  day: {fileID: 2100000, guid: b2c0069f85b67499e85bb2b9ecbfdaff, type: 2}
-  night: {fileID: 2100000, guid: 4d3d863937ae2436d8ee99fbb12dbcc1, type: 2}
-  blend: {fileID: 2100000, guid: e80041794f487438c86875ca1f6a50ab, type: 2}
 --- !u!114 &273178401555190492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,3 +188,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 3742736202113095190, guid: 43280320d16744c15969c9979a847b89, type: 3}
   waitingForPlayersGO: {fileID: 0}
+  gameOver:
+    m_InternalValue: 0

@@ -39,6 +39,8 @@ public class Movement : NetworkBehaviour
     public float gravityMultiplier = 2.5f;
     public float fallMultiplier = 2.5f;
     public float rotationSmoothTime = 0.1f;
+    public float impactAnticipationDistance = 2f;
+    public float anticipatedTimeToImpact = 0.6f;
     private Vector3 currentRotationVelocity;
     [System.NonSerialized] public Vector2 moveDirection;
     private Rigidbody rb;
@@ -71,6 +73,9 @@ public class Movement : NetworkBehaviour
 
     public void Movement_OnGameFinished(object sender, System.EventArgs e)
     {
+        canMove = false;
+        pushing = false;
+        ResetAnimator();
         movement.action.Disable();
         jump.action.started -= Jump;
     }
@@ -482,45 +487,66 @@ public class Movement : NetworkBehaviour
             Debug.Log("Playing should be falling at position " + fallYPosition);
         }
 
+        if (!isGrounded && rb.velocity.y < 0)
+        {
+            bool aboutToLand = Physics.SphereCast(
+                groundCheck.position + Vector3.up * 0.2f,
+                impactAnticipationDistance,
+                Vector3.down,
+                out RaycastHit anticipationHit,
+                impactAnticipationDistance,
+                groundLayer
+            );
+
+            if (aboutToLand)
+            {
+                float timeToImpact = anticipationHit.distance / Mathf.Abs(rb.velocity.y);
+                if (timeToImpact < anticipatedTimeToImpact)
+                {
+                    if (isFalling)
+                    {
+                        if (jumpYPosition - transform.position.y > 15)
+                        {
+                            // Set fall flat animation
+                            animator.SetBool("impact", true);
+                            animator.SetBool("landed", false);
+                            SetMovement(false);
+                        }
+                        else if (jumpYPosition - transform.position.y > 5)
+                        {
+                            // Set minor impact animation
+                            animator.SetBool("impact", false);
+                            animator.SetBool("landed", false);
+                            SetMovement(false);
+                        }
+                        else if (fallYPosition - transform.position.y > 15)
+                        {
+                            animator.SetBool("impact", true);
+                            animator.SetBool("landed", false);
+                            SetMovement(false);
+                        }
+                        else if (fallYPosition - transform.position.y > 5)
+                        {
+                            animator.SetBool("impact", false);
+                            animator.SetBool("landed", false);
+                            SetMovement(false);
+                        }
+                        else
+                        {
+                            animator.SetBool("landed", true);
+                            SetMovement(true);
+                        }
+                        isFalling = false;
+                    }
+                }
+            }
+        }
+
         if (isGrounded && !wasGrounded)
         {
             Debug.Log("Landed");
-            animator.SetTrigger("landed");
-            if (isFalling)
-            {
-                if (jumpYPosition - transform.position.y > 15)
-                {
-                    // Set fall flat animation
-                    animator.SetBool("impact", true);
-                    animator.SetBool("landed", false);
-                    SetMovement(false);
-                }
-                else if (jumpYPosition - transform.position.y > 5)
-                {
-                    // Set minor impact animation
-                    animator.SetBool("impact", false);
-                    animator.SetBool("landed", false);
-                    SetMovement(false);
-                }
-                else if (fallYPosition - transform.position.y > 15)
-                {
-                    animator.SetBool("impact", true);
-                    animator.SetBool("landed", false);
-                    SetMovement(false);
-                }
-                else if (fallYPosition - transform.position.y > 5)
-                {
-                    animator.SetBool("impact", false);
-                    animator.SetBool("landed", false);
-                    SetMovement(false);
-                }
-                else
-                {
-                    animator.SetBool("landed", true);
-                    SetMovement(true);
-                }
-                isFalling = false;
-            }
+            // animator.SetTrigger("landed");
+            
             animator.SetBool("falling", false);
         }
 
@@ -603,12 +629,14 @@ public class Movement : NetworkBehaviour
         if (!isGrounded && rb.velocity.y < 0f && !isFalling && transform.position.y < jumpYPosition)
         {
             animator.SetBool("falling", true);
+            animator.SetBool("landed", false);
             isFalling = true;
         }
         else if (!isGrounded && !isJumping && !isFalling && (fallYPosition - transform.position.y) > 1.5f)
         {
             Debug.Log("SETTING ANIMATION");
             animator.SetBool("falling", true);
+            animator.SetBool("landed", false);
             isFalling = true;
         }
         else if (pushing && isGrounded && canMove)
@@ -629,6 +657,15 @@ public class Movement : NetworkBehaviour
         }
     }
 
+    private void ResetAnimator()
+    {
+        animator.SetBool("pushing", false);
+        animator.SetBool("fast-push", false);
+        animator.SetBool("sprint", false);
+        animator.SetBool("run", false);
+        animator.SetBool("idle", true);
+    }
+
     [ServerRpc(RequireOwnership = false)]
     private void SetAnimatorSpeedServerRpc(float speed, ServerRpcParams serverRpcParams = default)
     {
@@ -646,14 +683,67 @@ public class Movement : NetworkBehaviour
 
     public void AllowMovement()
     {
+        if (!IsOwner) return;
         canMove = true;
         animator.SetBool("impact", false);
         animator.SetBool("landed", true);
         jumpYPosition = -999f;
     }
 
+    public void PlayFootstepSound()
+    {
+        SoundManager.Instance.PlayAtPosition("Footstep", transform.position);
+    }
+
+    public void PlayFallFlatSound()
+    {
+        SoundManager.Instance.PlayAtPosition("FallFlat", transform.position);
+    }
+
+    public void PlayJumpSound()
+    {
+        SoundManager.Instance.PlayAtPosition("Jump", transform.position);
+    }
+
+    public void PlayPlayerLandSound()
+    {
+        SoundManager.Instance.PlayAtPosition("PlayerLand", transform.position);
+    }
+
+    public void PlayGettingUpSound()
+    {
+        SoundManager.Instance.PlayAtPosition("GettingUp", transform.position);
+    }
+
+    [ServerRpc]
+    private void PlayFootstepSoundServerRpc()
+    {
+        PlayFootstepSoundClientRpc();
+    }
+
+    [ClientRpc]
+    private void PlayFootstepSoundClientRpc()
+    {
+        SoundManager.Instance.PlayAtPosition("Footstep", transform.position);
+    }
+
     public void SetMovement(bool move)
     {
         canMove = move;
+    }
+
+    public void GetHit()
+    {
+        if (IsOwner && animator != null) animator.SetTrigger("hit");
+    }
+
+    public void DisableMovement()
+    {
+        canMove = false;
+    }
+
+    public void EnableMovement()
+    {
+        canMove = true;
     }
 }

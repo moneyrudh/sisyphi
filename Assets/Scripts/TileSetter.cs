@@ -112,23 +112,24 @@ public class TileSetter : NetworkBehaviour
         if (!NetworkManager.Singleton.IsServer) return;
         if (SisyphiGameManager.Instance.IsPromptGenerationState())
         {
-            // float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
-            // const float demultiplier = 0.91f;
-            // int count = 0;
-            // int checkPointOffset = 2;
-            // float x = 0, z = 0;
+            float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+            const float demultiplier = 0.91f;
+            int count = 0;
+            int checkPointOffset = 2;
+            float x = 0, z = 0;
         
-            // SisyphiGameManager.Instance.PrintPrompts();
-            // List<string> prompts = SisyphiGameManager.Instance.GetPrompts();
-            // foreach (string s in prompts)
-            // {
-            //     await CallServer(s, x, z, count);
-            //     count += 1;
-            //     z += width * demultiplier * 10;
-            //     z += checkPointOffset * width * demultiplier;
-            // }
+            SisyphiGameManager.Instance.PrintPrompts();
+            List<string> prompts = SisyphiGameManager.Instance.GetPrompts();
+            foreach (string s in prompts)
+            {
+                count += 1;
+                await CallServer(s, x, z, count);
+                z += width * demultiplier * 10;
+                z += checkPointOffset * width * demultiplier;
+            }
             // SisyphiGameManager.Instance.SetCountdownState();
-            SisyphiGameManager.Instance.CinematicCompleteServerRpc();
+            SisyphiGameManager.Instance.StartCinematicServerRpc();
+            // SisyphiGameManager.Instance.CinematicCompleteServerRpc();
         }
     }
 
@@ -377,7 +378,7 @@ public class TileSetter : NetworkBehaviour
     {
         Debug.Log("Setting initial grid");
         float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
-        string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,5,5,5,5,0,0,0],[0,0,0,5,5,5,5,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
+        string response = @"{""tiles"":[[0,0,0,1,0,0,0,0,1,0],[0,1,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,0,1,0,0],[0,0,1,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,1,0],[0,1,0,0,1,0,0,0,0,0],[1,0,0,0,0,0,1,0,0,1],[0,0,1,0,0,0,0,0,0,0],[0,0,0,0,1,0,0,1,0,0]]}";
         int[][] initTiles = JsonConvert.DeserializeObject<ResponseBody>(response).tiles;
         // StartCoroutine(SetTiles(initTiles, initParent, 0, 0 - width * 9));
 

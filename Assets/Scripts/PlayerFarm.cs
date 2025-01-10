@@ -9,6 +9,7 @@ public class PlayerFarm : NetworkBehaviour
     private Movement movement;
     private float farmRange = 0.5f;
     [SerializeField] private LayerMask treeLayer;
+    [SerializeField] private LayerMask playerLayer;
     [SerializeField] private Transform farmPoint;
 
     private bool isFarming = false;
@@ -84,6 +85,20 @@ public class PlayerFarm : NetworkBehaviour
                 DamageTreeServerRpc(tree.GetComponent<NetworkObject>().NetworkObjectId);
             }
         }
+
+        hitColliders = Physics.OverlapSphere(
+            farmPoint.position,
+            farmRange,
+            playerLayer
+        );
+
+        foreach (var hit in hitColliders)
+        {
+            if (hit.CompareTag("Player") && hit.gameObject != gameObject)
+            {
+                hit.GetComponent<Movement>().GetHit();
+            }
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -94,5 +109,10 @@ public class PlayerFarm : NetworkBehaviour
             Debug.Log("Tree Damaged");
             tree.GetComponent<DamageTree>().Damage();
         }
+    }
+
+    public void PlayFarmAnimation()
+    {
+        SoundManager.Instance.PlayAtPosition("TreeChop", transform.position);
     }
 }

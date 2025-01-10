@@ -4,20 +4,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
 
 public class PlayerVisual : MonoBehaviour
 {
     [Header("Renderer References")]
-    [SerializeField] private List<SkinnedMeshRenderer> hairMeshRenderers;
-    [SerializeField] private List<SkinnedMeshRenderer> skinMeshRenderers;
-    [SerializeField] private SkinnedMeshRenderer pantMeshRenderer;
-    [SerializeField] private SkinnedMeshRenderer eyesMeshRenderer;
+    [SerializeField] public List<SkinnedMeshRenderer> hairMeshRenderers;
+    [SerializeField] public List<SkinnedMeshRenderer> skinMeshRenderers;
+    [SerializeField] public SkinnedMeshRenderer pantMeshRenderer;
+    [SerializeField] public SkinnedMeshRenderer eyesMeshRenderer;
 
     [Header("Material References")]
-    [SerializeField] private Material hairMaterial;
-    [SerializeField] private Material skinMaterial;
-    [SerializeField] private Material pantMaterial;
-    [SerializeField] private Material eyesMaterial;
+    [SerializeField] public Material hairMaterial;
+    [SerializeField] public Material skinMaterial;
+    [SerializeField] public Material pantMaterial;
+    [SerializeField] public Material eyesMaterial;
 
     [Header("Material Category Button References")]
     [SerializeField] private Button hairCategoryButton;
@@ -38,26 +39,30 @@ public class PlayerVisual : MonoBehaviour
         _pantMaterial = new Material(pantMeshRenderer.material);
         _eyesMaterial = new Material(eyesMeshRenderer.material);
 
-        hairCategoryButton.onClick.AddListener(() => {
-            ClearButtonInteractions();
-            SisyphiGameMultiplayer.Instance.ChangeCurrentMaterialCategory(MaterialCategory.Hair);
+        if (SceneManager.GetActiveScene().name == Loader.Scene.CharacterScene.ToString())
+        {
+            hairCategoryButton.onClick.AddListener(() => {
+                ClearButtonInteractions();
+                SisyphiGameMultiplayer.Instance.ChangeCurrentMaterialCategory(MaterialCategory.Hair);
+                hairCategoryButton.interactable = false;
+            });
+            skinCategoryButton.onClick.AddListener(() => {
+                ClearButtonInteractions();
+                SisyphiGameMultiplayer.Instance.ChangeCurrentMaterialCategory(MaterialCategory.Skin);
+                skinCategoryButton.interactable = false;
+            });
+            pantCategoryButton.onClick.AddListener(() => {
+                ClearButtonInteractions();
+                SisyphiGameMultiplayer.Instance.ChangeCurrentMaterialCategory(MaterialCategory.Pant);
+                pantCategoryButton.interactable = false;
+            });
+            eyesCategoryButton.onClick.AddListener(() => {
+                ClearButtonInteractions();
+                SisyphiGameMultiplayer.Instance.ChangeCurrentMaterialCategory(MaterialCategory.Eyes);
+                eyesCategoryButton.interactable = false;
+            });
             hairCategoryButton.interactable = false;
-        });
-        skinCategoryButton.onClick.AddListener(() => {
-            ClearButtonInteractions();
-            SisyphiGameMultiplayer.Instance.ChangeCurrentMaterialCategory(MaterialCategory.Skin);
-            skinCategoryButton.interactable = false;
-        });
-        pantCategoryButton.onClick.AddListener(() => {
-            ClearButtonInteractions();
-            SisyphiGameMultiplayer.Instance.ChangeCurrentMaterialCategory(MaterialCategory.Pant);
-            pantCategoryButton.interactable = false;
-        });
-        eyesCategoryButton.onClick.AddListener(() => {
-            ClearButtonInteractions();
-            SisyphiGameMultiplayer.Instance.ChangeCurrentMaterialCategory(MaterialCategory.Eyes);
-            eyesCategoryButton.interactable = false;
-        });
+        }
 
         foreach (SkinnedMeshRenderer skinnedMeshRenderer in hairMeshRenderers)
         {
@@ -71,8 +76,6 @@ public class PlayerVisual : MonoBehaviour
 
         pantMeshRenderer.material = _pantMaterial;
         eyesMeshRenderer.material = _eyesMaterial;
-
-        hairCategoryButton.interactable = false;
     }
 
     public void UpdateMaterials(MaterialCategory category, PlayerData playerData)

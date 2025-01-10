@@ -5,20 +5,21 @@ using TMPro;
 using UnityEngine.UI;
 using Unity.Netcode;
 
-public class EndGame : MonoBehaviour
+public class EndGame : NetworkBehaviour
 {
     [SerializeField] private GameObject EndGameUI;
     [SerializeField] private TMP_Text winText;
     [SerializeField] private Button mainMenuButton;
+    [SerializeField] private Image background;
 
     private void Start()
     {
-        mainMenuButton.onClick.AddListener(() => {
-            NetworkManager.Singleton.Shutdown();
-            Loader.Load(Loader.Scene.MainMenu);
-        });
+        // mainMenuButton.onClick.AddListener(() => {
+        //     NetworkManager.Singleton.Shutdown();
+        //     Loader.Load(Loader.Scene.MainMenu);
+        // });
         Hide();
-
+        if (background != null) background.gameObject.SetActive(false);
         SisyphiGameManager.Instance.GameFinishedEvent += EndGame_OnGameFinished;
     }
 
@@ -29,12 +30,18 @@ public class EndGame : MonoBehaviour
             switch (collider.gameObject.name)
             {
                 case "Boulder_0":
-                    if (SisyphiGameManager.Instance.IsGameOver()) return;
-                    Show("SISYPHUS 1 TAKES THE DUB");
+                    {
+                        if (SisyphiGameManager.Instance.IsGameOver()) return;
+                        PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(0);
+                        ShowServerRpc($"{playerData.playerName.ToString()} TAKES THE DUB");
+                    }
                     break;
                 case "Boulder_1":
-                    if (SisyphiGameManager.Instance.IsGameOver()) return;
-                    Show("SISYPHUS 2 TAKES THE DUB");
+                    {
+                        if (SisyphiGameManager.Instance.IsGameOver()) return;
+                        PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(1);
+                        ShowServerRpc($"{playerData.playerName.ToString()} TAKES THE DUB");
+                    }
                     break;
             }
         }
@@ -42,7 +49,20 @@ public class EndGame : MonoBehaviour
 
     private void EndGame_OnGameFinished(object sender, System.EventArgs e)
     {
-        Show("TIME'S UP, NOBODY WINS");
+        // Show("TIME'S UP, NOBODY WINS");
+    }
+
+    [ServerRpc]
+    private void ShowServerRpc(string message)
+    {
+        ShowClientRpc(message);
+    }
+
+    [ClientRpc]
+    private void ShowClientRpc(string message)
+    {
+        Show(message);
+        SoundManager.Instance.PlayOneShot("Bell");
     }
 
     private void Show(string message)
@@ -52,6 +72,49 @@ public class EndGame : MonoBehaviour
         SisyphiGameManager.Instance.SetGameFinishedServerRpc();
         EndGameUI.SetActive(true);
         winText.text = message;
+
+        StartCoroutine(ChangeScene());
+    }
+
+    private IEnumerator ChangeScene()
+    {
+        yield return new WaitForSeconds(3f);
+
+        background.gameObject.SetActive(true);
+        float elapsedTime = 0;
+        float fadeDuration = 5f;
+
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Lerp(0f, 1f, elapsedTime / fadeDuration);
+            background.color = new Color(0, 0, 0, alpha);
+            yield return null;
+        }
+
+        if (NetworkManager.Singleton.IsServer)
+        {
+            CleanupNetworkObjectsServerRpc();
+            SisyphiGameMultiplayer.Instance.LoadEndSceneServerRpc();
+        }
+        // Loader.Load(Loader.Scene.EndScene);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void CleanupNetworkObjectsServerRpc()
+    {
+        NetworkObject[] networkObjects = FindObjectsOfType<NetworkObject>();
+        foreach (NetworkObject netObj in networkObjects)
+        {
+            if (netObj.gameObject.GetComponent<NetworkManager>() != null ||
+                netObj.gameObject.GetComponent<SisyphiGameMultiplayer>() != null ||
+                netObj.gameObject.GetComponent<NetworkedSoundManager>() != null)
+            {
+                continue;
+            }
+
+            netObj.Despawn();
+        }
     }
 
     private void Hide()
