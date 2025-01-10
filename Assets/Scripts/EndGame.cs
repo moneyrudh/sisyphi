@@ -14,10 +14,11 @@ public class EndGame : NetworkBehaviour
 
     private void Start()
     {
-        // mainMenuButton.onClick.AddListener(() => {
-        //     NetworkManager.Singleton.Shutdown();
-        //     Loader.Load(Loader.Scene.MainMenu);
-        // });
+        mainMenuButton.onClick.AddListener(() => {
+            NetworkManager.Singleton.Shutdown();
+            Loader.Load(Loader.Scene.MainMenu);
+        });
+        mainMenuButton.gameObject.SetActive(false);
         Hide();
         if (background != null) background.gameObject.SetActive(false);
         SisyphiGameManager.Instance.GameFinishedEvent += EndGame_OnGameFinished;
@@ -49,7 +50,8 @@ public class EndGame : NetworkBehaviour
 
     private void EndGame_OnGameFinished(object sender, System.EventArgs e)
     {
-        // Show("TIME'S UP, NOBODY WINS");
+        mainMenuButton.gameObject.SetActive(true);
+        Show("Time's up, nobody wins. Better luck next time.\nAlso, you missed out on the victory scene.", false);
     }
 
     [ServerRpc]
@@ -61,11 +63,11 @@ public class EndGame : NetworkBehaviour
     [ClientRpc]
     private void ShowClientRpc(string message)
     {
-        Show(message);
+        Show(message, true);
         SoundManager.Instance.PlayOneShot("Bell");
     }
 
-    private void Show(string message)
+    private void Show(string message, bool changeScene)
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -73,7 +75,7 @@ public class EndGame : NetworkBehaviour
         EndGameUI.SetActive(true);
         winText.text = message;
 
-        StartCoroutine(ChangeScene());
+        if (changeScene) StartCoroutine(ChangeScene());
     }
 
     private IEnumerator ChangeScene()

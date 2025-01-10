@@ -306,3 +306,23 @@ MonoBehaviour:
     spatialBlend: 1
     mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
     source: {fileID: 0}
+  - name: Mount
+    clip: {fileID: 8300000, guid: 44438233d2d24417a953362821286e00, type: 3}
+    volume: 0.75
+    pitch: 0.75
+    loop: 0
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Boat
+    clip: {fileID: 8300000, guid: bda8372a0dfaf45af88b67b29d891f76, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 0
+    is3D: 1
+    maxDistance: 5
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}

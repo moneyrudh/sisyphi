@@ -60,6 +60,8 @@ public class BoatController : NetworkBehaviour
     private Rigidbody rb;
     private BoulderProperties currentBoulderProperties;
 
+    private bool isSoundPlaying = false;
+
     private void Start()
     {
         currentBoulderProperties = null;
@@ -364,13 +366,51 @@ public class BoatController : NetworkBehaviour
         Vector3 moveDir = transform.forward * moveDirection.y;
         Vector3 desiredPosition = CalculateDesiredPosition(moveDir, currentSpeedMultiplier);
 
-        if (CanMoveToPosition(moveDir))
+        bool canMove = CanMoveToPosition(moveDir);
+        bool shouldPlaySound = moveDirection.y != 0 && canMove;
+
+        if (shouldPlaySound != isSoundPlaying)
+        {
+            if (shouldPlaySound)
+            {
+                StartBoatSoundServerRpc();
+            }
+            else
+            {
+                StopBoatSoundServerRpc();
+            }
+            isSoundPlaying = shouldPlaySound;
+        }
+
+        if (canMove)
         {
             MoveToPosition(desiredPosition);
         }
         else if (IsCollidingWithLayerMask(obstructionTransform, obstructionLayer))
         {
             HandleCollisionResponse(transform.forward);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void StartBoatSoundServerRpc()
+    {
+        CheckExistingSourcesClientRpc();
+        NetworkedSoundManager.Instance.AttachContinuousSoundClientRpc("Boat", new NetworkObjectReference(gameObject));
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void StopBoatSoundServerRpc()
+    {
+        NetworkedSoundManager.Instance.StopContinuousSoundClientRpc(new NetworkObjectReference(gameObject));
+    }
+
+    [ClientRpc]
+    private void CheckExistingSourcesClientRpc()
+    {
+        if (TryGetComponent<AudioSource>(out AudioSource _source))
+        {
+            Destroy(_source);
         }
     }
 

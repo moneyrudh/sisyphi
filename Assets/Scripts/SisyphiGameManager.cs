@@ -174,7 +174,7 @@ public class SisyphiGameManager: NetworkBehaviour
                 }
                 break;
             case State.Playing:
-            gameplayTimer.Value -= Time.deltaTime;
+                gameplayTimer.Value -= Time.deltaTime;
                 if (gameplayTimer.Value < 0)
                 {
                     gameplayTimer.Value = -Mathf.Infinity;

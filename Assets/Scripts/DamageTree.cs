@@ -20,11 +20,20 @@ public class DamageTree : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkDespawn();
         if (IsServer)
         {
             health.Value = maxHealth;
             isDestroyed.Value = false;
         }
+
+        isDestroyed.OnValueChanged += OnIsDestroyedChanged;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        isDestroyed.OnValueChanged -= OnIsDestroyedChanged;
+        base.OnNetworkDespawn();
     }
 
     public void Damage()
@@ -37,7 +46,66 @@ public class DamageTree : NetworkBehaviour
         if (health.Value <= 0)
         {
             isDestroyed.Value = true;
-            OnTreeDestroyed();
+            // OnTreeDestroyed();
+        }
+    }
+
+    private void OnIsDestroyedChanged(bool previousValue, bool newValue)
+    {
+        if (newValue)
+        {
+            HandleTreeDestruction();
+        }
+    }
+
+    private void HandleTreeDestruction()
+    {
+        // Visual effects and sound (runs on all clients)
+        GameObject particlesGO = Instantiate(onDestroyedParticlesGO, 
+            new(transform.position.x, transform.position.y + 2.5f, transform.position.z), 
+            Quaternion.identity);
+        spawnedParticlesGO.Add(particlesGO);
+        Destroy(particlesGO, 5f);
+
+        SoundManager.Instance.PlayAtPosition("TreeBreak", transform.position);
+        SoundManager.Instance.PlayAtPosition("Explosion", transform.position);
+
+        // Only the server spawns logs
+        if (IsServer)
+        {
+            SpawnLogsServerRpc();
+        }
+
+        // Disable trees on all clients
+        GameObject trees = transform.Find("Trees").gameObject;
+        if (trees != null)
+        {
+            trees.SetActive(false);
+        }
+    }
+
+    [ServerRpc]
+    private void SpawnLogsServerRpc()
+    {
+        GameObject trees = transform.Find("Trees").gameObject;
+        if (trees == null) return;
+
+        foreach (Transform child in trees.transform)
+        {
+            LogCount logCount = child.gameObject.GetComponent<LogCount>();
+            int count = logCount.count;
+            int logIndex = count - 1;
+            
+            // Spawn the log as a network object
+            GameObject logPrefab = tileSetter.logs[logIndex].log;
+            GameObject log = Instantiate(logPrefab, child.position, Quaternion.identity);
+            
+            // Add LogCount before spawning
+            log.AddComponent<LogCount>().count = count * 3;
+            
+            // Spawn on network
+            NetworkObject netObj = log.GetComponent<NetworkObject>();
+            netObj.Spawn();
         }
     }
 

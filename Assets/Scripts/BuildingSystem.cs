@@ -739,15 +739,15 @@ public class BuildingSystem : NetworkBehaviour
         switch (currentBuildType)
         {
             case BuildableType.Ramp:
-                if (inventory.wood < 2) return;
+                if (inventory.wood.Value < 2) return;
                 TryPlaceRamp();
                 break;
             case BuildableType.Connector:
-                if (inventory.wood < 1) return;
+                if (inventory.wood.Value < 1) return;
                 TryPlaceConnector();
                 break;
             case BuildableType.Platform:
-                if (inventory.wood < 2) return;
+                if (inventory.wood.Value < 2) return;
                 TryPlacePlatform();
                 break;
         }
