@@ -6619,9 +6619,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Green-FireWood (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5933200330204489864, guid: 123eaecb0dcde6d4e94428d554d1f6c9, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5933200330204489864, guid: 123eaecb0dcde6d4e94428d554d1f6c9, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -826773209
+      objectReference: {fileID: 0}
     - target: {fileID: 5933200330204489865, guid: 123eaecb0dcde6d4e94428d554d1f6c9, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.054
+      objectReference: {fileID: 0}
+    - target: {fileID: 5933200330204489866, guid: 123eaecb0dcde6d4e94428d554d1f6c9, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6701,6 +6713,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Blue-FireWood
       objectReference: {fileID: 0}
+    - target: {fileID: 5987572886911937037, guid: 923791c7c386b014dab87eb63f30018d, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5987572886911937037, guid: 923791c7c386b014dab87eb63f30018d, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -826773209
+      objectReference: {fileID: 0}
+    - target: {fileID: 5987572886911937039, guid: 923791c7c386b014dab87eb63f30018d, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6775,9 +6799,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Green-FireWood
       objectReference: {fileID: 0}
+    - target: {fileID: 5933200330204489864, guid: 123eaecb0dcde6d4e94428d554d1f6c9, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5933200330204489864, guid: 123eaecb0dcde6d4e94428d554d1f6c9, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -826773209
+      objectReference: {fileID: 0}
     - target: {fileID: 5933200330204489865, guid: 123eaecb0dcde6d4e94428d554d1f6c9, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.069
+      objectReference: {fileID: 0}
+    - target: {fileID: 5933200330204489866, guid: 123eaecb0dcde6d4e94428d554d1f6c9, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6852,6 +6888,18 @@ PrefabInstance:
     - target: {fileID: 676028150557829203, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
       propertyPath: m_Name
       value: Purple-FireWood (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2550160821480287818, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2550160821495615114, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2550160821495615114, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -826773209
       objectReference: {fileID: 0}
     - target: {fileID: 6755740205280120797, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
       propertyPath: checkpointIndex
@@ -6931,6 +6979,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple-FireWood
       objectReference: {fileID: 0}
+    - target: {fileID: 2550160821480287818, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2550160821495615114, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2550160821495615114, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -826773209
+      objectReference: {fileID: 0}
     - target: {fileID: 6755740205280120797, guid: effaaa665bce18747b546d1bc5c10965, type: 3}
       propertyPath: checkpointIndex
       value: 6
@@ -6957,9 +7017,21 @@ PrefabInstance:
       propertyPath: checkpointIndex
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 6360420542244127405, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6360420542244127405, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -826773209
+      objectReference: {fileID: 0}
     - target: {fileID: 6360420542244127410, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
       propertyPath: m_LocalPosition.y
       value: -0.021
+      objectReference: {fileID: 0}
+    - target: {fileID: 6360420542244127411, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6360420542703049432, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
       propertyPath: m_LocalScale.x
@@ -7039,9 +7111,21 @@ PrefabInstance:
       propertyPath: checkpointIndex
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6360420542244127405, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6360420542244127405, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -826773209
+      objectReference: {fileID: 0}
     - target: {fileID: 6360420542244127410, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 6360420542244127411, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6360420542703049432, guid: 8fcb9d2d43929c04f8c70c38581418d4, type: 3}
       propertyPath: m_LocalScale.x
@@ -7176,6 +7260,18 @@ PrefabInstance:
     - target: {fileID: 5987572886358014243, guid: 923791c7c386b014dab87eb63f30018d, type: 3}
       propertyPath: m_Name
       value: Blue-FireWood (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5987572886911937037, guid: 923791c7c386b014dab87eb63f30018d, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5987572886911937037, guid: 923791c7c386b014dab87eb63f30018d, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -826773209
+      objectReference: {fileID: 0}
+    - target: {fileID: 5987572886911937039, guid: 923791c7c386b014dab87eb63f30018d, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -238,7 +238,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3db674b1e67845d9ac874a96bdb6983, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSpeedForSound: 0.4
+  minSpeedForSound: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 62409

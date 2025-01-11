@@ -40,7 +40,7 @@ public class BoulderSoundController : NetworkBehaviour
         
         // Check if boulder is grounded using raycast
         RaycastHit hit;
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, out hit, groundCheckDistance, groundLayer);
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, out hit, GetComponent<SphereCollider>().radius, groundLayer);
         
         if (isGrounded != wasGrounded)
         {
@@ -48,7 +48,7 @@ public class BoulderSoundController : NetworkBehaviour
         }
         
         // Determine if the sound should be playing
-        bool shouldPlaySound = isGrounded && horizontalSpeed > minSpeedForSound;
+        bool shouldPlaySound = (isGrounded || wasGrounded) && horizontalSpeed > minSpeedForSound;
         
         if (!wasGrounded && isGrounded)
         {
@@ -79,7 +79,7 @@ public class BoulderSoundController : NetworkBehaviour
     {
         // Visualize the ground check ray
         Gizmos.color = isGrounded ? Color.green : Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * groundCheckDistance);
+        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * GetComponent<SphereCollider>().radius);
     }
 
     [ServerRpc(RequireOwnership = false)]

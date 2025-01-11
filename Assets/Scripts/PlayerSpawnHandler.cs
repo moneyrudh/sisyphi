@@ -42,8 +42,10 @@ public class PlayerSpawnHandler : NetworkBehaviour
     private int playerIndex;
     private GameObject boulder;
     private int currentCheckpoint = -1;
+    private int boulderCheckpoint = -1;
     private CheckpointAction currentCheckpointAction;
     private Vector3 checkpointPosition;
+    private Vector3 boulderCheckpointPosition;
 
     private NetworkVariable<bool> isRespawnCooldown = new NetworkVariable<bool>(false);
     private float respawnCooldownTime = 3f;
@@ -208,6 +210,13 @@ public class PlayerSpawnHandler : NetworkBehaviour
         currentCheckpointAction = checkpointAction;
     }
 
+    public void SetBoulderCheckpoint(int checkpointIndex, Vector3 position)
+    {
+        if (checkpointIndex == boulderCheckpoint) return;
+        boulderCheckpoint = checkpointIndex;
+        boulderCheckpointPosition = position;
+    }
+
     public int GetCurrentCheckpoint()
     {
         return currentCheckpoint;
@@ -249,9 +258,9 @@ public class PlayerSpawnHandler : NetworkBehaviour
         rb.isKinematic = true;
         rb.useGravity = false;
 
-        Vector3 resetPosition = currentCheckpoint == -1 ? 
+        Vector3 resetPosition = boulderCheckpoint == -1 ? 
             spawnPoints[playerIndex] + new Vector3(0, 1f, 4f) :
-            checkpointPosition + new Vector3(0, 3f, 0);
+            boulderCheckpointPosition + new Vector3(0, 3f, 0);
     
         boulder.transform.position = resetPosition;
         boulder.transform.rotation = Quaternion.identity;
@@ -368,5 +377,10 @@ public class PlayerSpawnHandler : NetworkBehaviour
         movement.enabled = active;
         buildingSystem.enabled = active;
         playerFarm.enabled = active;
+    }
+
+    public bool isOwner()
+    {
+        return IsOwner;
     }
 }

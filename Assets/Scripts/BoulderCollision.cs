@@ -18,13 +18,11 @@ public class BoulderCollision : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsServer) return;
+        if (!IsOwner) return;
 
         if (collision.gameObject.CompareTag("Tree"))
         {
-            Debug.Log("TREE HIT AT VELOCITY " + rb.velocity.magnitude);
             float vel = Mathf.Sqrt(Mathf.Pow(rb.velocity.x, 2) + Mathf.Pow(rb.velocity.z, 2));
-            Debug.Log("BOULDER VELOCITY Z + X" + vel);
             switch (GetComponent<BoulderController>().GetBoulderProperties().boulderSize)
             {
                 case BoulderSize.Small:

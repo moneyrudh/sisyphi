@@ -20,9 +20,28 @@ public class CheckpointAction : MonoBehaviour
         if (collider.gameObject.CompareTag("Player"))
         {
             PlayerSpawnHandler spawnHandler = collider.GetComponent<PlayerSpawnHandler>();
-            if (spawnHandler.GetCurrentCheckpoint() == checkpointIndex) return;
-            PlayFireParticles();
-            spawnHandler.SetCheckpoint(this, checkpointIndex, transform.position);
+            if (spawnHandler.isOwner())
+            {
+                if (spawnHandler.GetCurrentCheckpoint() == checkpointIndex) return;
+                PlayFireParticles();
+                spawnHandler.SetCheckpoint(this, checkpointIndex, transform.position);
+            }
+        }
+        if (collider.gameObject.CompareTag("Boulder"))
+        {
+            NetworkObject networkObject = collider.GetComponent<NetworkObject>();
+            if (networkObject != null)
+            {
+                PlayerSpawnHandler[] players = FindObjectsOfType<PlayerSpawnHandler>();
+                foreach (PlayerSpawnHandler player in players)
+                {
+                    if (player.OwnerClientId == networkObject.OwnerClientId)
+                    {
+                        player.SetBoulderCheckpoint(checkpointIndex, transform.position);
+                        break;
+                    }
+                }
+            }
         }
     }
 
