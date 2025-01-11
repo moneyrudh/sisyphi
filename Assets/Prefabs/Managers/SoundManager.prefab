@@ -326,3 +326,13 @@ MonoBehaviour:
     spatialBlend: 1
     mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
     source: {fileID: 0}
+  - name: Fire
+    clip: {fileID: 8300000, guid: db711488d673c410487b245fff23a6e7, type: 3}
+    volume: 0.75
+    pitch: 1
+    loop: 1
+    is3D: 1
+    maxDistance: 5
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}

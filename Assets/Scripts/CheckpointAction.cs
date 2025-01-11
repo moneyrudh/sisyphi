@@ -7,6 +7,7 @@ public class CheckpointAction : MonoBehaviour
 {
     [SerializeField] private ParticleSystem fireParticles;
     [SerializeField] private int checkpointIndex;
+    AudioSource audioSource;
 
     public event System.Action<CheckpointAction, int, Vector3> OnCheckpointTriggered;
 
@@ -47,11 +48,17 @@ public class CheckpointAction : MonoBehaviour
 
     public void StopFireParticles()
     {
+        if (audioSource != null) SoundManager.Instance.DetachSound(audioSource);
         fireParticles.Stop();
     }
 
     private void PlayFireParticles()
     {
+        if (audioSource != null)
+        {
+            Destroy(audioSource);
+        }
         fireParticles.Play();
+        audioSource = SoundManager.Instance.AttachSound("Fire", gameObject);
     }
 }
