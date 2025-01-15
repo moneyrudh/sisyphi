@@ -24,6 +24,7 @@ public class PlayerInventory : NetworkBehaviour
         {
             wood.Value = 0;
         }
+        if (IsOwner) PlayerHUD.Instance.SetWood(wood.Value);
     }
 
     public void AddWood(int amount)
@@ -80,6 +81,7 @@ public class PlayerInventory : NetworkBehaviour
                 CollectWoodServerRpc(netObj.NetworkObjectId, count);
             }
             // StartCoroutine(ProcessWood(count, collision.gameObject));
+            PlayerHUD.Instance.SetWood(wood.Value);
             collecting = false;
         }
     }

@@ -22,11 +22,13 @@ public class CustomButtonBehaviour : MonoBehaviour, IPointerDownHandler, IPointe
     {
         buttonImage.sprite = pressedSprite;
         buttonText.alignment = TextAlignmentOptions.Bottom;
+        SoundManager.Instance.PlayOneShot("Hover");
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         buttonImage.sprite = normalSprite;
         buttonText.alignment = TextAlignmentOptions.Center;
+        SoundManager.Instance.PlayOneShot("TurnOffSystem");
     }
 }

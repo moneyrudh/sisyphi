@@ -101,6 +101,7 @@ public class BoulderSkillSystem : NetworkBehaviour
             if (!skillEnabled.Value && Time.time >= skillCooldownEndTime.Value)
             {
                 SetSkillEnabledServerRpc(true);
+                PlayerHUD.Instance.HandleUsedSkill(false);
             }
         }
     }
@@ -204,6 +205,7 @@ public class BoulderSkillSystem : NetworkBehaviour
 
         SetSkillCooldownServerRpc(Time.time + skillCooldownDuration);
         SetSkillEnabledServerRpc(false);
+        PlayerHUD.Instance.HandleUsedSkill(true);
     }
 
     [ServerRpc(RequireOwnership = false)]

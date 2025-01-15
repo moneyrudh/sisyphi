@@ -8,14 +8,14 @@ public class PauseMenu : MonoBehaviour
 {
     [SerializeField] private Button quitButton;
     [SerializeField] private GameObject pauseMenuGO;
+    [SerializeField] private GameObject quitConfirmationGO;
 
     private bool isPauseMenuOpen;
 
     private void Start()
     {
         quitButton.onClick.AddListener(() => {
-            NetworkManager.Singleton.Shutdown();
-            Loader.Load(Loader.Scene.MainMenu);
+            quitConfirmationGO.SetActive(true);
         });
 
         isPauseMenuOpen = false;

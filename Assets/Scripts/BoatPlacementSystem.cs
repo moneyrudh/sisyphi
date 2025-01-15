@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using System.Linq;
+using System.Linq.Expressions;
 
 public class BoatPlacementSystem : NetworkBehaviour
 {
@@ -81,11 +82,11 @@ public class BoatPlacementSystem : NetworkBehaviour
             placeBoatConfirm.action.started -= HandleBoatConfirm;
         }
 
-        if (removeBoatAction != null)
-        {
-            removeBoatAction.action.Disable();
-            removeBoatAction.action.started -= HandleBoatRemoval;
-        }
+        // if (removeBoatAction != null)
+        // {
+        //     removeBoatAction.action.Disable();
+        //     removeBoatAction.action.started -= HandleBoatRemoval;
+        // }
     }
 
     private void EnableInputs()
@@ -103,11 +104,11 @@ public class BoatPlacementSystem : NetworkBehaviour
             placeBoatConfirm.action.started += HandleBoatConfirm;
         }
 
-        if (removeBoatAction != null)
-        {
-            removeBoatAction.action.Enable();
-            removeBoatAction.action.started += HandleBoatRemoval;
-        }
+        // if (removeBoatAction != null)
+        // {
+        //     removeBoatAction.action.Enable();
+        //     removeBoatAction.action.started += HandleBoatRemoval;
+        // }
     }
 
     private void DisableInputs()
@@ -125,11 +126,11 @@ public class BoatPlacementSystem : NetworkBehaviour
             placeBoatConfirm.action.started -= HandleBoatConfirm;
         }
 
-        if (removeBoatAction != null)
-        {
-            removeBoatAction.action.Disable();
-            removeBoatAction.action.started -= HandleBoatRemoval;
-        }
+        // if (removeBoatAction != null)
+        // {
+        //     removeBoatAction.action.Disable();
+        //     removeBoatAction.action.started -= HandleBoatRemoval;
+        // }
     }
 
     private void OnHasPlacedBoatChanged(bool previousValue, bool newValue)
@@ -350,6 +351,7 @@ public class BoatPlacementSystem : NetworkBehaviour
         inPlacementMode = !inPlacementMode;
         Debug.Log($"Placement mode toggled to {inPlacementMode} for client {OwnerClientId}");
         OnPlacementModeChanged?.Invoke(inPlacementMode);
+        PlayerHUD.Instance.HandleBoatToggle(inPlacementMode);
         
         if (!inPlacementMode)
         {
@@ -491,6 +493,7 @@ public class BoatPlacementSystem : NetworkBehaviour
             if (IsOwner)
             {
                 DisablePlacementMode();
+                PlayerHUD.Instance.HandleBoatHUD(true);
             }
             SoundManager.Instance.PlayAtPosition("BoatOn", placedBoat.transform.position);
         }

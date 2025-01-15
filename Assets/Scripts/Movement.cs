@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
+using Unity.VisualScripting;
 
 public class Movement : NetworkBehaviour
 {
@@ -74,10 +75,8 @@ public class Movement : NetworkBehaviour
     public void Movement_OnGameFinished(object sender, System.EventArgs e)
     {
         canMove = false;
-        pushing = false;
-        ResetAnimator();
-        movement.action.Disable();
-        jump.action.started -= Jump;
+        // pushing = false;
+        // ResetAnimator();
     }
 
     public override void OnNetworkSpawn()
@@ -745,5 +744,12 @@ public class Movement : NetworkBehaviour
     public void EnableMovement()
     {
         canMove = true;
+    }
+
+    private void OnDestroy()
+    {
+        SisyphiGameManager.Instance.GameFinishedEvent -= Movement_OnGameFinished;
+        if (movement != null) movement.action.Disable();
+        if (jump != null) jump.action.started -= Jump;
     }
 }

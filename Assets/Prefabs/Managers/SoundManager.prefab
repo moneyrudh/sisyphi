@@ -332,6 +332,16 @@ MonoBehaviour:
     pitch: 1
     loop: 1
     is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Toggle
+    clip: {fileID: 8300000, guid: b7d421d5eadcb4647b8222bed4801a92, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 0
     maxDistance: 5
     spatialBlend: 1
     mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}

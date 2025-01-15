@@ -40,7 +40,7 @@ public class BoulderSoundController : NetworkBehaviour
         
         // Check if boulder is grounded using raycast
         RaycastHit hit;
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, out hit, GetComponent<SphereCollider>().radius, groundLayer);
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, out hit, GetComponent<SphereCollider>().radius * 1.2f, groundLayer);
         
         if (isGrounded != wasGrounded)
         {

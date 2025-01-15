@@ -5,13 +5,22 @@ using UnityEngine.UI;
 
 public class MainMenuUI : MonoBehaviour
 {
+    [Header("Main Menu")]
     [SerializeField] private Button playButton;
+    [SerializeField] private Button settingsButton;
     [SerializeField] private Button quitButton;
+
+    [Header("Pause Menu")]
+    [SerializeField] private GameObject PauseMenuGO;
+    [SerializeField] private Button closeButton;
 
     private void Awake()
     {
         playButton.onClick.AddListener(() => {
             Loader.Load(Loader.Scene.LobbyScene);
+        });
+        settingsButton.onClick.AddListener(() => {
+            PauseMenuGO.SetActive(true);
         });
         quitButton.onClick.AddListener(() => {
             Application.Quit();

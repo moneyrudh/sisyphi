@@ -151,7 +151,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
             if (player.nameTextTransform == null) continue;
 
             // Get the direction from each name text to the current player's camera
-            Vector3 directionToCamera = (playerCamera.transform.position - player.nameTextTransform.position).normalized;
+            Vector3 directionToCamera = (player.nameTextTransform.position - playerCamera.transform.position).normalized;
             
             // Calculate the rotation that would make the text face the camera
             Quaternion targetRotation = Quaternion.LookRotation(-directionToCamera, Vector3.up);

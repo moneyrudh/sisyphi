@@ -69,6 +69,7 @@ public class PlayerFarm : NetworkBehaviour
 
     void CheckHit()
     {
+        movement.SetMovement(false);
         Debug.Log("Checking hit");
         Collider[] hitColliders = Physics.OverlapSphere(
             farmPoint.position,
@@ -99,6 +100,7 @@ public class PlayerFarm : NetworkBehaviour
                 hit.GetComponent<Movement>().GetHit();
             }
         }
+        movement.SetMovement(true);
     }
 
     [ServerRpc(RequireOwnership = false)]

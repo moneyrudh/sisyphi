@@ -9,6 +9,7 @@ public class EndGame : NetworkBehaviour
 {
     [SerializeField] private GameObject EndGameUI;
     [SerializeField] private TMP_Text winText;
+    [SerializeField] private TMP_Text winTextBackground;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Image background;
 
@@ -74,6 +75,7 @@ public class EndGame : NetworkBehaviour
         SisyphiGameManager.Instance.SetGameFinishedServerRpc();
         EndGameUI.SetActive(true);
         winText.text = message;
+        winTextBackground.text = message;
 
         if (changeScene) StartCoroutine(ChangeScene());
     }

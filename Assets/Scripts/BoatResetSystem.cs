@@ -125,6 +125,7 @@ public class BoatResetSystem : NetworkBehaviour
         StartCoroutine(placementSystem.ReinitializePreview());
         SoundManager.Instance.PlayOneShot("PickUpBoat");
         Debug.Log("Boat has been reset. You can now place a new boat.");
+        PlayerHUD.Instance.HandleBoatHUD(false);
     }
 
     [ServerRpc]

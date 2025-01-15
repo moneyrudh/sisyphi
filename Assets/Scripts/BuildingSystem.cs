@@ -179,21 +179,21 @@ public class BuildingSystem : NetworkBehaviour
     {
         if (!IsOwner || playerCamera == null) return;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SetBuildType(BuildableType.Ramp);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SetBuildType(BuildableType.Connector);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SetBuildType(BuildableType.Platform);
-        }
-
         if (inBuildMode)
         {
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                SetBuildType(BuildableType.Ramp);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                SetBuildType(BuildableType.Connector);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                SetBuildType(BuildableType.Platform);
+            }
+
             HandleMouseDetection();
 
             if (Input.GetKeyDown(KeyCode.R))
@@ -209,6 +209,7 @@ public class BuildingSystem : NetworkBehaviour
         {
             currentBuildType = type;
             UpdateBuildPreview();
+            SoundManager.Instance.PlayOneShot("Toggle");
         }
     }
 
@@ -227,12 +228,15 @@ public class BuildingSystem : NetworkBehaviour
         {
             case BuildableType.Ramp:
                 prefabToSpawn = rampGhostPrefab;
+                PlayerHUD.Instance.HandleBuildableToggle(0);
                 break;
             case BuildableType.Connector:
                 prefabToSpawn = connectorGhostPrefab;
+                PlayerHUD.Instance.HandleBuildableToggle(1);
                 break;
             case BuildableType.Platform:
                 prefabToSpawn = platformGhostPrefab;
+                PlayerHUD.Instance.HandleBuildableToggle(2);
                 break;
         }
 
@@ -965,6 +969,18 @@ public class BuildingSystem : NetworkBehaviour
 
         inBuildMode = !inBuildMode;
         OnBuildModeChanged?.Invoke(inBuildMode);
+        switch (currentBuildType)
+        {
+            case BuildableType.Ramp:
+                PlayerHUD.Instance.HandleBuildToggle(inBuildMode, 0);
+                break;
+            case BuildableType.Connector:
+                PlayerHUD.Instance.HandleBuildToggle(inBuildMode, 1);
+                break;
+            case BuildableType.Platform:
+                PlayerHUD.Instance.HandleBuildToggle(inBuildMode, 2);
+                break;
+        }
 
         if (!inBuildMode)
         {

@@ -1597,8 +1597,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Player Name
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9f0a0059308cc41e3948322a72ebb299, type: 2}
+  m_sharedMaterial: {fileID: 2122897221469429247, guid: 9f0a0059308cc41e3948322a72ebb299, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1622,8 +1622,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.12
-  m_fontSizeBase: 0.12
+  m_fontSize: 0.14
+  m_fontSizeBase: 0.14
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1632,13 +1632,13 @@ MonoBehaviour:
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
-  m_characterSpacing: 0
+  m_characterSpacing: -10
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -4758,7 +4758,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7094120f24b4806bb2dad40565d3de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wood: 0
+  wood:
+    m_InternalValue: 0
 --- !u!114 &5899198299220735642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4811,7 +4812,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 971a29e621157473d9796c427364211e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resetBoatAction: {fileID: -7415950866107471503, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
+  resetBoatAction: {fileID: 4470123054780279601, guid: 1bec52005fdab47cb8759d0f26f8792d, type: 3}
   removeCheckRadius: 2
   removalObstructionLayer:
     serializedVersion: 2

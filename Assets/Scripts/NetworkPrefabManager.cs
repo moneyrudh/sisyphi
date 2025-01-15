@@ -10,9 +10,23 @@ using Unity.Netcode;
 
 public class NetworkPrefabManager : MonoBehaviour
 {
+    public static NetworkPrefabManager Instance { get; private set; }
     [SerializeField] private NetworkManager networkManager;
     [SerializeField] NetworkPrefabsList networkPrefabsList;
     [SerializeField] private GameObject[] prefabs;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
+
+    private void Start()
+    {
+        AddPrefabsToNetworkManager();
+    }
 
     #if UNITY_EDITOR
     public void LogAllPrefabHashes()

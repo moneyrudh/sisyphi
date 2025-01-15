@@ -101,13 +101,22 @@ public class DamageTree : NetworkBehaviour
             GameObject log = Instantiate(logPrefab, child.position, Quaternion.identity);
             
             // Add LogCount before spawning
-            log.AddComponent<LogCount>().count = count * 3;
             
             // Spawn on network
             NetworkObject netObj = log.GetComponent<NetworkObject>();
             netObj.Spawn();
+
+            AddLogCountClientRpc(new NetworkObjectReference(log), count);
         }
     }
+
+    [ClientRpc]
+    private void AddLogCountClientRpc(NetworkObjectReference logRef, int count)
+    {
+        if (!logRef.TryGet(out NetworkObject logObj)) return;
+
+        logObj.gameObject.AddComponent<LogCount>().count = count * 3;
+    } 
 
     private void OnTreeDestroyed()
     {

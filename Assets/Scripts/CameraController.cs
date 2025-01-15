@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
+using System.Text.Json.Serialization;
 
 public class CameraController : NetworkBehaviour
 {
@@ -16,6 +17,10 @@ public class CameraController : NetworkBehaviour
     public float maxVerticalAngle = 45f;
     public float rotationSpeed = 2f;
     public Vector3 offset = new Vector3(0f, 2f, 0f);
+
+    [Header("Sensitivity")]
+    public float mouseSensitivityMultiplier = 1f;
+    private float currentSensitivity = 1f;
 
     [Header("Smoothing")]
     public float positionSmoothTime = 0.1f;
@@ -136,8 +141,8 @@ public class CameraController : NetworkBehaviour
         // float mouseX = mouseInput.x * rotationSpeed;
         // float mouseY = mouseInput.y * rotationSpeed;
 
-        currentHorizontalAngle += mouseInput.x * rotationSpeed;
-        currentVerticalAngle -= mouseInput.y * rotationSpeed;
+        currentHorizontalAngle += mouseInput.x * rotationSpeed * currentSensitivity;
+        currentVerticalAngle -= mouseInput.y * rotationSpeed * currentSensitivity;
         currentVerticalAngle = Mathf.Clamp(currentVerticalAngle, minVerticalAngle, maxVerticalAngle);
 
         Vector3 targetPosition = transform.position + offset;
@@ -167,5 +172,10 @@ public class CameraController : NetworkBehaviour
     public Quaternion GetCameraRotation()
     {
         return Quaternion.Euler(0, currentHorizontalAngle, 0);
+    }
+
+    public void UpdateSensitivity(float sensitivity)
+    {
+        currentSensitivity = sensitivity * mouseSensitivityMultiplier;
     }
 }
