@@ -46,6 +46,7 @@ public class SisyphiGameManager: NetworkBehaviour
 
     private void Start()
     {
+        SoundManager.Instance.Stop("Theme");
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -274,6 +275,11 @@ public class SisyphiGameManager: NetworkBehaviour
     public float GetCountdownTimer()
     {
         return countdownTimer.Value;
+    }
+
+    public float GetGameplayTimer()
+    {
+        return gameplayTimer.Value;
     }
 
     public void SetCountdownState()

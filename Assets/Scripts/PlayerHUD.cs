@@ -37,6 +37,11 @@ public class PlayerHUD : MonoBehaviour
     [SerializeField] private Color normalColor;
     [SerializeField] private Color buildableNormalColor;
 
+    [Header("Gameplay Timer")]
+    [SerializeField] private TMP_Text gameTimer;
+    [SerializeField] private Color gameTimerLateColor;
+    private bool gameTimerColorSet = false;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -49,6 +54,21 @@ public class PlayerHUD : MonoBehaviour
         HandleBoatHUD(false);
         HandleBuildToggle(false, 0);
         Hide();
+    }
+
+    private void Update()
+    {
+        float seconds = SisyphiGameManager.Instance.GetGameplayTimer();
+        seconds = Mathf.Max(seconds, 0);
+        float minutes = Mathf.Floor(seconds / 60f);
+        int secondsRounded = (int) Mathf.Ceil(seconds);
+        int minutesRounded = (int) minutes;
+        gameTimer.text = $"{minutesRounded}:{secondsRounded}";
+        if (!gameTimerColorSet && minutes == 0)
+        {
+            gameTimer.color = gameTimerLateColor;
+            gameTimerColorSet = true;
+        }        
     }
 
     private void PlayerHUD_OnStateChanged(object sender, System.EventArgs e)

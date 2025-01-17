@@ -12,6 +12,7 @@ public class EndGame : NetworkBehaviour
     [SerializeField] private TMP_Text winTextBackground;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Image background;
+    private NetworkVariable<bool> isGameOver = new NetworkVariable<bool>(false);
 
     private void Start()
     {
@@ -27,6 +28,7 @@ public class EndGame : NetworkBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
+        if (isGameOver.Value) return;
         if (collider.gameObject.CompareTag("Boulder"))
         {
             switch (collider.gameObject.name)
@@ -35,6 +37,7 @@ public class EndGame : NetworkBehaviour
                     {
                         if (SisyphiGameManager.Instance.IsGameOver()) return;
                         PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(0);
+                        SetGameOverServerRpc();
                         ShowServerRpc($"{playerData.playerName.ToString()} TAKES THE DUB");
                     }
                     break;
@@ -42,6 +45,7 @@ public class EndGame : NetworkBehaviour
                     {
                         if (SisyphiGameManager.Instance.IsGameOver()) return;
                         PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(1);
+                        SetGameOverServerRpc();
                         ShowServerRpc($"{playerData.playerName.ToString()} TAKES THE DUB");
                     }
                     break;
@@ -49,8 +53,16 @@ public class EndGame : NetworkBehaviour
         }
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void SetGameOverServerRpc()
+    {
+        isGameOver.Value = true;
+    }
+
     private void EndGame_OnGameFinished(object sender, System.EventArgs e)
     {
+        if (isGameOver.Value) return;
+        SetGameOverServerRpc();
         mainMenuButton.gameObject.SetActive(true);
         Show("Time's up, nobody wins. Better luck next time.\nAlso, you missed out on the victory scene.", false);
     }

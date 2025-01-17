@@ -56,16 +56,6 @@ MonoBehaviour:
     spatialBlend: 1
     mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
     source: {fileID: 0}
-  - name: Theme
-    clip: {fileID: 8300000, guid: c8c0780d0340b497e889b5a126a4b561, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 1
-    is3D: 0
-    maxDistance: 15
-    spatialBlend: 1
-    mixerGroup: {fileID: 1198073000552039611, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
-    source: {fileID: 0}
   - name: Footstep
     clip: {fileID: 8300000, guid: c17e6d655911249449497123310b613e, type: 3}
     volume: 0.75
@@ -345,4 +335,34 @@ MonoBehaviour:
     maxDistance: 5
     spatialBlend: 1
     mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Sisyphi
+    clip: {fileID: 8300000, guid: 249cc245ba85f450dbb872a76e6c312f, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    is3D: 0
+    maxDistance: 5
+    spatialBlend: 1
+    mixerGroup: {fileID: 1198073000552039611, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Ocean
+    clip: {fileID: 8300000, guid: 28b6779be42a543ed95e3c6eec024f54, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    is3D: 1
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Theme
+    clip: {fileID: 8300000, guid: a6df17645653f4923a318c69432e3656, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: 1198073000552039611, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
     source: {fileID: 0}

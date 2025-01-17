@@ -37,6 +37,7 @@ public class FirstPrompt : MonoBehaviour
     {
         if (SisyphiGameManager.Instance.IsFirstPrompt())
         {
+            SoundManager.Instance.Play("Sisyphi");
             Show();
         }
         if (SisyphiGameManager.Instance.IsSecondPrompt())

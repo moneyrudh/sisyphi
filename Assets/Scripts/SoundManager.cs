@@ -59,6 +59,11 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        Play("Theme");
+    }
+
     private void InitializeSounds()
     {
         soundDictionary = new Dictionary<string, Sound>();
