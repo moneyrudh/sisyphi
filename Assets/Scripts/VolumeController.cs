@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class VolumeController : MonoBehaviour
@@ -15,9 +16,18 @@ public class VolumeController : MonoBehaviour
         musicVolumeSlider.onValueChanged.AddListener(HandleMusicVolumeChanged);
         SFXVolumeSlider.onValueChanged.AddListener(HandleSFXVolumeChanged);
 
-        masterVolumeSlider.value = 1f;
-        musicVolumeSlider.value = 1f;
-        SFXVolumeSlider.value = 1f;
+        if (SceneManager.GetActiveScene().name == Loader.Scene.MainMenu.ToString())
+        {
+            masterVolumeSlider.value = 1f;
+            musicVolumeSlider.value = 1f;
+            SFXVolumeSlider.value = 1f;
+        }
+        else
+        {
+            masterVolumeSlider.value = SoundManager.Instance.GetMasterVolume();
+            musicVolumeSlider.value = SoundManager.Instance.GetMusicVolume();
+            SFXVolumeSlider.value = SoundManager.Instance.GetSFXVolume();
+        }
     }
 
     private void HandleMasterVolumeChanged(float volume)

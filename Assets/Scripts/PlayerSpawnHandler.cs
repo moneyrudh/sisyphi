@@ -128,11 +128,11 @@ public class PlayerSpawnHandler : NetworkBehaviour
             TryRespawnBoulder();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             TryRespawnPlayer();
         }
-        if (Input.GetKeyDown(KeyCode.Alpha9))
+        if (Input.GetKeyDown(KeyCode.T))
         {
             TryRespawnBoulder();
         }

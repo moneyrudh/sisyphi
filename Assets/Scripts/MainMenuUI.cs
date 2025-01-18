@@ -26,10 +26,14 @@ public class MainMenuUI : MonoBehaviour
             Application.Quit();
         });
 
+        closeButton.onClick.AddListener(() => {
+            Hide();
+        });
         Time.timeScale = 1f;
     }
-
-    private void Start()
+    
+    private void Hide()
     {
+        PauseMenuGO.SetActive(false);
     }
 }

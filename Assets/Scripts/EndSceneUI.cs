@@ -13,10 +13,14 @@ public class EndSceneUI : MonoBehaviour
         mainMenuButton.onClick.AddListener(() => {
             NetworkManager.Singleton.Shutdown();
             Loader.Load(Loader.Scene.MainMenu);
+            SoundManager.Instance.StopAll();
+            SoundManager.Instance.Play("Theme");
         });
 
         mainMenuButton.gameObject.SetActive(false);
         StartCoroutine(PlayEndSequence());
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
     
     private IEnumerator PlayEndSequence()
@@ -32,7 +36,6 @@ public class EndSceneUI : MonoBehaviour
             yield return null;
         }
 
-        SoundManager.Instance.PlayOneShot("Victory");
         yield return new WaitForSeconds(7f);
 
         mainMenuButton.gameObject.SetActive(true);

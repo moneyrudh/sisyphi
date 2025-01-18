@@ -75,6 +75,7 @@ public class Movement : NetworkBehaviour
     public void Movement_OnGameFinished(object sender, System.EventArgs e)
     {
         canMove = false;
+        animator.speed = 1;
         // pushing = false;
         // ResetAnimator();
     }
@@ -117,8 +118,8 @@ public class Movement : NetworkBehaviour
 
     void Update()
     {
-        if (SisyphiGameManager.Instance.IsGameOver()) return;
-        if (!SisyphiGameManager.Instance.IsGamePlaying()) return;
+        // if (SisyphiGameManager.Instance.IsGameOver()) return;
+        // if (!SisyphiGameManager.Instance.IsGamePlaying()) return;
         
         if (IsOwner)
         {
@@ -222,27 +223,27 @@ public class Movement : NetworkBehaviour
             Debug.Log("HIT! Object: " + hit.collider.name);
         }
 
-        bool boulderBlocked = Physics.Raycast(
-            boulderCheck.position,
-            direction,
-            out hit,
-            boulderCollisionDistance,
-            boulderLayer,
-            QueryTriggerInteraction.Ignore
-        );
+        // bool boulderBlocked = Physics.Raycast(
+        //     boulderCheck.position,
+        //     direction,
+        //     out hit,
+        //     boulderCollisionDistance,
+        //     boulderLayer,
+        //     QueryTriggerInteraction.Ignore
+        // );
 
-        if (boulderBlocked)
-        {
-            Debug.Log("BOULDER HIT");
-        }
+        // if (boulderBlocked)
+        // {
+        //     Debug.Log("BOULDER HIT");
+        // }
         
-        DrawSphereCast(
-            boulderCheck.position,
-            direction,
-            boulderCheckRadius,
-            boulderCollisionDistance,
-            boulderBlocked ? Color.red : Color.green
-        );
+        // DrawSphereCast(
+        //     boulderCheck.position,
+        //     direction,
+        //     boulderCheckRadius,
+        //     boulderCollisionDistance,
+        //     boulderBlocked ? Color.red : Color.green
+        // );
         
         DrawSphereCast(
             headCheck.position,
@@ -260,7 +261,7 @@ public class Movement : NetworkBehaviour
             0.5f
         );
 
-        return !headBlocked && !groundBlocked && !boulderBlocked;
+        return !headBlocked && !groundBlocked;
     }
 
     private bool CanRotateInDirection(Vector3 direction)

@@ -17,7 +17,7 @@ public class PreviewTriggerHandler : MonoBehaviour
         buildingSystem = system;
         buildableObject = buildable;
         triggerCollider = GetComponent<BoxCollider>();
-        CreateDebugLines();
+        // CreateDebugLines();
     }
 
     private void CreateDebugLines()
@@ -79,7 +79,7 @@ public class PreviewTriggerHandler : MonoBehaviour
             transform.parent.rotation
         );
 
-        UpdateDebugBox(center, halfExtents, transform.parent.rotation);
+        // UpdateDebugBox(center, halfExtents, transform.parent.rotation);
 
         bool hasValidCollision = false;
         Collider validCollider = null;
@@ -117,7 +117,7 @@ public class PreviewTriggerHandler : MonoBehaviour
         Vector3 center = transform.TransformPoint(triggerCollider.center);
         Vector3 halfExtents = Vector3.Scale(triggerCollider.size * 0.5f, transform.lossyScale);
         
-        UpdateDebugBox(center, halfExtents, transform.rotation);
+        // UpdateDebugBox(center, halfExtents, transform.rotation);
         
         Collider[] hitColliders = Physics.OverlapBox(center, halfExtents, transform.rotation);
         

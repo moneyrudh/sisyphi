@@ -237,14 +237,14 @@ MonoBehaviour:
     mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
     source: {fileID: 0}
   - name: Victory
-    clip: {fileID: 8300000, guid: 5a10c5a1901e54434a01fa9d36eeb5dd, type: 3}
+    clip: {fileID: 8300000, guid: 582f2ac9061ae4194bf373c5ded1c1fd, type: 3}
     volume: 1
     pitch: 1
     loop: 0
     is3D: 0
     maxDistance: 15
     spatialBlend: 1
-    mixerGroup: {fileID: -5240452653931735231, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    mixerGroup: {fileID: 1198073000552039611, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
     source: {fileID: 0}
   - name: BoulderLarge
     clip: {fileID: 8300000, guid: 5d7a7d6571e87480095e4d7a0ea5009b, type: 3}
@@ -358,6 +358,26 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Theme
     clip: {fileID: 8300000, guid: a6df17645653f4923a318c69432e3656, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: 1198073000552039611, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Loss
+    clip: {fileID: 8300000, guid: 61c81d69104ed4eb4a7074d66f350bba, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    is3D: 0
+    maxDistance: 15
+    spatialBlend: 1
+    mixerGroup: {fileID: 1198073000552039611, guid: 89e6886b3134345dfbe7ff42bd26eb67, type: 2}
+    source: {fileID: 0}
+  - name: Prompt
+    clip: {fileID: 8300000, guid: d9250c8f0be7e4d6d86007a8974de476, type: 3}
     volume: 1
     pitch: 1
     loop: 1

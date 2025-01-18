@@ -20,12 +20,13 @@ public class EndGameScene : NetworkBehaviour
     void Start()
     {
         SetSkybox();
+
+        if (NetworkManager.Singleton.IsServer) animationIndex.Value = UnityEngine.Random.Range(0, 4);
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void SetSkyboxServerRpc()
     {
-        animationIndex.Value = UnityEngine.Random.Range(0, 3);
         SetSkyboxClientRpc();
     }
 
@@ -55,6 +56,17 @@ public class EndGameScene : NetworkBehaviour
                 RenderSettings.fogDensity = skyboxMaterial.density;
             }
             break;
+        }
+        Debug.Log("Winner client id: " + SisyphiGameMultiplayer.Instance.GetWinnerClientId());
+        if (SisyphiGameMultiplayer.Instance.IsLocalPlayerWinner())
+        {
+            Debug.Log("Local player is the WINNER");
+            SoundManager.Instance.Play("Victory");
+        }
+        else
+        {
+            Debug.Log("Local player is NOT the WINNER");
+            SoundManager.Instance.Play("Loss");
         }
     }
 

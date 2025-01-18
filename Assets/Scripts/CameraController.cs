@@ -4,6 +4,8 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using System.Text.Json.Serialization;
+using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.PlayerLoop;
 
 public class CameraController : NetworkBehaviour
 {
@@ -11,6 +13,7 @@ public class CameraController : NetworkBehaviour
     public InputActionReference mouseLook;
 
     [Header("Camera Settings")]
+    private LayerMask postProcessingLayer;
     public float distance = 5f;
     public float heightOffset = 1.5f;
     public float minVerticalAngle = -20f;
@@ -64,18 +67,27 @@ public class CameraController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        GameObject cam = new GameObject($"PlayerCamera_{OwnerClientId}");
-        playerCamera = cam.AddComponent<Camera>();
-        if (Camera.main != null) playerCamera.CopyFrom(Camera.main);
-
-        // Vector3 targetPosition = transform.position + offset;
-        // playerCamera.transform.position = targetPosition - playerCamera.transform.forward * distance;
-
-        if (Camera.main != null) Camera.main.gameObject.SetActive(false);
+        // GameObject cam = new GameObject($"PlayerCamera_{OwnerClientId}");
+        playerCamera = Camera.main;
+        playerCamera.gameObject.name = $"PlayerCamera_{OwnerClientId}";
+        // if (Camera.main != null) 
+        // {
+        //     playerCamera.CopyFrom(Camera.main);
+        //     var mainCamPostProcessLayer = Camera.main.GetComponent<UnityEngine.Rendering.PostProcessing.PostProcessLayer>();
+        //     if (mainCamPostProcessLayer != null)
+        //     {
+        //         var postProcessLayer = cam.AddComponent<UnityEngine.Rendering.PostProcessing.PostProcessLayer>();
+        //         postProcessLayer.volumeLayer = postProcessingLayer;
+        //         postProcessLayer.volumeTrigger = cam.transform;
+        //         postProcessLayer.antialiasingMode = mainCamPostProcessLayer.antialiasingMode;
+        //         cam.layer = LayerMask.NameToLayer("PostProcessing");
+        //         Camera.main.gameObject.SetActive(false);
+        //     }
+        // } 
 
         playerCamera.transform.position = cinematicPointA.position;
         playerCamera.transform.rotation = cinematicPointA.rotation;
-        cam.AddComponent<AudioListener>();
+        playerCamera.gameObject.AddComponent<AudioListener>();
         Debug.Log("ALREADY SET BRUH");
         targetCameraDistance = distance;
     }

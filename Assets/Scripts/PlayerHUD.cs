@@ -60,15 +60,26 @@ public class PlayerHUD : MonoBehaviour
     {
         float seconds = SisyphiGameManager.Instance.GetGameplayTimer();
         seconds = Mathf.Max(seconds, 0);
-        float minutes = Mathf.Floor(seconds / 60f);
-        int secondsRounded = (int) Mathf.Ceil(seconds);
-        int minutesRounded = (int) minutes;
-        gameTimer.text = $"{minutesRounded}:{secondsRounded}";
-        if (!gameTimerColorSet && minutes == 0)
+        if (seconds == 0)
         {
-            gameTimer.color = gameTimerLateColor;
-            gameTimerColorSet = true;
-        }        
+            gameTimer.text = "00:00";
+        }
+        else
+        {
+            float minutes = Mathf.Floor(seconds / 60f);
+            if (seconds == Mathf.Floor(seconds))
+            {
+                Debug.Log("TOTAL SECONDS: " + seconds);
+            }
+            int secondsRounded = (int) Mathf.Ceil(seconds % 60);
+            int minutesRounded = (int) minutes;
+            gameTimer.text = $"{(minutesRounded > 9 ? minutesRounded : "0" + minutesRounded )}:{(secondsRounded > 9 ? secondsRounded : "0" + secondsRounded)}";
+            if (!gameTimerColorSet && minutes == 0)
+            {
+                gameTimer.color = gameTimerLateColor;
+                gameTimerColorSet = true;
+            }        
+        }
     }
 
     private void PlayerHUD_OnStateChanged(object sender, System.EventArgs e)

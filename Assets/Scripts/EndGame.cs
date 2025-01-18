@@ -24,6 +24,7 @@ public class EndGame : NetworkBehaviour
         Hide();
         if (background != null) background.gameObject.SetActive(false);
         SisyphiGameManager.Instance.GameFinishedEvent += EndGame_OnGameFinished;
+        // SisyphiGameManager.Instance.OnStateChanged += EndGame_OnGameFinished;
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -37,6 +38,7 @@ public class EndGame : NetworkBehaviour
                     {
                         if (SisyphiGameManager.Instance.IsGameOver()) return;
                         PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(0);
+                        SisyphiGameMultiplayer.Instance.SetWinnerClientIdServerRpc(playerData.clientId);
                         SetGameOverServerRpc();
                         ShowServerRpc($"{playerData.playerName.ToString()} TAKES THE DUB");
                     }
@@ -45,6 +47,7 @@ public class EndGame : NetworkBehaviour
                     {
                         if (SisyphiGameManager.Instance.IsGameOver()) return;
                         PlayerData playerData = SisyphiGameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(1);
+                        SisyphiGameMultiplayer.Instance.SetWinnerClientIdServerRpc(playerData.clientId);
                         SetGameOverServerRpc();
                         ShowServerRpc($"{playerData.playerName.ToString()} TAKES THE DUB");
                     }
@@ -61,13 +64,12 @@ public class EndGame : NetworkBehaviour
 
     private void EndGame_OnGameFinished(object sender, System.EventArgs e)
     {
-        if (isGameOver.Value) return;
-        SetGameOverServerRpc();
+        Debug.Log("TIME UP BUDDY");
         mainMenuButton.gameObject.SetActive(true);
         Show("Time's up, nobody wins. Better luck next time.\nAlso, you missed out on the victory scene.", false);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void ShowServerRpc(string message)
     {
         ShowClientRpc(message);
@@ -77,17 +79,19 @@ public class EndGame : NetworkBehaviour
     private void ShowClientRpc(string message)
     {
         Show(message, true);
-        SoundManager.Instance.PlayOneShot("Bell");
     }
 
     private void Show(string message, bool changeScene)
     {
+        SoundManager.Instance.Stop("Sisyphi");
+        SoundManager.Instance.PlayOneShot("Bell");
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         SisyphiGameManager.Instance.SetGameFinishedServerRpc();
         EndGameUI.SetActive(true);
         winText.text = message;
         winTextBackground.text = message;
+        SetGameOverServerRpc();
 
         if (changeScene) StartCoroutine(ChangeScene());
     }

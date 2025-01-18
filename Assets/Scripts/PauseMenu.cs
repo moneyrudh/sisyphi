@@ -24,6 +24,7 @@ public class PauseMenu : MonoBehaviour
 
     private void Update()
     {
+        if (!SisyphiGameManager.Instance.IsGamePlaying()) return;
         if (!isPauseMenuOpen && Input.GetKeyDown(KeyCode.Escape))
         {
             isPauseMenuOpen = true;

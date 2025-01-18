@@ -21,7 +21,7 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
 {
     public const int PLAYER_COUNT = 2;
     private const string PLAYER_PREFS_NAME_MULTIPLAYER = "PlayerNameMultiplayer";
-    private NetworkVariable<int> skyboxIndex = new NetworkVariable<int>(0);
+    private NetworkVariable<int> skyboxIndex = new NetworkVariable<int>(1);
     private NetworkList<PlayerData> playerDataNetworkList;
     [SerializeField] private List<Color> playerColors;
     [SerializeField] private List<Material> boulderMaterials;
@@ -35,7 +35,8 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     public event EventHandler OnMaterialCategoryNetworkListChanged;
 
     private string playerName;
-    private int winnerPlayerIndex = -1;
+    private NetworkVariable<int> winnerPlayerIndex = new NetworkVariable<int>(-1);
+    private NetworkVariable<ulong> winnerClientId = new NetworkVariable<ulong>();
 
     private void Awake() {
         Instance = this;
@@ -366,19 +367,36 @@ public class SisyphiGameMultiplayer : NetworkBehaviour
     //     }
     // }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void SetWinnerClientIdServerRpc(ulong clientId)
+    {
+        winnerClientId.Value = clientId;
+        SetWinnerIndex(GetPlayerDataIndexFromClientId(clientId));
+    }
+
+    public ulong GetWinnerClientId()
+    {
+        return winnerClientId.Value;
+    }
+
     public void SetWinnerIndex(int index)
     {
-        winnerPlayerIndex = index;
+        winnerPlayerIndex.Value = index;
     }
 
     private int GetNonWinnerIndex()
     {
-        return winnerPlayerIndex == 0 ? 1 : 0;
+        return winnerPlayerIndex.Value == 0 ? 1 : 0;
     }
 
     public int GetWinnerIndexFromPlayerIndex(int index)
     {
-        return index == 0 ? winnerPlayerIndex : GetNonWinnerIndex();
+        return index == 0 ? winnerPlayerIndex.Value : GetNonWinnerIndex();
+    }
+
+    public bool IsLocalPlayerWinner()
+    {
+        return winnerClientId.Value == NetworkManager.Singleton.LocalClientId;
     }
 
     [ServerRpc(RequireOwnership = false)]

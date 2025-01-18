@@ -37,6 +37,8 @@ public class CountdownUI : MonoBehaviour
         }
         if (SisyphiGameManager.Instance.IsGamePlaying())
         {
+            SoundManager.Instance.Stop("Prompt");
+            SoundManager.Instance.Play("Sisyphi");
             countdownText.gameObject.SetActive(false);
             Hide();
         }

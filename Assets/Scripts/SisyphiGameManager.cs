@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using UnityEngine.SceneManagement;
+using Unity.VisualScripting;
 
 public class SisyphiGameManager: NetworkBehaviour 
 {
@@ -18,7 +19,7 @@ public class SisyphiGameManager: NetworkBehaviour
     private const float timerDuration = 4f;
     private NetworkVariable<int> cinematicCompletionCount = new NetworkVariable<int>(0);
     private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(timerDuration);
-    private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(600f);
+    private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(60f);
 
     public event EventHandler GameFinishedEvent;
     public NetworkVariable<bool> gameOver = new NetworkVariable<bool>(false);
@@ -179,11 +180,11 @@ public class SisyphiGameManager: NetworkBehaviour
                 if (gameplayTimer.Value < 0)
                 {
                     gameplayTimer.Value = -Mathf.Infinity;
+                    GameFinishedEventClientRpc();
                     SetGameFinishedServerRpc();
                 }
                 break;
             case State.Finished:
-                GameFinishedEvent?.Invoke(this, EventArgs.Empty);
                 break;
         }
     }
@@ -199,8 +200,16 @@ public class SisyphiGameManager: NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SetGameFinishedServerRpc()
     {
+        Debug.Log("GAME OVER");
         state.Value = State.Finished;
         gameOver.Value = true;
+    }
+
+    [ClientRpc]
+    private void GameFinishedEventClientRpc()
+    {
+        Debug.Log("Calling Game Finished Event");
+        GameFinishedEvent?.Invoke(this, EventArgs.Empty);
     }
 
     [ServerRpc(RequireOwnership = false)]

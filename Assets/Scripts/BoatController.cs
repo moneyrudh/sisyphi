@@ -396,7 +396,7 @@ public class BoatController : NetworkBehaviour
     private void StartBoatSoundServerRpc()
     {
         CheckExistingSourcesClientRpc();
-        NetworkedSoundManager.Instance.AttachContinuousSoundClientRpc("Boat", new NetworkObjectReference(gameObject));
+        NetworkedSoundManager.Instance.AttachContinuousSoundClientRpc("Ocean", new NetworkObjectReference(gameObject));
     }
 
     [ServerRpc(RequireOwnership = false)]

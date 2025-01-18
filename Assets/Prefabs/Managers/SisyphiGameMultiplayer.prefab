@@ -88,20 +88,20 @@ MonoBehaviour:
   - {fileID: 2100000, guid: de817775c8d1142c1aca61456e9a5841, type: 2}
   skyboxMaterialList:
   - material: {fileID: 2100000, guid: e80041794f487438c86875ca1f6a50ab, type: 2}
-    fogColor: {r: 0.33333334, g: 0.16470589, b: 0.4, a: 0}
-    fogMode: 2
+    fogColor: {r: 0.5765323, g: 0.36445355, b: 0.6603774, a: 1}
+    fogMode: 1
     startDistance: 0
-    endDistance: 60
+    endDistance: 500
     density: 0.02
   - material: {fileID: 2100000, guid: b2c0069f85b67499e85bb2b9ecbfdaff, type: 2}
-    fogColor: {r: 1, g: 0.43137255, b: 0.24313726, a: 0}
-    fogMode: 2
+    fogColor: {r: 0.4, g: 0.79607844, b: 1, a: 1}
+    fogMode: 1
     startDistance: 0
-    endDistance: 70
+    endDistance: 500
     density: 0.02
   - material: {fileID: 2100000, guid: 4d3d863937ae2436d8ee99fbb12dbcc1, type: 2}
-    fogColor: {r: 0.78431374, g: 0.21176471, b: 0.5882353, a: 0}
-    fogMode: 2
-    startDistance: -10
-    endDistance: 100
+    fogColor: {r: 0.78431374, g: 0.21176471, b: 0.5882353, a: 1}
+    fogMode: 1
+    startDistance: 0
+    endDistance: 500
     density: 0.02

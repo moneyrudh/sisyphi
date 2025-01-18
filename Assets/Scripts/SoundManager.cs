@@ -231,6 +231,15 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public bool IsPlaying(string soundName)
+    {
+        if (soundDictionary.TryGetValue(soundName, out Sound sound))
+        {
+            if (sound.source.isPlaying) return true;
+        }
+        return false;
+    }
+
     public void StopAll()
     {
         foreach (var sound in soundDictionary.Values)
@@ -252,6 +261,33 @@ public class SoundManager : MonoBehaviour
     public void SetMasterVolume(float volume)
     {
         SetVolume(MASTER_VOLUME, volume);
+    }
+
+    public float GetMusicVolume()
+    {
+        if (audioMixer.GetFloat(MUSIC_VOLUME, out float value))
+        {
+            return Mathf.InverseLerp(MIN_VOLUME, MAX_VOLUME, value);
+        }
+        return 0f;
+    }
+
+    public float GetSFXVolume()
+    {
+        if (audioMixer.GetFloat(SFX_VOLUME, out float value))
+        {
+            return Mathf.InverseLerp(MIN_VOLUME, MAX_VOLUME, value);
+        }
+        return 0f;
+    }
+
+    public float GetMasterVolume()
+    {
+        if (audioMixer.GetFloat(MASTER_VOLUME, out float value))
+        {
+            return Mathf.InverseLerp(MIN_VOLUME, MAX_VOLUME, value);
+        }
+        return 0f;
     }
 
     private void SetVolume(string parameter, float normalizedVolume)

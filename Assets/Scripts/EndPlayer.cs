@@ -17,8 +17,8 @@ public class EndPlayer : MonoBehaviour
 
     void Start()
     {
-        SetPlayerColor();
         finalPlayerIndex = SisyphiGameMultiplayer.Instance.GetWinnerIndexFromPlayerIndex(playerIndex);
+        SetPlayerColor();
     }
 
     public void SetPlayerColor()

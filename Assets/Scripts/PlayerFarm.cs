@@ -69,6 +69,7 @@ public class PlayerFarm : NetworkBehaviour
 
     void CheckHit()
     {
+        if (!IsOwner) return;
         movement.SetMovement(false);
         Debug.Log("Checking hit");
         Collider[] hitColliders = Physics.OverlapSphere(

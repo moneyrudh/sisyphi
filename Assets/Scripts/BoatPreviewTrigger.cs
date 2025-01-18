@@ -23,7 +23,7 @@ public class BoatPreviewTrigger : MonoBehaviour
         triggerCollider = GetComponent<BoxCollider>();
         waterLayer = system.waterLayer;
         originalExtents = triggerCollider.size * 1.4f; // Store the original size
-        CreateDebugLines();
+        // CreateDebugLines();
     }
     
     private void CreateDebugLines()
@@ -52,7 +52,7 @@ public class BoatPreviewTrigger : MonoBehaviour
         if (placementSystem == null) return;
 
         ValidatePlacement();
-        UpdateDebugVisualization();
+        // UpdateDebugVisualization();
     }
 
     private void ValidatePlacement()

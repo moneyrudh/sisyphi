@@ -28,6 +28,6 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
-        // SoundManager.Instance.Play("Theme");
+        if (!SoundManager.Instance.IsPlaying("Theme")) SoundManager.Instance.Play("Theme");
     }
 }
