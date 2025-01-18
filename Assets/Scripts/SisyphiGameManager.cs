@@ -16,10 +16,10 @@ public class SisyphiGameManager: NetworkBehaviour
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private Dictionary<ulong, bool> playerReadyDictionary;
     private NetworkVariable<NetworkPromptArray> prompts = new NetworkVariable<NetworkPromptArray>(new NetworkPromptArray(4));
-    private const float timerDuration = 4f;
+    private const float timerDuration = 30f;
     private NetworkVariable<int> cinematicCompletionCount = new NetworkVariable<int>(0);
     private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(timerDuration);
-    private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(60f);
+    private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(900f);
 
     public event EventHandler GameFinishedEvent;
     public NetworkVariable<bool> gameOver = new NetworkVariable<bool>(false);
