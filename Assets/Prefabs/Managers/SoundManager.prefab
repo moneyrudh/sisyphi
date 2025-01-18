@@ -368,7 +368,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Loss
     clip: {fileID: 8300000, guid: 61c81d69104ed4eb4a7074d66f350bba, type: 3}
-    volume: 1
+    volume: 0.75
     pitch: 1
     loop: 1
     is3D: 0
@@ -378,7 +378,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Prompt
     clip: {fileID: 8300000, guid: d9250c8f0be7e4d6d86007a8974de476, type: 3}
-    volume: 1
+    volume: 0.5
     pitch: 1
     loop: 1
     is3D: 0
