@@ -37,6 +37,8 @@ public class SecondPrompt : MonoBehaviour
         if (SisyphiGameManager.Instance.IsSecondPrompt())
         {
             Show();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
         if (SisyphiGameManager.Instance.IsPromptGenerationState())
         {

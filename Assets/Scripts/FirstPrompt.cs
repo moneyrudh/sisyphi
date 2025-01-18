@@ -39,6 +39,8 @@ public class FirstPrompt : MonoBehaviour
         {
             SoundManager.Instance.Play("Prompt");
             Show();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
         if (SisyphiGameManager.Instance.IsSecondPrompt())
         {

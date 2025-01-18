@@ -28,7 +28,6 @@ public class NetworkPrefabManager : MonoBehaviour
         AddPrefabsToNetworkManager();
     }
 
-    #if UNITY_EDITOR
     public void LogAllPrefabHashes()
     {
         foreach (GameObject prefab in prefabs)
@@ -84,7 +83,6 @@ public class NetworkPrefabManager : MonoBehaviour
             }
         }
 
-        EditorUtility.SetDirty(networkManager);
+        // EditorUtility.SetDirty(networkManager);
     }
-    #endif
 }

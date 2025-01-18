@@ -84,11 +84,11 @@ public class PlayerSpawnHandler : NetworkBehaviour
             SetInitialPosition();
             SisyphiGameManager.Instance.SetPlayerJoinedServerRpc();
             SpawnBoulderServerRpc();
-            SetPlayerColor();
             GetComponent<BoulderSkillSystem>().InitializeBoulderSkillSystemServerRpc();
 
             StartCoroutine(WaitForOtherPlayerCoroutine());
         }
+        SetPlayerColor();
     }
 
     private IEnumerator WaitForOtherPlayerCoroutine()
@@ -320,14 +320,12 @@ public class PlayerSpawnHandler : NetworkBehaviour
     [ClientRpc]
     private void AssignBoulderClientRpc(ulong clientId, NetworkObjectReference boulderRef, int index)
     {
-        if (OwnerClientId == clientId)
+        if (boulderRef.TryGet(out NetworkObject boulderNetObj))
         {
-            if (boulderRef.TryGet(out NetworkObject boulderNetObj))
-            {
-                boulder = boulderNetObj.gameObject;
-                boulder.GetComponent<Rigidbody>().isKinematic = true;
-                boulderNetObj.gameObject.name = "Boulder_" + index;
-            }
+            boulder = boulderNetObj.gameObject;
+            boulder.GetComponent<Rigidbody>().isKinematic = true;
+            boulderNetObj.gameObject.name = "Boulder_" + index;
+            SetBoulderMaterial();
         }
     }
 

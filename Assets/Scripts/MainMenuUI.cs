@@ -30,6 +30,7 @@ public class MainMenuUI : MonoBehaviour
             Hide();
         });
         Time.timeScale = 1f;
+        Hide();
     }
     
     private void Hide()

@@ -99,9 +99,25 @@ public class PlayerFarm : NetworkBehaviour
             if (hit.CompareTag("Player") && hit.gameObject != gameObject)
             {
                 hit.GetComponent<Movement>().GetHit();
+                PlayerHitServerRpc(new NetworkObjectReference(hit.GetComponent<NetworkObject>()));
             }
         }
         movement.SetMovement(true);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlayerHitServerRpc(NetworkObjectReference playerRef)
+    {
+        PlayerHitClientRpc(playerRef);
+    }
+
+    [ClientRpc]
+    private void PlayerHitClientRpc(NetworkObjectReference playerRef)
+    {
+        if (playerRef.TryGet(out NetworkObject playerObj))
+        {
+            if (playerObj.IsOwner) playerObj.GetComponent<Movement>().GetHit();
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]

@@ -39,6 +39,8 @@ public class HostDisconnectUI : MonoBehaviour
             disconnectMessage.text = "Player has disconnected!";
             Show();
         }
+        SoundManager.Instance.StopAll();
+        SoundManager.Instance.PlayOneShot("Unforch");
     }
 
     private void NetworkManager_OnServerStopped(bool wasAHost)
