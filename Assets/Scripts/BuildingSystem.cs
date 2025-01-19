@@ -25,6 +25,7 @@ public class BuildingSystem : NetworkBehaviour
     [Header("Preview Materials")]
     public Material validPreviewMaterial;
     public Material invalidPreviewMaterial;
+    public Material noWoodPreviewMaterial;
 
     [Header("Building Settings")]
     public float snapDistance = 1f;
@@ -196,7 +197,7 @@ public class BuildingSystem : NetworkBehaviour
 
             HandleMouseDetection();
 
-            if (Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(KeyCode.C))
             {
                 InvertRampDirection();
             }
@@ -1030,12 +1031,29 @@ public class BuildingSystem : NetworkBehaviour
     private void UpdatePreviewValidity()
     {
         isValidPlacement = overlappingColliders.Count == 0;
-        UpdatePreviewMaterial(isValidPlacement);
+        bool validButNoWood = false;
+
+        if (isValidPlacement)
+        {
+            switch (currentBuildType)
+            {
+                case BuildableType.Ramp:
+                    if (inventory.wood.Value < 2) validButNoWood = true;
+                    break;
+                case BuildableType.Connector:
+                    if (inventory.wood.Value < 1) validButNoWood = true;
+                    break;
+                case BuildableType.Platform:
+                    if (inventory.wood.Value < 2) validButNoWood = true;
+                    break;
+            }
+        }
+        UpdatePreviewMaterial(isValidPlacement, validButNoWood);
     }
 
-    private void UpdatePreviewMaterial(bool isValid)
+    private void UpdatePreviewMaterial(bool isValid, bool validButNoWood = false)
     {
-        Material materialToUse = isValid ? validPreviewMaterial : invalidPreviewMaterial;
+        Material materialToUse = isValid ? (validButNoWood ? noWoodPreviewMaterial : validPreviewMaterial) : invalidPreviewMaterial;
         foreach (Renderer renderer in previewRenderers)
         {
             renderer.material = materialToUse;

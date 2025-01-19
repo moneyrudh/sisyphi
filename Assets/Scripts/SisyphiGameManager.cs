@@ -97,8 +97,8 @@ public class SisyphiGameManager: NetworkBehaviour
         }
 
         StartGameClientRpc();
-        // state.Value = State.Playing;
-        state.Value = State.FirstPrompt;
+        state.Value = State.Playing;
+        // state.Value = State.FirstPrompt;
         // StartCinematicClientRpc();
     }
 

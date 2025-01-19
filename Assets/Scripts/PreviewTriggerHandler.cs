@@ -17,7 +17,7 @@ public class PreviewTriggerHandler : MonoBehaviour
         buildingSystem = system;
         buildableObject = buildable;
         triggerCollider = GetComponent<BoxCollider>();
-        // CreateDebugLines();
+        CreateDebugLines();
     }
 
     private void CreateDebugLines()
@@ -72,21 +72,27 @@ public class PreviewTriggerHandler : MonoBehaviour
             halfExtents.z = temp;
         }
         
-        int hitCount = Physics.OverlapBoxNonAlloc(
+        // int hitCount = Physics.OverlapBoxNonAlloc(
+        //     center,
+        //     halfExtents,
+        //     overlapResults,
+        //     transform.parent.rotation
+        // );
+
+        Collider[] hitColliders = Physics.OverlapBox(
             center,
             halfExtents,
-            overlapResults,
             transform.parent.rotation
         );
 
-        // UpdateDebugBox(center, halfExtents, transform.parent.rotation);
+        UpdateDebugBox(center, halfExtents, transform.parent.rotation);
 
         bool hasValidCollision = false;
         Collider validCollider = null;
 
-        for (int i = 0; i < hitCount; i++)
+        for (int i = 0; i < hitColliders.Length; i++)
         {
-            Collider hitCollider = overlapResults[i];
+            Collider hitCollider = hitColliders[i];
             
             // Skip if it's part of the preview
             if (hitCollider.gameObject.tag == "Rock") continue;
@@ -94,11 +100,14 @@ public class PreviewTriggerHandler : MonoBehaviour
             if (hitCollider.transform.IsChildOf(transform)) continue;
             if (hitCollider.isTrigger) continue;
             // For debugging
-            Debug.Log($"Found collision with: {hitCollider.gameObject.name}");
 
-            hasValidCollision = true;
-            validCollider = hitCollider;
-            overlappingColliders.Add(hitCollider);
+            if (!hitCollider.TryGetComponent<TileEdges>(out _))
+            {
+                hasValidCollision = true;
+                validCollider = hitCollider;
+                overlappingColliders.Add(hitCollider);
+                break;
+            }
         }
 
         // Notify building system of the collision state
@@ -117,7 +126,7 @@ public class PreviewTriggerHandler : MonoBehaviour
         Vector3 center = transform.TransformPoint(triggerCollider.center);
         Vector3 halfExtents = Vector3.Scale(triggerCollider.size * 0.5f, transform.lossyScale);
         
-        // UpdateDebugBox(center, halfExtents, transform.rotation);
+        UpdateDebugBox(center, halfExtents, transform.rotation);
         
         Collider[] hitColliders = Physics.OverlapBox(center, halfExtents, transform.rotation);
         

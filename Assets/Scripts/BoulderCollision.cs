@@ -18,7 +18,7 @@ public class BoulderCollision : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsOwner) return;
+        if (NetworkManager.Singleton.LocalClientId != OwnerClientId) return;
 
         if (collision.gameObject.CompareTag("Tree"))
         {

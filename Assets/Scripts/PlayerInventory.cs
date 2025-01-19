@@ -48,7 +48,11 @@ public class PlayerInventory : NetworkBehaviour
 
     public void RemoveWood(int amount)
     {
-        if (IsOwner) RemoveWoodServerRpc(amount);
+        if (IsOwner) 
+        {
+            RemoveWoodServerRpc(amount);
+            PlayerHUD.Instance.SetWood(wood.Value); 
+        } 
     }
 
     [ServerRpc(RequireOwnership = false)]

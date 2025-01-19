@@ -25,7 +25,7 @@ public class Movement : NetworkBehaviour
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float sprintMultiplier = 1.5f;
-    public float pushSpeed = 1.5f;
+    public float pushSpeed = 2f;
     public float fallingVelocity = -2f;
     public float jumpForce = 5f;
     public float rotationSpeed = 72f;

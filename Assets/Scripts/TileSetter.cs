@@ -112,21 +112,21 @@ public class TileSetter : NetworkBehaviour
         if (!NetworkManager.Singleton.IsServer) return;
         if (SisyphiGameManager.Instance.IsPromptGenerationState())
         {
-            float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
-            const float demultiplier = 0.91f;
-            int count = 0;
-            int checkPointOffset = 2;
-            float x = 0, z = 0;
+            // float width = environmentTileGroups[0].tiles[0].GetComponent<Renderer>().bounds.size.x * sizeMultiplier;
+            // const float demultiplier = 0.91f;
+            // int count = 0;
+            // int checkPointOffset = 2;
+            // float x = 0, z = 0;
         
-            SisyphiGameManager.Instance.PrintPrompts();
-            List<string> prompts = SisyphiGameManager.Instance.GetPrompts();
-            foreach (string s in prompts)
-            {
-                count += 1;
-                await CallServer(s, x, z, count);
-                z += width * demultiplier * 10;
-                z += checkPointOffset * width * demultiplier;
-            }
+            // SisyphiGameManager.Instance.PrintPrompts();
+            // List<string> prompts = SisyphiGameManager.Instance.GetPrompts();
+            // foreach (string s in prompts)
+            // {
+            //     count += 1;
+            //     await CallServer(s, x, z, count);
+            //     z += width * demultiplier * 10;
+            //     z += checkPointOffset * width * demultiplier;
+            // }
             // SisyphiGameManager.Instance.SetCountdownState();
             SisyphiGameManager.Instance.StartCinematicServerRpc();
             // SisyphiGameManager.Instance.CinematicCompleteServerRpc();
