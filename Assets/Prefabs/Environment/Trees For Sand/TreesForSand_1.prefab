@@ -583,7 +583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2980336589
+  GlobalObjectIdHash: 288422531
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -688,6 +688,8 @@ GameObject:
   - component: {fileID: 3230141191596922347}
   - component: {fileID: 4196569277373508207}
   - component: {fileID: 5758168931561793209}
+  - component: {fileID: 2548462043001733512}
+  - component: {fileID: 7073700557928175305}
   m_Layer: 0
   m_Name: Sand Tree_10
   m_TagString: Untagged
@@ -782,6 +784,32 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300104, guid: 45cd0360ea39d4740bde76ad2a1f2b3f, type: 3}
+--- !u!114 &2548462043001733512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2705671112881454464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 1
+--- !u!114 &7073700557928175305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2705671112881454464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &2794586472905650510
 GameObject:
   m_ObjectHideFlags: 0
@@ -1039,6 +1067,8 @@ GameObject:
   - component: {fileID: 2769231141565617231}
   - component: {fileID: 6221630248731174735}
   - component: {fileID: 3999315272538686238}
+  - component: {fileID: 6719736205403370966}
+  - component: {fileID: 5579552338286165636}
   m_Layer: 0
   m_Name: Sand Tree_4
   m_TagString: Untagged
@@ -1133,6 +1163,32 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300050, guid: 45cd0360ea39d4740bde76ad2a1f2b3f, type: 3}
+--- !u!114 &6719736205403370966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5308892304750906148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 1
+--- !u!114 &5579552338286165636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5308892304750906148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &5339285775487607308
 GameObject:
   m_ObjectHideFlags: 0
@@ -1228,6 +1284,8 @@ GameObject:
   - component: {fileID: 7093327145685827657}
   - component: {fileID: 3617538815903267762}
   - component: {fileID: 1546073372781962341}
+  - component: {fileID: 5634847048141941532}
+  - component: {fileID: 754189571163205567}
   m_Layer: 0
   m_Name: Cactus_11
   m_TagString: Untagged
@@ -1322,6 +1380,32 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300160, guid: 45cd0360ea39d4740bde76ad2a1f2b3f, type: 3}
+--- !u!114 &5634847048141941532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5952260253576998645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 3
+--- !u!114 &754189571163205567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5952260253576998645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &6110794521204676488
 GameObject:
   m_ObjectHideFlags: 0
@@ -1706,6 +1790,8 @@ GameObject:
   - component: {fileID: 6530237061159113448}
   - component: {fileID: 5316745723615927014}
   - component: {fileID: 2544082724958506705}
+  - component: {fileID: 3410048725283195484}
+  - component: {fileID: 975037237958452373}
   m_Layer: 0
   m_Name: Cactus_2
   m_TagString: Untagged
@@ -1800,3 +1886,29 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300036, guid: 45cd0360ea39d4740bde76ad2a1f2b3f, type: 3}
+--- !u!114 &3410048725283195484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9194055191642476766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 2
+--- !u!114 &975037237958452373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9194055191642476766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}

@@ -178,7 +178,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Hover
     clip: {fileID: 8300000, guid: a94c4b442c42d418cbb9486761662bb3, type: 3}
-    volume: 1
+    volume: 0.75
     pitch: 1
     loop: 0
     is3D: 0
@@ -228,7 +228,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: TurnOffSystem
     clip: {fileID: 8300000, guid: 240b7fd4b7fb64510803712105a23364, type: 3}
-    volume: 1
+    volume: 0.5
     pitch: 1
     loop: 0
     is3D: 0

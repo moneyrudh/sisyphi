@@ -331,7 +331,7 @@ GameObject:
   - component: {fileID: -6187512072380745620}
   - component: {fileID: 6400847478083580932}
   - component: {fileID: 3742245002829099242}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LogsForGrass_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

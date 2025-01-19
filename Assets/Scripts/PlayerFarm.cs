@@ -98,7 +98,7 @@ public class PlayerFarm : NetworkBehaviour
         {
             if (hit.CompareTag("Player") && hit.gameObject != gameObject)
             {
-                hit.GetComponent<Movement>().GetHit();
+                // hit.GetComponent<Movement>().GetHit();
                 PlayerHitServerRpc(new NetworkObjectReference(hit.GetComponent<NetworkObject>()));
             }
         }

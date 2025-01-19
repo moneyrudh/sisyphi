@@ -350,6 +350,7 @@ public class BuildingSystem : NetworkBehaviour
 
         if (!hitSomething)
         {
+            Debug.Log("NOTHING HIT");
             HideBuildPreview();
             currentTileEdge = null;
             currentBuildableEdge = null;
@@ -362,6 +363,7 @@ public class BuildingSystem : NetworkBehaviour
 
         if (Physics.Raycast(ray, out hit, maxBuildDistance, tileLayer))
         {
+            Debug.Log("HIT TILE: " + hit.collider.name);
             TileEdges tile = hit.collider.GetComponent<TileEdges>();
             if (tile != null && currentBuildType == BuildableType.Ramp)
             {
@@ -664,6 +666,7 @@ public class BuildingSystem : NetworkBehaviour
         }
         else if (closestEdge == null)
         {
+            Debug.Log("COULD NOT FIND CLOSEST EDGE. HIDING PREVIEW.");
             HideBuildPreview();
             currentTileEdge = null;
         }

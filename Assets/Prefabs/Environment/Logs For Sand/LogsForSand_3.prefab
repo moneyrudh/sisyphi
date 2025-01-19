@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 8353451066355189791}
   - component: {fileID: 3709048832257096495}
   - component: {fileID: 7280574985746644613}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LogsForSand_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

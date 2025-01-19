@@ -133,7 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particlesPrefab: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &565668148706482011
 GameObject:
   m_ObjectHideFlags: 0
@@ -931,7 +931,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particlesPrefab: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &3941416293646705140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1372,7 +1372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particlesPrefab: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &6091531248931015883
 GameObject:
   m_ObjectHideFlags: 0
@@ -1506,7 +1506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particlesPrefab: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &7072848524621244168
 GameObject:
   m_ObjectHideFlags: 0
@@ -1519,7 +1519,7 @@ GameObject:
   - component: {fileID: 5408727343310901010}
   - component: {fileID: 4216662075510471168}
   - component: {fileID: 3086856910956898262}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Main_Big_2_1(Clone)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2097,7 +2097,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859cdf6c874824640b0ee665e66fdcd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  onDestroyedParticlesGO: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!65 &-2433532728009692009
 BoxCollider:
   m_ObjectHideFlags: 0

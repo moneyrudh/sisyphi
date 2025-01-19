@@ -363,7 +363,7 @@ GameObject:
   - component: {fileID: -3314862327994735396}
   - component: {fileID: -6037639556550157973}
   - component: {fileID: 2077379077061732368}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LogsForGrass_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}

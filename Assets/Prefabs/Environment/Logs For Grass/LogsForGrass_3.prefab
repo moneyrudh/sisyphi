@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -2253090785843465664}
   - component: {fileID: -5270074830533333682}
   - component: {fileID: 2372747511082372430}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LogsForGrass_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

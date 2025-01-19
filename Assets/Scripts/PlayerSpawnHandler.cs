@@ -231,6 +231,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
             transform.position = spawnPoints[playerIndex];
         }
         else transform.position = checkpointPosition + new Vector3(0, 1.5f, 0);
+        movement.ResetMovement();
         // SyncPositionClientRpc(spawnPoints[playerIndex]);
     }
 

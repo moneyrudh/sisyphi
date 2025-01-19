@@ -57,6 +57,7 @@ public class Movement : NetworkBehaviour
     private bool isFreeFalling;
     private float jumpYPosition;
     private float fallYPosition;
+    private bool beingHit = false;
 
     private NetworkVariable<float> animationSpeed = new NetworkVariable<float>(1f);
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
@@ -78,6 +79,12 @@ public class Movement : NetworkBehaviour
         animator.speed = 1;
         // pushing = false;
         // ResetAnimator();
+    }
+
+    public void ResetMovement()
+    {
+        canMove = true;
+        pushing = false;
     }
 
     public override void OnNetworkSpawn()
@@ -125,7 +132,7 @@ public class Movement : NetworkBehaviour
         {
             moveDirection = movement.action.ReadValue<Vector2>();
             CheckGrounded();
-            UpdateAnimator();
+            if (!beingHit) UpdateAnimator();
             CheckRockProximity();
 
             if (pushing && Input.GetKey(KeyCode.LeftShift))
@@ -626,6 +633,15 @@ public class Movement : NetworkBehaviour
     {
         bool isMoving = moveDirection.magnitude > 0;
 
+        if (SisyphiGameManager.Instance.IsGameOver())
+        {
+            SetAnimatorSpeedServerRpc(1f);
+            animator.SetBool("pushing", false);
+            animator.SetBool("sprint", false);
+            animator.SetBool("run", false);
+            animator.SetBool("idle", true);
+            return;
+        }
         if (!isGrounded && rb.velocity.y < 0f && !isFalling && transform.position.y < jumpYPosition)
         {
             animator.SetBool("falling", true);
@@ -735,6 +751,16 @@ public class Movement : NetworkBehaviour
     public void GetHit()
     {
         if (IsOwner && animator != null) animator.SetTrigger("hit");
+    }
+
+    public void GettingHit()
+    {
+        beingHit = true;
+    }
+
+    public void NotGettingHit()
+    {
+        beingHit = false;
     }
 
     public void DisableMovement()

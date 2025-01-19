@@ -278,7 +278,9 @@ GameObject:
   - component: {fileID: 6729943094402615720}
   - component: {fileID: 5104131076157655456}
   - component: {fileID: 3495065048796595157}
-  - component: {fileID: 466604897028758024}
+  - component: {fileID: 1318820826130154006}
+  - component: {fileID: 561458307451385420}
+  - component: {fileID: 7196182634339835300}
   m_Layer: 0
   m_Name: Palm
   m_TagString: Untagged
@@ -351,8 +353,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &466604897028758024
-MeshCollider:
+--- !u!114 &1318820826130154006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2576385561661214510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 3
+--- !u!136 &561458307451385420
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -369,10 +384,24 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300182, guid: 45cd0360ea39d4740bde76ad2a1f2b3f, type: 3}
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 3.8881226
+  m_Direction: 1
+  m_Center: {x: 0.017982543, y: 1.9440565, z: 0.07134944}
+--- !u!114 &7196182634339835300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2576385561661214510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &2824107637032282102
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,7 +488,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 71506093
+  GlobalObjectIdHash: 3623158603
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -751,7 +780,9 @@ GameObject:
   - component: {fileID: 3277466333409436414}
   - component: {fileID: 7909353796918644163}
   - component: {fileID: 2162493054246165205}
-  - component: {fileID: 5187660975084211202}
+  - component: {fileID: 5363890330351696648}
+  - component: {fileID: 5247766098839298891}
+  - component: {fileID: 7941355269170231622}
   m_Layer: 0
   m_Name: Palm_3
   m_TagString: Untagged
@@ -824,8 +855,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &5187660975084211202
-MeshCollider:
+--- !u!114 &5363890330351696648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3951245394347614436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 3
+--- !u!136 &5247766098839298891
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -842,10 +886,24 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300072, guid: 45cd0360ea39d4740bde76ad2a1f2b3f, type: 3}
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 3.8463454
+  m_Direction: 1
+  m_Center: {x: -0.26, y: 1.923168, z: -0.02}
+--- !u!114 &7941355269170231622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3951245394347614436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &6518030343082661930
 GameObject:
   m_ObjectHideFlags: 0
@@ -1078,7 +1136,9 @@ GameObject:
   - component: {fileID: 6236202761280359057}
   - component: {fileID: 7743877039656591180}
   - component: {fileID: 577673729409606945}
-  - component: {fileID: 7535493512094167949}
+  - component: {fileID: 7157237754540901151}
+  - component: {fileID: 6603765033996362465}
+  - component: {fileID: 4796152559810718367}
   m_Layer: 0
   m_Name: Palm_0
   m_TagString: Untagged
@@ -1151,8 +1211,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7535493512094167949
-MeshCollider:
+--- !u!114 &7157237754540901151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7546857485403012117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145695161a8dc4602a3c28b982c11591, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 3
+--- !u!136 &6603765033996362465
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1169,10 +1242,24 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300184, guid: 45cd0360ea39d4740bde76ad2a1f2b3f, type: 3}
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 3.3386986
+  m_Direction: 1
+  m_Center: {x: -0.14, y: 1.669345, z: 0.01}
+--- !u!114 &4796152559810718367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7546857485403012117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &8104199278562235997
 GameObject:
   m_ObjectHideFlags: 0

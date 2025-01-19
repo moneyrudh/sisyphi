@@ -575,7 +575,7 @@ GameObject:
   - component: {fileID: 2427486558206168856}
   - component: {fileID: -1299550704240067561}
   - component: {fileID: -2196810667963253507}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: GrassyRocks_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -661,7 +661,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 487829899
+  GlobalObjectIdHash: 2742750182
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

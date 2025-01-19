@@ -412,7 +412,7 @@ GameObject:
   - component: {fileID: -2723549430690895918}
   - component: {fileID: -6842098000234629486}
   - component: {fileID: -3701471503942985231}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: SandyRocks_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

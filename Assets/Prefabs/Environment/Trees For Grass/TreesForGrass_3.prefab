@@ -916,7 +916,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particlesPrefab: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &3030809795223715646
 GameObject:
   m_ObjectHideFlags: 0
@@ -1766,7 +1766,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particlesPrefab: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &4674230823311632494
 GameObject:
   m_ObjectHideFlags: 0
@@ -2089,7 +2089,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a855369058984231b167b70cc6d8b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particlesPrefab: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  particlesPrefab: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &4964415045306573649
 GameObject:
   m_ObjectHideFlags: 0
@@ -2102,7 +2102,7 @@ GameObject:
   - component: {fileID: 6792372230292351740}
   - component: {fileID: 4310861765739549953}
   - component: {fileID: 6551536182974242969}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Main_Big_2_2(Clone)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3542,7 +3542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859cdf6c874824640b0ee665e66fdcd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onDestroyedParticlesGO: {fileID: 4914716930404006884, guid: e04a895f3093b4e868bccb0f1dd4a6b6, type: 3}
+  onDestroyedParticlesGO: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!65 &5077444914186417305
 BoxCollider:
   m_ObjectHideFlags: 0
