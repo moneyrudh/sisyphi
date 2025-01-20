@@ -181,7 +181,7 @@ MonoBehaviour:
     boulderSize: 1
     localScale: 1
   - pushingMass: 20
-    boulderSize: 1
+    boulderSize: 2
     localScale: 1.15
 --- !u!114 &643503801212808847
 MonoBehaviour:
