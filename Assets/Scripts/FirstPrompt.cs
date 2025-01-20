@@ -42,7 +42,7 @@ public class FirstPrompt : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
-        if (SisyphiGameManager.Instance.IsSecondPrompt() || SisyphiGameManager.Instance.IsGamePlaying())
+        if (gameObject.activeSelf && (SisyphiGameManager.Instance.IsSecondPrompt() || SisyphiGameManager.Instance.IsGamePlaying()))
         {
             Hide();
         }

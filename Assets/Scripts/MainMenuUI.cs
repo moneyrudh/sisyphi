@@ -8,11 +8,16 @@ public class MainMenuUI : MonoBehaviour
     [Header("Main Menu")]
     [SerializeField] private Button playButton;
     [SerializeField] private Button settingsButton;
+    [SerializeField] private Button howToPlayButton;
     [SerializeField] private Button quitButton;
 
     [Header("Pause Menu")]
     [SerializeField] private GameObject PauseMenuGO;
     [SerializeField] private Button closeButton;
+
+    [Header("How To Play Menu")]
+    [SerializeField] private GameObject HowToPlayGO;
+    [SerializeField] private Button htpCloseButton;
 
     private void Awake()
     {
@@ -22,19 +27,33 @@ public class MainMenuUI : MonoBehaviour
         settingsButton.onClick.AddListener(() => {
             PauseMenuGO.SetActive(true);
         });
+        howToPlayButton.onClick.AddListener(() => {
+            HowToPlayGO.SetActive(true);
+        });
         quitButton.onClick.AddListener(() => {
             Application.Quit();
         });
 
         closeButton.onClick.AddListener(() => {
-            Hide();
+            HideSettings();
         });
+
+        htpCloseButton.onClick.AddListener(() => {
+            HideHTP();
+        });
+
         Time.timeScale = 1f;
-        Hide();
+        HideSettings();
+        HideHTP();
     }
     
-    private void Hide()
+    private void HideSettings()
     {
         PauseMenuGO.SetActive(false);
+    }
+
+    private void HideHTP()
+    {
+        HowToPlayGO.SetActive(false);
     }
 }

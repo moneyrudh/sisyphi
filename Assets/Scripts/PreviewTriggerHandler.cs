@@ -17,7 +17,7 @@ public class PreviewTriggerHandler : MonoBehaviour
         buildingSystem = system;
         buildableObject = buildable;
         triggerCollider = GetComponent<BoxCollider>();
-        CreateDebugLines();
+        // CreateDebugLines();
     }
 
     private void CreateDebugLines()
@@ -60,9 +60,8 @@ public class PreviewTriggerHandler : MonoBehaviour
     {
         Collider previewCollider = GetComponent<Collider>();
         Bounds bounds = previewCollider.bounds;
-        Vector3 center = bounds.center;
-        Vector3 halfExtents = bounds.extents / 1.2f;
-        Debug.Log(transform.parent.rotation);
+        Vector3 center = new Vector3(0, 0.5f, 0) + bounds.center;
+        Vector3 halfExtents = bounds.extents / 1.5f;
 
         float yRotation = transform.parent.rotation.eulerAngles.y;
         if (Mathf.Approximately(yRotation, 90f) || Mathf.Approximately(yRotation, 270f))
@@ -85,7 +84,7 @@ public class PreviewTriggerHandler : MonoBehaviour
             transform.parent.rotation
         );
 
-        UpdateDebugBox(center, halfExtents, transform.parent.rotation);
+        // UpdateDebugBox(center, halfExtents, transform.parent.rotation);
 
         bool hasValidCollision = false;
         Collider validCollider = null;
@@ -113,12 +112,12 @@ public class PreviewTriggerHandler : MonoBehaviour
         // Notify building system of the collision state
         buildingSystem.HandleCollisionEnter(hasValidCollision, validCollider);
 
-        Color color = hasValidCollision ? Color.red : Color.green;
-        foreach (var line in debugLines)
-        {
-            line.startColor = color;
-            line.endColor = color;
-        }
+        // Color color = hasValidCollision ? Color.red : Color.green;
+        // foreach (var line in debugLines)
+        // {
+        //     line.startColor = color;
+        //     line.endColor = color;
+        // }
     }
 
     private void HandleNonRampCollision()
@@ -126,7 +125,7 @@ public class PreviewTriggerHandler : MonoBehaviour
         Vector3 center = transform.TransformPoint(triggerCollider.center);
         Vector3 halfExtents = Vector3.Scale(triggerCollider.size * 0.5f, transform.lossyScale);
         
-        UpdateDebugBox(center, halfExtents, transform.rotation);
+        // UpdateDebugBox(center, halfExtents, transform.rotation);
         
         Collider[] hitColliders = Physics.OverlapBox(center, halfExtents, transform.rotation);
         

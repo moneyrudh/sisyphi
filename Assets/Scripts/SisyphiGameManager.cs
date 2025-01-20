@@ -18,6 +18,7 @@ public class SisyphiGameManager: NetworkBehaviour
     private NetworkVariable<NetworkPromptArray> prompts = new NetworkVariable<NetworkPromptArray>(new NetworkPromptArray(4));
     private const float timerDuration = 30f;
     private NetworkVariable<int> cinematicCompletionCount = new NetworkVariable<int>(0);
+    private NetworkVariable<int> playersReady = new NetworkVariable<int>(0);
     private NetworkVariable<float> countdownTimer = new NetworkVariable<float>(timerDuration);
     private NetworkVariable<float> gameplayTimer = new NetworkVariable<float>(900f);
 
@@ -97,7 +98,7 @@ public class SisyphiGameManager: NetworkBehaviour
         }
 
         StartGameClientRpc();
-        state.Value = State.Playing;
+        // state.Value = State.Playing;
         // state.Value = State.FirstPrompt;
         // StartCinematicClientRpc();
     }
@@ -141,6 +142,10 @@ public class SisyphiGameManager: NetworkBehaviour
         switch (state.Value)
         {
             case State.WaitingToStart:
+                if (playersReady.Value == SisyphiGameMultiplayer.PLAYER_COUNT)
+                {
+                    state.Value = State.FirstPrompt;
+                }
                 break;
             case State.FirstPrompt:
                 countdownTimer.Value -= Time.deltaTime;
@@ -216,6 +221,12 @@ public class SisyphiGameManager: NetworkBehaviour
     public void CinematicCompleteServerRpc(ServerRpcParams serverRpcParams = default)
     {
         cinematicCompletionCount.Value++;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void PlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        playersReady.Value++;
     }
 
     [ServerRpc]

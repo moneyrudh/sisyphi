@@ -197,7 +197,7 @@ public class BuildingSystem : NetworkBehaviour
 
             HandleMouseDetection();
 
-            if (Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKeyDown(KeyCode.X))
             {
                 InvertRampDirection();
             }

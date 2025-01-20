@@ -70,7 +70,6 @@ public class PlayerFarm : NetworkBehaviour
     void CheckHit()
     {
         if (!IsOwner) return;
-        movement.SetMovement(false);
         Debug.Log("Checking hit");
         Collider[] hitColliders = Physics.OverlapSphere(
             farmPoint.position,
@@ -102,7 +101,6 @@ public class PlayerFarm : NetworkBehaviour
                 PlayerHitServerRpc(new NetworkObjectReference(hit.GetComponent<NetworkObject>()));
             }
         }
-        movement.SetMovement(true);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -133,5 +131,15 @@ public class PlayerFarm : NetworkBehaviour
     public void PlayFarmAnimation()
     {
         SoundManager.Instance.PlayAtPosition("TreeChop", transform.position);
+    }
+
+    public void DisableMovement()
+    {
+        movement.SetMovement(false);
+    }
+
+    public void EnableMovement()
+    {
+        movement.SetMovement(true);
     }
 }

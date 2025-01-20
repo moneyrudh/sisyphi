@@ -87,6 +87,7 @@ public class PlayerSpawnHandler : NetworkBehaviour
             GetComponent<BoulderSkillSystem>().InitializeBoulderSkillSystemServerRpc();
 
             StartCoroutine(WaitForOtherPlayerCoroutine());
+            SisyphiGameManager.Instance.PlayerReadyServerRpc();
         }
         SetPlayerColor();
     }

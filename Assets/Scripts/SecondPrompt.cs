@@ -40,7 +40,7 @@ public class SecondPrompt : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
-        if (SisyphiGameManager.Instance.IsPromptGenerationState() || SisyphiGameManager.Instance.IsGamePlaying())
+        if (gameObject.activeSelf && (SisyphiGameManager.Instance.IsPromptGenerationState() || SisyphiGameManager.Instance.IsGamePlaying()))
         {
             Hide();
         }
