@@ -135,11 +135,11 @@ public class PlayerFarm : NetworkBehaviour
 
     public void DisableMovement()
     {
-        movement.SetMovement(false);
+        if (movement != null) movement.SetMovement(false);
     }
 
     public void EnableMovement()
     {
-        movement.SetMovement(true);
+        if (movement != null) movement.SetMovement(true);
     }
 }

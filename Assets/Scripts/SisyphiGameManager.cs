@@ -144,7 +144,7 @@ public class SisyphiGameManager: NetworkBehaviour
             case State.WaitingToStart:
                 if (playersReady.Value == SisyphiGameMultiplayer.PLAYER_COUNT)
                 {
-                    state.Value = State.FirstPrompt;
+                    state.Value = State.Playing;
                 }
                 break;
             case State.FirstPrompt:

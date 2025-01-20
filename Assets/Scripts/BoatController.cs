@@ -321,9 +321,10 @@ public class BoatController : NetworkBehaviour
         float currentSpeedMultiplier = GetCurrentSpeedMultiplier();
         float currentRotationMultiplier = GetCurrentRotationMultiplier();
 
-        if (currentSpeedMultiplier <= 0) return;
 
         if (moveDirection.x != 0) HandleRotation(currentRotationMultiplier);
+        
+        // if (currentSpeedMultiplier <= 0) return;
         if (moveDirection.y != 0) HandleForwardMovement(currentSpeedMultiplier);
 
         if (IsServer || IsHost)
@@ -797,12 +798,14 @@ public class BoatController : NetworkBehaviour
 
     private void UpdateBoulderProperties()
     {
+        Debug.Log($"UpdateBoulderProperties - HasBoulder: {hasBoulder.Value}, CurrentSize: {currentBoulderSize.Value}, IsOwner: {IsOwner}");
         if (!hasBoulder.Value || currentBoulderRef.Value.TryGet(out NetworkObject boulderObj) == false) return;
 
         BoulderController boulderController = boulderObj.GetComponent<BoulderController>();
         if (boulderController != null)
         {
             BoulderSize newSize = boulderController.GetBoulderProperties().boulderSize;
+            Debug.Log($"Boulder Properties - NewSize: {newSize}, CurrentSize: {currentBoulderSize.Value}, BoulderOwner: {boulderObj.OwnerClientId}");
             if (currentBoulderSize.Value != newSize)
             {
                 if (IsServer)
@@ -829,15 +832,15 @@ public class BoatController : NetworkBehaviour
 
         if (other.CompareTag("Boulder"))
         {
-            Debug.Log("TRIGGER ENTERED: " + other.name);
-            hasBoulder.Value = true;
-            NetworkObject boulderNetObj = other.GetComponent<NetworkObject>();
-            if (boulderNetObj != null)
-            {
-                currentBoulderRef.Value = new NetworkObjectReference(boulderNetObj);
-                currentBoulderController = other.GetComponent<BoulderController>();
-                UpdateBoulderSizeClientRpc(currentBoulderController.GetBoulderProperties().boulderSize);
-            }
+            // Debug.Log("TRIGGER ENTERED: " + other.name);
+            // hasBoulder.Value = true;
+            // NetworkObject boulderNetObj = other.GetComponent<NetworkObject>();
+            // if (boulderNetObj != null)
+            // {
+            //     currentBoulderRef.Value = new NetworkObjectReference(boulderNetObj);
+            //     currentBoulderController = other.GetComponent<BoulderController>();
+            //     UpdateBoulderSizeClientRpc(currentBoulderController.GetBoulderProperties().boulderSize);
+            // }
         }
     }
 
@@ -848,11 +851,11 @@ public class BoatController : NetworkBehaviour
         if (!isMounted.Value && other.CompareTag("Boulder"))
         {
             // Debug.Log("TRIGGER EXITED: " + other.name);
-            hasBoulder.Value = false;
-            currentBoulderRef.Value = default;
-            currentBoulderController = null;
-            currentBoulderNetObj = null;
-            UpdateBoulderSizeClientRpc(BoulderSize.Medium);
+            // hasBoulder.Value = false;
+            // currentBoulderRef.Value = default;
+            // currentBoulderController = null;
+            // currentBoulderNetObj = null;
+            // UpdateBoulderSizeClientRpc(BoulderSize.Medium);
         }
     }
 

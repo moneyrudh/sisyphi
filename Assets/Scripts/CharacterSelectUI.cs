@@ -35,6 +35,13 @@ public class CharacterSelectUI : MonoBehaviour
 
         lobbyNameText.text = "Lobby Name: " + lobby.Name;
         lobbyCodeText.text = "Lobby Code: " + lobby.LobbyCode;
+
+        CharacterSelectReady.Instance.PlayersReadyEvent += CharacterSelectUI_OnPlayersReady;
+    }
+
+    private void CharacterSelectUI_OnPlayersReady(bool ready)
+    {
+        readyButton.interactable = false;
     }
 
     private void FixedUpdate()

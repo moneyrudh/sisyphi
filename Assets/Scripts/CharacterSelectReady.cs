@@ -9,6 +9,7 @@ public class CharacterSelectReady : NetworkBehaviour
     public static CharacterSelectReady Instance { get; private set; }
     public event EventHandler OnReadyPlayer;
     private Dictionary<ulong, bool> playerReadyDictionary;
+    public event System.Action<bool> PlayersReadyEvent;
 
     private void Awake()
     {
@@ -89,6 +90,7 @@ public class CharacterSelectReady : NetworkBehaviour
         if (allClientsReady)
         {
             SisyphiGameLobby.Instance.DeleteLobby();
+            PlayersReadyEvent?.Invoke(true);
             Loader.LoadNetwork(Loader.Scene.GameScene);
         }
     }
