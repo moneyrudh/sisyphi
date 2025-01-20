@@ -5745,6 +5745,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3016139223795583900, guid: 202b46a2a23a64cd0b18ce8c7aab2d04, type: 3}
+      propertyPath: priority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3016139223795583900, guid: 202b46a2a23a64cd0b18ce8c7aab2d04, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3977341722371084010, guid: 202b46a2a23a64cd0b18ce8c7aab2d04, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -17723,7 +17731,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 13.1428}
+  m_AnchoredPosition: {x: 0, y: 13.142799}
   m_SizeDelta: {x: 0, y: -26.2855}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1989387423
@@ -18659,7 +18667,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 293331152}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
