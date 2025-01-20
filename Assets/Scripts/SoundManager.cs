@@ -62,7 +62,6 @@ public class SoundManager : MonoBehaviour
     private void Start()
     {
         Play("Theme");
-        SetMasterVolume(0f);
     }
 
     private void InitializeSounds()
