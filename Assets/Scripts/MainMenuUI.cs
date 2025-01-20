@@ -11,6 +11,11 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Button howToPlayButton;
     [SerializeField] private Button quitButton;
 
+    [Header("Cursor Settings")]
+    [SerializeField] private Texture2D cursorTexture;
+    private CursorMode cursorMode = CursorMode.Auto;
+    public Vector2 hotSpot = Vector2.zero;
+
     [Header("Pause Menu")]
     [SerializeField] private GameObject PauseMenuGO;
     [SerializeField] private Button closeButton;
@@ -21,6 +26,8 @@ public class MainMenuUI : MonoBehaviour
 
     private void Awake()
     {
+        Cursor.SetCursor(cursorTexture, hotSpot, cursorMode);
+
         playButton.onClick.AddListener(() => {
             Loader.Load(Loader.Scene.LobbyScene);
         });

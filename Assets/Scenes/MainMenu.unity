@@ -18717,6 +18717,8 @@ MonoBehaviour:
   settingsButton: {fileID: 696208361}
   howToPlayButton: {fileID: 1180727803}
   quitButton: {fileID: 2107265344}
+  cursorTexture: {fileID: 2800000, guid: 5a653700f7d2446148d6c02b560f4b53, type: 3}
+  hotSpot: {x: 0, y: 0}
   PauseMenuGO: {fileID: 1044687817}
   closeButton: {fileID: 765804192}
   HowToPlayGO: {fileID: 520346341}
