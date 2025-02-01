@@ -8,7 +8,7 @@ public class DamageTree : NetworkBehaviour
     [SerializeField] GameObject onDestroyedParticlesGO;
     private List<GameObject> spawnedParticlesGO;
     private TileSetter tileSetter;
-    private int maxHealth = 4;
+    private int maxHealth = 2;
     private NetworkVariable<int> health = new NetworkVariable<int>();
     private NetworkVariable<bool> isDestroyed = new NetworkVariable<bool>();
 

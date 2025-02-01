@@ -31,6 +31,11 @@ public class TileEdges : NetworkBehaviour
     //     InitializeEdges();
     // }
 
+    private void Awake()
+    {
+        InitializeEdges();
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -126,15 +131,49 @@ public class TileEdges : NetworkBehaviour
 
     private void OnDrawGizmos()
     {
-        if (edges == null || edges.Length == 0) return;
+        // if (edges == null || edges.Length == 0) return;
+
+        // Gizmos.color = Color.red;
+        // foreach (var edge in edges)
+        // {
+        //     if (edge != null)
+        //     {
+        //         Gizmos.DrawLine(edge.startPoint, edge.endPoint);
+        //     }
+        // }
+        float tileSize;
+        if (GetComponent<Renderer>() == null) tileSize = 2f * sizeMultiplier * demultiplier;
+        else tileSize = GetComponent<Renderer>().bounds.size.x * sizeMultiplier * demultiplier;
+        float halfSize = tileSize / 4f;
 
         Gizmos.color = Color.red;
-        foreach (var edge in edges)
-        {
-            if (edge != null)
-            {
-                Gizmos.DrawLine(edge.startPoint, edge.endPoint);
-            }
-        }
+        Matrix4x4 originalMatrix = Gizmos.matrix;
+        Gizmos.matrix = transform.localToWorldMatrix;
+
+        // Draw North edge
+        Gizmos.DrawLine(
+            new Vector3(-halfSize, halfSize, halfSize),
+            new Vector3(halfSize, halfSize, halfSize)
+        );
+
+        // Draw East edge
+        Gizmos.DrawLine(
+            new Vector3(halfSize, halfSize, halfSize),
+            new Vector3(halfSize, halfSize, -halfSize)
+        );
+
+        // Draw South edge
+        Gizmos.DrawLine(
+            new Vector3(-halfSize, halfSize, -halfSize),
+            new Vector3(halfSize, halfSize, -halfSize)
+        );
+
+        // Draw West edge
+        Gizmos.DrawLine(
+            new Vector3(-halfSize, halfSize, -halfSize),
+            new Vector3(-halfSize, halfSize, halfSize)
+        );
+
+        Gizmos.matrix = originalMatrix;
     }
 }

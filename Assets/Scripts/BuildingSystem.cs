@@ -49,6 +49,7 @@ public class BuildingSystem : NetworkBehaviour
     public bool inBuildMode = false;
     private Movement movement;
     private PlayerInventory inventory;
+    private bool isZFlipped = false;
 
     [Header("Validity")]
     public bool isValidPlacement = true;
@@ -201,6 +202,11 @@ public class BuildingSystem : NetworkBehaviour
             {
                 InvertRampDirection();
             }
+
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                FlipRampDirection();
+            }
         }
     }
 
@@ -209,6 +215,7 @@ public class BuildingSystem : NetworkBehaviour
         if (currentBuildType != type)
         {
             currentBuildType = type;
+            isZFlipped = false;
             UpdateBuildPreview();
             SoundManager.Instance.PlayOneShot("Toggle");
         }
@@ -552,6 +559,11 @@ public class BuildingSystem : NetworkBehaviour
                 break;
         }
 
+        if (isZFlipped)
+        {
+            buildPreview.transform.Rotate(0, 0, 180f);
+        }
+
         buildPreview.transform.position = edgeWorldPos;
     }
 
@@ -742,6 +754,27 @@ public class BuildingSystem : NetworkBehaviour
         }
     }
 
+    private Quaternion FlipRampRotation(EdgeDirection direction)
+    {
+        switch (direction)
+        {
+            case EdgeDirection.North:
+                currentTileEdge.direction = EdgeDirection.South;
+                return Quaternion.Euler(0, 0, 0);
+            case EdgeDirection.East:
+                currentTileEdge.direction = EdgeDirection.West;
+                return Quaternion.Euler(0, 90, 0);
+            case EdgeDirection.South:
+                currentTileEdge.direction = EdgeDirection.North;
+                return Quaternion.Euler(0, 180, 0);
+            case EdgeDirection.West:
+                currentTileEdge.direction = EdgeDirection.East;
+                return Quaternion.Euler(0, 270, 0);
+            default:
+                return Quaternion.identity;
+        }
+    }
+
     private void TryPlaceBuild()
     {
         switch (currentBuildType)
@@ -830,6 +863,26 @@ public class BuildingSystem : NetworkBehaviour
         Quaternion rotation = InvertRampRotation(currentTileEdge.direction);
         buildPreview.transform.rotation = rotation;
         // UpdateRampPreview(currentTileEdge);
+    }
+
+    private void FlipRampDirection()
+    {
+        // Only allow flipping if we're in ramp mode and have a preview
+        if (buildPreview == null || currentBuildType != BuildableType.Ramp) return;
+
+        // Only allow Z-axis flip when placing on buildable objects
+        if (currentBuildableEdge != null && targetBuildableObject != null)
+        {
+            // Toggle flip state
+            isZFlipped = !isZFlipped;
+            
+            // Get current rotation and add 180 degrees around Z axis if flipped
+            Vector3 currentRotation = buildPreview.transform.rotation.eulerAngles;
+            float zRotation = isZFlipped ? 180f : 0f;
+            
+            // Maintain current X and Y rotation while setting Z rotation
+            buildPreview.transform.rotation = Quaternion.Euler(currentRotation.x, currentRotation.y, zRotation);
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -972,6 +1025,7 @@ public class BuildingSystem : NetworkBehaviour
         }
 
         inBuildMode = !inBuildMode;
+        isZFlipped = false;
         OnBuildModeChanged?.Invoke(inBuildMode);
         switch (currentBuildType)
         {
