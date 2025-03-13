@@ -24,7 +24,17 @@ public class PlayerInventory : NetworkBehaviour
         {
             wood.Value = 0;
         }
+        wood.OnValueChanged += OnWoodValueChanged;
+    
         if (IsOwner) PlayerHUD.Instance.SetWood(wood.Value);
+    }
+
+    private void OnWoodValueChanged(int previousValue, int newValue)
+    {
+        if (IsOwner)
+        {
+            PlayerHUD.Instance.SetWood(newValue);
+        }
     }
 
     public void AddWood(int amount)
@@ -48,11 +58,22 @@ public class PlayerInventory : NetworkBehaviour
 
     public void RemoveWood(int amount)
     {
-        if (IsOwner) 
+        if (IsServer)
         {
+            // If already on server, directly modify the value
+            wood.Value = Mathf.Max(0, wood.Value - amount);
+        }
+        else if (IsOwner)
+        {
+            // If client owner, send RPC to server
             RemoveWoodServerRpc(amount);
-            PlayerHUD.Instance.SetWood(wood.Value); 
-        } 
+        }
+        
+        // Update HUD if owner (regardless of server/client)
+        if (IsOwner)
+        {
+            PlayerHUD.Instance.SetWood(wood.Value);
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -113,5 +134,11 @@ public class PlayerInventory : NetworkBehaviour
     private void OnDisable()
     {
         processedWood.Clear();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        wood.OnValueChanged -= OnWoodValueChanged;
+        base.OnNetworkDespawn();
     }
 }
